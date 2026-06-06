@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Municipio Ibarra - Frontend
 
-## Getting Started
+Sistema interno desarrollado para el Municipio de San Miguel de Ibarra.
 
-First, run the development server:
+## Stack
+- Next.js 16
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Flujo de trabajo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Ramas
+- `main` → producción, siempre estable
+- `develop` → integración, aquí se mergean las features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Reglas (obligatorias)
+- ❌ Nunca hacer push directo a `main` o `develop`
+- ✅ Crear siempre una branch desde `develop`
+- ✅ Abrir un PR hacia `develop` cuando termines una tarea
+- ✅ El PR debe ser aprobado por el líder antes de mergear
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Nomenclatura de branches
+- `feature/nombre-descriptivo`
+- `fix/nombre-del-bug`
+- `chore/nombre`
 
-## Learn More
+## Convenciones de commits
 
-To learn more about Next.js, take a look at the following resources:
+### Formato
+`tipo: descripción corta en minúsculas`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Tipos
+- `feat` → nueva funcionalidad
+- `fix` → corrección de bug
+- `chore` → configuración, dependencias
+- `style` → cambios de estilos
+- `refactor` → refactorización de código
+- `docs` → documentación
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Ejemplos
+- `feat: add login form`
+- `fix: fix password validation`
+- `chore: configure eslint`
+- `style: adjust navbar colors`
+- `refactor: extract auth hook`
+- `docs: update README`
