@@ -18,7 +18,7 @@ Sistema interno desarrollado para el Municipio de San Miguel de Ibarra.
 - ❌ Nunca hacer push directo a `main` o `develop`
 - ✅ Crear siempre una branch desde `develop`
 - ✅ Abrir un PR hacia `develop` cuando termines una tarea
-- ✅ El PR debe ser aprobado por el líder antes de mergear
+- ✅ El PR debe ser aprobado por el equipo antes de mergear
 
 ### Nomenclatura de branches
 - `feature/nombre-descriptivo`
