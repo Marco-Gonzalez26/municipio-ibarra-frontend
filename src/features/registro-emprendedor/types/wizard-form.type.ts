@@ -15,6 +15,7 @@ export interface DatosPersonalesForm {
   numero_casa: string
 
   id_estado_civil: number | null
+  id_rango_edad: number | null
   tiene_discapacidad: boolean
   id_tipo_discapacidad: number | null
   porcentaje_discapacidad: string

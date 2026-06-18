@@ -1,4 +1,3 @@
-
 // Tipo base compartido por la mayoría de catálogos
 // NOTA: el backend es inconsistente en este campo: algunos endpoints devuelven
 // 1/0 (number) y otros true/false (boolean). Se tipa como union para reflejar

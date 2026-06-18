@@ -42,15 +42,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
   const tieneDiscapacidad = watch('tiene_discapacidad')
   const idEtnia = watch('id_etnia')
   const esOtraEtnia = idEtnia === 6
-  console.log({
-    maritalStatus,
-    genders,
-    occupations,
-    ageRanges,
-    ethnicities,
-    educationLevels,
-    disabilityTypes,
-  })
+
   function onSubmit(data: DatosPersonalesForm) {
     updatePersonalData(data)
     onNext()
@@ -208,15 +200,16 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
             </Field>
           )}
         />
+
         <Controller
-          name="fecha_nacimiento"
+          name="id_rango_edad"
           control={control}
-          rules={{ required: 'La fecha de nacimiento es obligatoria' }}
+          rules={{ required: 'El rango de edad es obligatorio' }}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Rango de edad *</FieldLabel>
               <Select
-                value={field.value?.toString()}
+                value={field.value?.toString() ?? ''}
                 onValueChange={(v) => field.onChange(Number(v))}
               >
                 <SelectTrigger className="focus:ring-secondary! focus:border-secondary! focus:ring-1!">
@@ -347,7 +340,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Estado Civil *</FieldLabel>
               <RadioGroup
-                value={field.value?.toString()}
+                value={field.value?.toString() ?? ''}
                 onValueChange={(v) => field.onChange(Number(v))}
                 className="flex flex-wrap gap-4"
               >
@@ -397,7 +390,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Tipo de Discapacidad *</FieldLabel>
                 <Select
-                  value={field.value?.toString()}
+                  value={field.value?.toString() ?? ''}
                   onValueChange={(v) => field.onChange(Number(v))}
                 >
                   <SelectTrigger className="focus:ring-secondary! focus:border-secondary! focus:ring-1!">
@@ -500,7 +493,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Género *</FieldLabel>
               <RadioGroup
-                value={field.value?.toString()}
+                value={field.value?.toString() ?? ''}
                 onValueChange={(v) => field.onChange(Number(v))}
                 className="flex flex-wrap gap-4"
               >
@@ -532,7 +525,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Etnia *</FieldLabel>
               <Select
-                value={field.value?.toString()}
+                value={field.value?.toString() ?? ''}
                 onValueChange={(v) => field.onChange(Number(v))}
               >
                 <SelectTrigger className="focus:ring-secondary! focus:border-secondary! focus:ring-1!">
@@ -583,7 +576,7 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Nivel de Estudios *</FieldLabel>
               <Select
-                value={field.value?.toString()}
+                value={field.value?.toString() ?? ''}
                 onValueChange={(v) => field.onChange(Number(v))}
               >
                 <SelectTrigger className="focus:ring-secondary! focus:border-secondary! focus:ring-1!">
