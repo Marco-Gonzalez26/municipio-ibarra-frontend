@@ -8,19 +8,20 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useWizardStore } from '../store/wizard.store'
 import type { AsistenciaTecnicaForm } from '../types/wizard-form.type'
+import type { TechnicalAssistanceCatalogs } from '../types/props.type'
 
 // TODO: reemplazar por datos reales de catareaasistencia (agrupados por categoría)
-const AREAS_ASISTENCIA_GROUPS = [
-  {
-    categoria: 'Gestión de Negocio',
-    items: [
-      { id: 1, descripcion: 'Modelo de Negocio' },
+// const AREAS_ASISTENCIA_GROUPS = [
+//   {
+//     categoria: 'Gestión de Negocio',
+//     items: [
+//       { id: 1, descripcion: 'Modelo de Negocio' },
       // { id: 2, descripcion: 'Plan de Negocio' },
       // { id: 3, descripcion: 'Estatuto' },
       // { id: 4, descripcion: 'Orientación Tributaria' },
       // { id: 5, descripcion: 'Orientación Financiera' },
-    ],
-  },
+  //   ],
+  // },
   // {
   //   categoria: 'Marketing y Publicidad',
   //   items: [
@@ -43,18 +44,20 @@ const AREAS_ASISTENCIA_GROUPS = [
   //     { id: 17, descripcion: 'Fomento Productivo' },
   //   ],
   // },
-]
+// ]
 
 interface TechnicalAssistanceStepProps {
   onPrevious: () => void
   onFinish: () => void
   isSubmitting?: boolean
+  catalogs: TechnicalAssistanceCatalogs
 }
 
 export function TechnicalAssistanceStep({
   onPrevious,
   onFinish,
   isSubmitting,
+  catalogs,
 }: TechnicalAssistanceStepProps) {
   const technicalAssistance = useWizardStore(
     (state) => state.formData.asistenciaTecnica
@@ -62,6 +65,11 @@ export function TechnicalAssistanceStep({
   const updateTechnicalAssistance = useWizardStore(
     (state) => state.updateTechnicalAssistance
   )
+
+  // catareaasistencia tiene un campo "categoria" que se puede usar para agrupar las opciones en la UI, pero por ahora lo dejamos plano hasta tener claridad sobre las categorías finales.
+  const assistanceAreaOptions = catalogs.assistanceAreas.data
+    .filter((area) => area.activo)
+    .sort((a, b) => a.orden - b.orden)
 
   // Deriva la "situación actual" a partir de las respuestas previas del wizard,
   // en vez de pedírsela de nuevo al usuario.
@@ -113,51 +121,43 @@ export function TechnicalAssistanceStep({
         name="areas_asistencia"
         control={control}
         render={({ field }) => (
-          <div className="space-y-6">
+          <div className="space-y-3">
             <FieldLabel>Áreas de Asesoramiento</FieldLabel>
 
-            {AREAS_ASISTENCIA_GROUPS.map((group) => (
-              <div key={group.categoria}>
-                <h3 className="mb-2 text-sm font-semibold text-primary">
-                  {group.categoria}
-                </h3>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-                  {group.items.map((option) => {
-                    const checked = field.value.includes(option.id)
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+              {assistanceAreaOptions.map((option) => {
+                const checked = field.value.includes(option.id)
 
-                    function handleCheckedChange(isChecked: boolean) {
-                      if (isChecked) {
-                        field.onChange([...field.value, option.id])
-                      } else {
-                        field.onChange(
-                          field.value.filter((id: number) => id !== option.id)
-                        )
-                      }
-                    }
-
-                    return (
-                      <div key={option.id} className="flex items-center gap-2">
-                        <Checkbox
-                          id={`area-${option.id}`}
-                          checked={checked}
-                          onCheckedChange={handleCheckedChange}
-                        />
-                        <FieldLabel
-                          htmlFor={`area-${option.id}`}
-                          className="font-normal"
-                        >
-                          {option.descripcion}
-                        </FieldLabel>
-                      </div>
+                function handleCheckedChange(isChecked: boolean) {
+                  if (isChecked) {
+                    field.onChange([...field.value, option.id])
+                  } else {
+                    field.onChange(
+                      field.value.filter((id: number) => id !== option.id)
                     )
-                  })}
-                </div>
-              </div>
-            ))}
+                  }
+                }
+
+                return (
+                  <div key={option.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`area-${option.id}`}
+                      checked={checked}
+                      onCheckedChange={handleCheckedChange}
+                    />
+                    <FieldLabel
+                      htmlFor={`area-${option.id}`}
+                      className="font-normal"
+                    >
+                      {option.descripcion}
+                    </FieldLabel>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       />
-
       <Controller
         name="observaciones"
         control={control}

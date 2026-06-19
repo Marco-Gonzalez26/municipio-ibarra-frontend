@@ -2,6 +2,7 @@ import {
   CatalogoItem,
   CatalogoResponse,
   RangoEdadItem,
+  CatalogoItemConOrden,
 } from '@/types/catalog.type'
 
 export interface PersonalDataCatalogs {
@@ -12,4 +13,8 @@ export interface PersonalDataCatalogs {
   ethnicities: CatalogoResponse<CatalogoItem>
   educationLevels: CatalogoResponse<CatalogoItem>
   disabilityTypes: CatalogoResponse<CatalogoItem>
+}
+
+export interface TechnicalAssistanceCatalogs {
+  assistanceAreas: CatalogoResponse<CatalogoItemConOrden & { activo: boolean }>
 }

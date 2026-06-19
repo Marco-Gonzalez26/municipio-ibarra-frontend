@@ -28,6 +28,7 @@ const initialState: RegistroEmprendedorState = {
     calle_secundaria: '',
     numero_casa: '',
     id_estado_civil: null,
+    id_rango_edad: null,
     tiene_discapacidad: false,
     id_tipo_discapacidad: null,
     porcentaje_discapacidad: '',

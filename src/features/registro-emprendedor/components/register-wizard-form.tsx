@@ -1,37 +1,29 @@
 'use client'
-
+import {useState} from 'react'
+import {toast} from 'sonner'
+import { useRouter } from 'next/navigation'
 import { WizardStepper } from './wizard-stepper'
 import { useWizardStore } from '../store/wizard.store'
 import { PersonalDataStep } from './personal-data-step'
-import {
-  CatalogoItem,
-  CatalogoItemConOrden,
-  CatalogoResponse,
-  RangoEdadItem,
-} from '@/types/catalog.type'
 import { CurrentSituationStep } from './current-situation-step'
 import { IntentionsStep } from './intentions-step'
 import { EnterpriseStep } from './enterprise-step'
 import { TechnicalAssistanceStep } from './technical-assistance-step'
 import { entrepreneurService } from '../services/entrepreneur.service'
 import { mapWizardToEntrepreneurDTO } from '../utils/wizard-form-mapper'
-interface PersonalDataCatalogs {
-  maritalStatus: CatalogoResponse<CatalogoItem & { activo: boolean }>
-  genders: CatalogoResponse<CatalogoItem & { activo: boolean }>
-  occupations: CatalogoResponse<CatalogoItem & { activo: boolean }>
-  ageRanges: CatalogoResponse<RangoEdadItem & { activo: boolean }>
-  ethnicities: CatalogoResponse<CatalogoItem & { activo: boolean }>
-  educationLevels: CatalogoResponse<CatalogoItem & { activo: boolean }>
-  disabilityTypes: CatalogoResponse<CatalogoItem & { activo: boolean }>
-}
+import type { PersonalDataCatalogs, TechnicalAssistanceCatalogs } from '../types/props.type'
+
 
 interface RegisterWizardProps {
   personalDataCatalogs: PersonalDataCatalogs
+  technicalAssistanceCatalogs: TechnicalAssistanceCatalogs
+
 }
-export function RegisterWizard({ personalDataCatalogs }: RegisterWizardProps) {
+export function RegisterWizard({ personalDataCatalogs, technicalAssistanceCatalogs }: RegisterWizardProps) {
   const currentStep = useWizardStore((state) => state.currentStep)
   const goToNextStep = useWizardStore((state) => state.goToNextStep)
   const goToPreviousStep = useWizardStore((state) => state.goToPreviousStep)
+  const router = useRouter()
   async function onFinish() {
     const state = useWizardStore.getState().formData
     const dto = mapWizardToEntrepreneurDTO(
@@ -43,10 +35,18 @@ export function RegisterWizard({ personalDataCatalogs }: RegisterWizardProps) {
       console.log({ dto })
       const newEntrepreneur = await entrepreneurService.create(dto)
       console.log({ newEntrepreneur })
-
+      toast.success('¡Solicitud enviada con éxito!', {
+        description: 'Información registrada correctamente.',
+      })
+      useWizardStore.getState().reset()
+      router.push('/')
       // await enterpriseService.create(mapWizardToEnterpriseDTO(state, newEntrepreneur.id))
     } catch (error) {
       // manejar error, mostrar feedback al usuario
+      toast.error('No se pudo enviar la solicitud', {
+        description:
+          error instanceof Error ? error.message : 'Intente nuevamente.',
+      })
     }
   }
   return (
@@ -79,6 +79,7 @@ export function RegisterWizard({ personalDataCatalogs }: RegisterWizardProps) {
           <TechnicalAssistanceStep
             onPrevious={goToPreviousStep}
             onFinish={onFinish}
+            catalogs={technicalAssistanceCatalogs}
           />
         ) : null}
       </div>
