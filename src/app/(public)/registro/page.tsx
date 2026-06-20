@@ -12,6 +12,9 @@ export default async function Page() {
     educationLevels,
     disabilityTypes,
     assistanceAreas,
+    incomeLevels,
+    entrepreneurSituations,
+    entrepreneurOccupations,
   ] = await Promise.all([
     catalogService.getMaritalStatus(),
     catalogService.getGender(),
@@ -21,6 +24,9 @@ export default async function Page() {
     catalogService.getEducationLevel(),
     catalogService.getDisabilityType(),
     catalogService.getAssistanceArea(),
+    catalogService.getIncomeLevel(),
+    catalogService.getEntrepreneurSituation(),
+    catalogService.getOccupation(),
   ])
 
   return (
@@ -51,6 +57,11 @@ export default async function Page() {
             disabilityTypes,
           }}
           technicalAssistanceCatalogs={{ assistanceAreas }}
+          currentSituationCatalogs={{
+            incomeLevels,
+            entrepreneurSituations,
+            entrepreneurOccupations,
+          }}
         />
       </div>
     </div>

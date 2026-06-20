@@ -18,3 +18,9 @@ export interface PersonalDataCatalogs {
 export interface TechnicalAssistanceCatalogs {
   assistanceAreas: CatalogoResponse<CatalogoItemConOrden & { activo: boolean }>
 }
+
+export interface CurrentSituationCatalogs {
+  incomeLevels: CatalogoResponse<CatalogoItem>
+  entrepreneurSituations: CatalogoResponse<CatalogoItem>
+  entrepreneurOccupations: CatalogoResponse<CatalogoItem>
+}

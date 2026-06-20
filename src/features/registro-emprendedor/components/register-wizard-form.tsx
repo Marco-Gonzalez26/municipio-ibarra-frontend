@@ -1,6 +1,6 @@
 'use client'
-import {useState} from 'react'
-import {toast} from 'sonner'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { WizardStepper } from './wizard-stepper'
 import { useWizardStore } from '../store/wizard.store'
@@ -11,15 +11,23 @@ import { EnterpriseStep } from './enterprise-step'
 import { TechnicalAssistanceStep } from './technical-assistance-step'
 import { entrepreneurService } from '../services/entrepreneur.service'
 import { mapWizardToEntrepreneurDTO } from '../utils/wizard-form-mapper'
-import type { PersonalDataCatalogs, TechnicalAssistanceCatalogs } from '../types/props.type'
-
+import type {
+  CurrentSituationCatalogs,
+  PersonalDataCatalogs,
+  TechnicalAssistanceCatalogs,
+} from '../types/props.type'
 
 interface RegisterWizardProps {
   personalDataCatalogs: PersonalDataCatalogs
   technicalAssistanceCatalogs: TechnicalAssistanceCatalogs
 
+  currentSituationCatalogs: CurrentSituationCatalogs
 }
-export function RegisterWizard({ personalDataCatalogs, technicalAssistanceCatalogs }: RegisterWizardProps) {
+export function RegisterWizard({
+  personalDataCatalogs,
+  technicalAssistanceCatalogs,
+  currentSituationCatalogs,
+}: RegisterWizardProps) {
   const currentStep = useWizardStore((state) => state.currentStep)
   const goToNextStep = useWizardStore((state) => state.goToNextStep)
   const goToPreviousStep = useWizardStore((state) => state.goToPreviousStep)
@@ -64,6 +72,7 @@ export function RegisterWizard({ personalDataCatalogs, technicalAssistanceCatalo
         ) : null}
         {currentStep === 'situacion-actual' ? (
           <CurrentSituationStep
+            catalogs={currentSituationCatalogs}
             onNext={goToNextStep}
             onPrevious={goToPreviousStep}
           />

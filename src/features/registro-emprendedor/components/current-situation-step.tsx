@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { useWizardStore } from '../store/wizard.store'
 import type { SituacionActualForm } from '../types/wizard-form.type'
+import { CurrentSituationCatalogs } from '../types/props.type'
 
 // TODO: reemplazar por datos reales de catocupacion y catnivelingresos
 const OCUPACION_OPTIONS = [
@@ -29,25 +30,22 @@ const OCUPACION_OPTIONS = [
   { id: 10, descripcion: 'Otro' },
 ]
 
-const NIVEL_INGRESOS_OPTIONS = [
-  { id: 1, descripcion: 'Sin ingresos' },
-  { id: 2, descripcion: 'Menos del salario básico' },
-  { id: 3, descripcion: 'Salario básico' },
-  { id: 4, descripcion: 'Más de un salario básico' },
-  { id: 5, descripcion: 'Más de dos salarios básicos' },
-]
-
 const OCUPACION_OTRA_ID = 10
 
 interface CurrentSituationStepProps {
   onNext: () => void
   onPrevious: () => void
+  catalogs: CurrentSituationCatalogs
 }
 
 export function CurrentSituationStep({
   onNext,
   onPrevious,
+  catalogs,
 }: CurrentSituationStepProps) {
+  const { entrepreneurSituations, incomeLevels, entrepreneurOccupations } =
+    catalogs
+
   const currentSituation = useWizardStore(
     (state) => state.formData.situacionActual
   )
@@ -94,7 +92,7 @@ export function CurrentSituationStep({
                   <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
-                  {OCUPACION_OPTIONS.map((option) => (
+                  {entrepreneurOccupations.data.map((option) => (
                     <SelectItem key={option.id} value={option.id.toString()}>
                       {option.descripcion}
                     </SelectItem>
@@ -140,7 +138,7 @@ export function CurrentSituationStep({
                   <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
-                  {NIVEL_INGRESOS_OPTIONS.map((option) => (
+                  {incomeLevels.data.map((option) => (
                     <SelectItem key={option.id} value={option.id.toString()}>
                       {option.descripcion}
                     </SelectItem>
