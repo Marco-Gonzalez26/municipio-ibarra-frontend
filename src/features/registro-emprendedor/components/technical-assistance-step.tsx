@@ -9,7 +9,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useWizardStore } from '../store/wizard.store'
 import type { AsistenciaTecnicaForm } from '../types/wizard-form.type'
 import type { TechnicalAssistanceCatalogs } from '../types/props.type'
-import { CatalogoItem } from '@/types/catalog.type'
 
 interface TechnicalAssistanceStepProps {
   onPrevious: () => void
@@ -31,11 +30,6 @@ export function TechnicalAssistanceStep({
   const updateTechnicalAssistance = useWizardStore(
     (state) => state.updateTechnicalAssistance
   )
-
-  // catareaasistencia tiene un campo "categoria" que se puede usar para agrupar las opciones en la UI, pero por ahora lo dejamos plano hasta tener claridad sobre las categorías finales.
-  const assistanceAreaOptions = assistanceAreas.data
-    .filter((area) => area.activo)
-    .sort((a, b) => a.orden - b.orden)
 
   const themeOptions = themeAssistanceAreas.data.filter((area) => area.activo)
   const themeOptionsByCategory = themeOptions.reduce(

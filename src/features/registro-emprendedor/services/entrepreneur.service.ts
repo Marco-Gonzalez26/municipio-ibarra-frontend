@@ -1,10 +1,8 @@
 import { api } from '@/lib/https'
-import type {
-  Emprendedor,
-  EmprendedorCreateDTO,
-} from '@/types/entrepreneur.type'
+import type { EmprendedorCreateDTO } from '@/types/entrepreneur.type'
+import { EmprendedorResponse } from '@/types/form.type'
 
 export const entrepreneurService = {
   create: (payload: EmprendedorCreateDTO) =>
-    api.post<Emprendedor>('/emprendedor', { body: payload }),
+    api.post<EmprendedorResponse>('/emprendedor', { body: payload }),
 }

@@ -1,5 +1,7 @@
 // Formulario Referencia General
 
+import { Emprendedor } from './entrepreneur.type'
+
 export interface FormularioReferenciaGeneral {
   id: number
   id_emprendedor: number
@@ -87,3 +89,19 @@ export type FormularioAsistRequerimientoCreateDTO = Omit<
   FormularioAsistRequerimiento,
   'id'
 >
+
+// Respuestas del Backend
+export interface EmprendedorResponse {
+  ok: boolean
+  emprendedor: Emprendedor
+}
+
+export interface FormularioReferenciaGeneralResponse {
+  ok: boolean
+  formulario_referencia_general: FormularioReferenciaGeneral
+}
+
+export interface FormularioAsistenciaTecnicaResponse {
+  ok: boolean
+  data: FormularioAsistenciaTecnica
+}

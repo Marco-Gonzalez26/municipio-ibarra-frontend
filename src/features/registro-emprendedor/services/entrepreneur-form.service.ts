@@ -1,23 +1,26 @@
 import { api } from '@/lib/https'
 import type {
-  FormularioReferenciaGeneral,
   FormularioReferenciaGeneralCreateDTO,
   FormularioRefSector,
   FormularioRefSectorCreateDTO,
   FormularioRefInfraestructura,
   FormularioRefInfraestructuraCreateDTO,
-  FormularioAsistenciaTecnica,
   FormularioAsistenciaTecnicaCreateDTO,
   FormularioAsistRequerimiento,
   FormularioAsistRequerimientoCreateDTO,
+  FormularioReferenciaGeneralResponse,
+  FormularioAsistenciaTecnicaResponse,
 } from '@/types/form.type'
 
 export const entrepeneurFormService = {
   // Formulario referencia general
   createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
-    api.post<FormularioReferenciaGeneral>('/formulariosreferenciageneral', {
-      body: payload,
-    }),
+    api.post<FormularioReferenciaGeneralResponse>(
+      '/formulariosreferenciageneral',
+      {
+        body: payload,
+      }
+    ),
 
   // Sectores — uno por uno
   createRefSector: (payload: FormularioRefSectorCreateDTO) =>
@@ -58,9 +61,12 @@ export const entrepeneurFormService = {
 
   // Formulario asistencia técnica
   createAsistenciaTecnica: (payload: FormularioAsistenciaTecnicaCreateDTO) =>
-    api.post<FormularioAsistenciaTecnica>('/formularioasistenciatecnica', {
-      body: payload,
-    }),
+    api.post<FormularioAsistenciaTecnicaResponse>(
+      '/formularioasistenciatecnica',
+      {
+        body: payload,
+      }
+    ),
 
   // Requerimientos asistencia — uno por uno
   createAsistRequerimiento: (payload: FormularioAsistRequerimientoCreateDTO) =>

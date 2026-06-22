@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { WizardStepper } from './wizard-stepper'
@@ -101,7 +100,7 @@ export function RegisterWizard({
       console.log({ error })
       // manejar error, mostrar feedback al usuario
       toast.error('No se pudo enviar la solicitud', {
-        description: error.msg ?? 'Intente nuevamente.',
+        description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
       })
     }
   }
