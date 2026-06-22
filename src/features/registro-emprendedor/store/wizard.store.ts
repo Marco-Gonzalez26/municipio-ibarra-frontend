@@ -5,6 +5,7 @@ import type {
 } from '../types/wizard-form.type'
 
 const STEP_ORDER: WizardStep[] = [
+  'pago',
   'datos-personales',
   'situacion-actual',
   'intenciones',
@@ -13,6 +14,10 @@ const STEP_ORDER: WizardStep[] = [
 ]
 
 const initialState: RegistroEmprendedorState = {
+  pago: {
+    valor_pago_inicial: null,
+    codigo_pago: '',
+  },
   datosPersonales: {
     nombres: '',
     apellidos: '',
@@ -93,6 +98,8 @@ interface WizardStoreState {
     data: Partial<RegistroEmprendedorState['asistenciaTecnica']>
   ) => void
 
+  updatePayment: (data: Partial<RegistroEmprendedorState['pago']>) => void
+
   // true si el usuario ya tiene un emprendimiento (paso 2)
   hasEnterprise: () => boolean
 
@@ -100,7 +107,7 @@ interface WizardStoreState {
 }
 
 export const useWizardStore = create<WizardStoreState>((set, get) => ({
-  currentStep: 'datos-personales',
+  currentStep: 'pago',
   formData: initialState,
 
   setCurrentStep: (step) => set({ currentStep: step }),
@@ -165,6 +172,13 @@ export const useWizardStore = create<WizardStoreState>((set, get) => ({
       },
     })),
 
+  updatePayment: (data) =>
+    set((state) => ({
+      formData: {
+        ...state.formData,
+        pago: { ...state.formData.pago, ...data },
+      },
+    })),
   hasEnterprise: () => get().formData.situacionActual.tiene_emprendimiento,
 
   reset: () => set({ currentStep: 'datos-personales', formData: initialState }),

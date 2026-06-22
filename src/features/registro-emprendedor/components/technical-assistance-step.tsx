@@ -9,42 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useWizardStore } from '../store/wizard.store'
 import type { AsistenciaTecnicaForm } from '../types/wizard-form.type'
 import type { TechnicalAssistanceCatalogs } from '../types/props.type'
-
-// TODO: reemplazar por datos reales de catareaasistencia (agrupados por categoría)
-// const AREAS_ASISTENCIA_GROUPS = [
-//   {
-//     categoria: 'Gestión de Negocio',
-//     items: [
-//       { id: 1, descripcion: 'Modelo de Negocio' },
-      // { id: 2, descripcion: 'Plan de Negocio' },
-      // { id: 3, descripcion: 'Estatuto' },
-      // { id: 4, descripcion: 'Orientación Tributaria' },
-      // { id: 5, descripcion: 'Orientación Financiera' },
-  //   ],
-  // },
-  // {
-  //   categoria: 'Marketing y Publicidad',
-  //   items: [
-  //     { id: 6, descripcion: 'Sondeo de Mercado' },
-  //     { id: 7, descripcion: 'Diseño de Marca' },
-  //     { id: 8, descripcion: 'Redes Sociales' },
-  //     { id: 9, descripcion: 'Diseño de Etiquetas' },
-  //     { id: 10, descripcion: 'Publicidad y Medios' },
-  //   ],
-  // },
-  // {
-  //   categoria: 'Productividad y Desarrollo',
-  //   items: [
-  //     { id: 11, descripcion: 'Registro Artesanal' },
-  //     { id: 12, descripcion: 'BPM' },
-  //     { id: 13, descripcion: 'Permisos Sanitarios' },
-  //     { id: 14, descripcion: 'Desarrollo de Nuevos Productos' },
-  //     { id: 15, descripcion: 'Costos de Producción' },
-  //     { id: 16, descripcion: 'Normativa de Etiquetado' },
-  //     { id: 17, descripcion: 'Fomento Productivo' },
-  //   ],
-  // },
-// ]
+import { CatalogoItem } from '@/types/catalog.type'
 
 interface TechnicalAssistanceStepProps {
   onPrevious: () => void
@@ -59,6 +24,7 @@ export function TechnicalAssistanceStep({
   isSubmitting,
   catalogs,
 }: TechnicalAssistanceStepProps) {
+  const { assistanceAreas, themeAssistanceAreas } = catalogs
   const technicalAssistance = useWizardStore(
     (state) => state.formData.asistenciaTecnica
   )
@@ -67,9 +33,26 @@ export function TechnicalAssistanceStep({
   )
 
   // catareaasistencia tiene un campo "categoria" que se puede usar para agrupar las opciones en la UI, pero por ahora lo dejamos plano hasta tener claridad sobre las categorías finales.
-  const assistanceAreaOptions = catalogs.assistanceAreas.data
+  const assistanceAreaOptions = assistanceAreas.data
     .filter((area) => area.activo)
     .sort((a, b) => a.orden - b.orden)
+
+  const themeOptions = themeAssistanceAreas.data.filter((area) => area.activo)
+  const themeOptionsByCategory = themeOptions.reduce(
+    (acc, theme) => {
+      console.log({ theme })
+      const area = assistanceAreas.data.find((a) => a.id === theme.id_area)
+      const categoryName = area?.descripcion ?? 'Sin categoría'
+
+      if (!acc[categoryName]) {
+        acc[categoryName] = []
+      }
+
+      acc[categoryName].push(theme)
+      return acc
+    },
+    {} as Record<string, typeof themeOptions>
+  )
 
   // Deriva la "situación actual" a partir de las respuestas previas del wizard,
   // en vez de pedírsela de nuevo al usuario.
@@ -94,7 +77,6 @@ export function TechnicalAssistanceStep({
   })
 
   function onSubmit(data: AsistenciaTecnicaForm) {
-    console.log({ data })
     updateTechnicalAssistance(data)
     onFinish()
   }
@@ -121,40 +103,53 @@ export function TechnicalAssistanceStep({
         name="areas_asistencia"
         control={control}
         render={({ field }) => (
-          <div className="space-y-3">
+          <div className="space-y-6">
             <FieldLabel>Áreas de Asesoramiento</FieldLabel>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {assistanceAreaOptions.map((option) => {
-                const checked = field.value.includes(option.id)
+            {Object.entries(themeOptionsByCategory).map(
+              ([category, themes]) => (
+                <div key={category}>
+                  <h3 className="mb-2 text-sm font-semibold text-indigo-900">
+                    {category}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+                    {themes.map((option) => {
+                      const checked = field.value.includes(option.id)
 
-                function handleCheckedChange(isChecked: boolean) {
-                  if (isChecked) {
-                    field.onChange([...field.value, option.id])
-                  } else {
-                    field.onChange(
-                      field.value.filter((id: number) => id !== option.id)
-                    )
-                  }
-                }
+                      function handleCheckedChange(isChecked: boolean) {
+                        if (isChecked) {
+                          field.onChange([...field.value, option.id])
+                        } else {
+                          field.onChange(
+                            field.value.filter((id: number) => id !== option.id)
+                          )
+                        }
+                      }
 
-                return (
-                  <div key={option.id} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`area-${option.id}`}
-                      checked={checked}
-                      onCheckedChange={handleCheckedChange}
-                    />
-                    <FieldLabel
-                      htmlFor={`area-${option.id}`}
-                      className="font-normal"
-                    >
-                      {option.descripcion}
-                    </FieldLabel>
+                      return (
+                        <div
+                          key={option.id}
+                          className="flex items-center gap-2"
+                        >
+                          <Checkbox
+                            id={`area-${option.id}`}
+                            checked={checked}
+                            onCheckedChange={handleCheckedChange}
+                            disabled={option.id !== 1}
+                          />
+                          <FieldLabel
+                            htmlFor={`area-${option.id}`}
+                            className="font-normal"
+                          >
+                            {option.descripcion}
+                          </FieldLabel>
+                        </div>
+                      )
+                    })}
                   </div>
-                )
-              })}
-            </div>
+                </div>
+              )
+            )}
           </div>
         )}
       />

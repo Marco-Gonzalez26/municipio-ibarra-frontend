@@ -20,10 +20,15 @@ import { PersonalDataCatalogs } from '../types/props.type'
 
 interface PersonalDataStepProps {
   onNext: () => void
+  onPrevious: () => void
   catalogs: PersonalDataCatalogs
 }
 
-export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
+export function PersonalDataStep({
+  onNext,
+  onPrevious,
+  catalogs,
+}: PersonalDataStepProps) {
   const personalData = useWizardStore((state) => state.formData.datosPersonales)
   const updatePersonalData = useWizardStore((state) => state.updatePersonalData)
   const {
@@ -612,12 +617,16 @@ export function PersonalDataStep({ onNext, catalogs }: PersonalDataStepProps) {
           )}
         />
       </div>
-
-      <div className="flex justify-end gap-3 border-t pt-6">
-        <Button type="button" variant="outline">
-          Guardar Borrador
+      <div className="flex justify-between gap-3 border-t pt-6">
+        <Button type="button" variant="outline" onClick={onPrevious}>
+          Anterior
         </Button>
-        <Button type="submit">Siguiente</Button>
+        <div className="flex justify-end gap-3 border-t pt-6">
+          <Button type="button" variant="outline">
+            Guardar Borrador
+          </Button>
+          <Button type="submit">Siguiente</Button>
+        </div>
       </div>
     </form>
   )

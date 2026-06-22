@@ -15,6 +15,10 @@ export default async function Page() {
     incomeLevels,
     entrepreneurSituations,
     entrepreneurOccupations,
+    enterpriseTypes,
+    enterpriseSectors,
+    enterpriseInfrastructures,
+    themeAssistanceAreas,
   ] = await Promise.all([
     catalogService.getMaritalStatus(),
     catalogService.getGender(),
@@ -27,6 +31,10 @@ export default async function Page() {
     catalogService.getIncomeLevel(),
     catalogService.getEntrepreneurSituation(),
     catalogService.getOccupation(),
+    catalogService.getEnterpriseType(),
+    catalogService.getEnterpriseSector(),
+    catalogService.getEnterpriseInfrastructure(),
+    catalogService.getThemeAssistanceAreas(),
   ])
 
   return (
@@ -56,11 +64,24 @@ export default async function Page() {
             educationLevels,
             disabilityTypes,
           }}
-          technicalAssistanceCatalogs={{ assistanceAreas }}
+          technicalAssistanceCatalogs={{
+            assistanceAreas,
+            themeAssistanceAreas,
+          }}
           currentSituationCatalogs={{
             incomeLevels,
             entrepreneurSituations,
             entrepreneurOccupations,
+          }}
+          enterpriseCatalogs={{
+            enterpriseTypes,
+            enterpriseSectors,
+            enterpriseInfrastructures,
+            assistanceAreas,
+            themeAssistanceAreas,
+          }}
+          intentionsCatalogs={{
+            interestsSectors: enterpriseSectors,
           }}
         />
       </div>

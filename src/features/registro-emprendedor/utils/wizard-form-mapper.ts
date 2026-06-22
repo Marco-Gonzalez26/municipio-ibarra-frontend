@@ -1,6 +1,10 @@
 import type { EmprendedorCreateDTO } from '@/types/entrepreneur.type'
 import type { RangoEdadItem } from '@/types/catalog.type'
 import type { RegistroEmprendedorState } from '../types/wizard-form.type'
+import {
+  FormularioAsistenciaTecnicaCreateDTO,
+  FormularioReferenciaGeneralCreateDTO,
+} from '@/types/form.type'
 
 /**
  * Calcula la edad exacta a partir de la fecha de nacimiento (formato YYYY-MM-DD).
@@ -31,6 +35,61 @@ export function resolveAgeRangeId(
     (range) => age >= range.edad_min && age <= range.edad_max
   )
   return match ? match.id : null
+}
+
+/**
+ * Deriva el id_situacion del cat_situacion_emprendedor a partir de las
+ * respuestas del wizard:
+ * 1 → No tengo ni soy parte de un emprendimiento ni de una asociatividad y anhelo emprender
+ * 2 → Tengo un emprendimiento
+ * 3 → Soy parte de una asociatividad emprendedora
+ */
+export function resolveSituacionId(state: RegistroEmprendedorState): number {
+  if (state.situacionActual.pertenece_asociatividad) return 3
+  if (state.situacionActual.tiene_emprendimiento) return 2
+  return 1
+}
+
+/**
+ * Transforma el estado del wizard en el DTO de formulario_referencia_general.
+ */
+export function mapWizardToFormularioReferenciaDTO(
+  state: RegistroEmprendedorState,
+  idEmprendedor: number,
+  today: string
+): FormularioReferenciaGeneralCreateDTO {
+  return {
+    id_emprendedor: idEmprendedor,
+    fecha_formulario: today,
+    tiene_emprendimiento: state.situacionActual.tiene_emprendimiento,
+    esta_en_asociatividad: state.situacionActual.pertenece_asociatividad,
+    intencion_emprender: state.intenciones.desea_emprender ?? null,
+    motivo_intencion_emprender: state.intenciones.motivacion_emprender || null,
+    intencion_mejorar: state.emprendimiento.desea_mejorar ?? null,
+    motivo_intencion_mejorar: state.emprendimiento.motivo_mejora || null,
+    nombre_emprendimiento: state.emprendimiento.nombre_emprendimiento || null,
+    id_tipo_oferta: state.emprendimiento.id_tipo ?? null,
+    notas_adicionales: null,
+    valor_pago_inicial: state.pago.valor_pago_inicial,
+    codigo_pago: state.pago.codigo_pago,
+  }
+}
+
+/**
+ * Transforma el estado del wizard en el DTO de formulario_asistencia_tecnica.
+ */
+export function mapWizardToFormularioAsistenciaDTO(
+  state: RegistroEmprendedorState,
+  idEmprendedor: number,
+  today: string
+): FormularioAsistenciaTecnicaCreateDTO {
+  return {
+    id_emprendedor: idEmprendedor,
+    fecha_formulario: today,
+    nombre_emprendimiento: state.emprendimiento.nombre_emprendimiento || null,
+    id_situacion: resolveSituacionId(state),
+    notas: state.asistenciaTecnica.observaciones || null,
+  }
 }
 
 /**

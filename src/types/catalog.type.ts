@@ -23,6 +23,10 @@ export interface RangoEdadItem {
   activo: boolean | number
 }
 
+export interface TemaAsistenciaItem extends CatalogoItem {
+  id_area: number
+}
+
 export interface CatalogoResponse<T = CatalogoItem> {
   total: number
   data: T[]

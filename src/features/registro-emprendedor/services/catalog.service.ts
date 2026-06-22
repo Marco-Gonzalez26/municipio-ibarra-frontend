@@ -4,6 +4,7 @@ import type {
   CatalogoItemConOrden,
   CatalogoResponse,
   RangoEdadItem,
+  TemaAsistenciaItem,
 } from '@/types/catalog.type'
 
 // Normaliza el campo activo que el backend devuelve como boolean o 0/1
@@ -80,6 +81,30 @@ export const catalogService = {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
       '/catsituacionemprendedor'
     )
+    return normalizeResponse(res)
+  },
+
+  getEnterpriseType: async () => {
+    const res = await api.get<CatalogoResponse<CatalogoItem>>('/cattipooferta')
+    return normalizeResponse(res)
+  },
+
+  getEnterpriseSector: async () => {
+    const res = await api.get<CatalogoResponse<CatalogoItem>>(
+      '/catsectoremprendimiento'
+    )
+    return normalizeResponse(res)
+  },
+
+  getEnterpriseInfrastructure: async () => {
+    const res = await api.get<CatalogoResponse<CatalogoItem>>(
+      '/catinfraestructura'
+    )
+    return normalizeResponse(res)
+  },
+  getThemeAssistanceAreas: async () => {
+    const res =
+      await api.get<CatalogoResponse<TemaAsistenciaItem>>('/cattemaasistencia')
     return normalizeResponse(res)
   },
 }

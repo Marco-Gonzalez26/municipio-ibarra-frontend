@@ -17,50 +17,22 @@ import {
 } from '@/components/ui/select'
 import { useWizardStore } from '../store/wizard.store'
 import type { EmprendimientoForm } from '../types/wizard-form.type'
-
-// TODO: pendiente catálogo "sector" y "tipo" de emprendimiento, no existe aún en backend
-const SECTOR_OPTIONS = [
-  { id: 1, descripcion: 'Tecnología' },
-  { id: 2, descripcion: 'Gastronomía' },
-  { id: 3, descripcion: 'Textil' },
-  { id: 4, descripcion: 'Agrícola' },
-  { id: 5, descripcion: 'Otro' },
-]
-
-const TIPO_OPTIONS = [
-  { id: 1, descripcion: 'Servicios' },
-  { id: 2, descripcion: 'Producción' },
-  { id: 3, descripcion: 'Comercio' },
-]
-
-// TODO: pendiente catálogo "recursos disponibles", no existe aún en backend
-const RECURSOS_OPTIONS = [
-  { id: 1, descripcion: 'Modelo de Negocio' },
-  { id: 2, descripcion: 'Plan de Negocio' },
-  { id: 3, descripcion: 'Estatuto' },
-  { id: 4, descripcion: 'RUC o RIMPE' },
-  { id: 5, descripcion: 'Registro Contable' },
-  { id: 6, descripcion: 'Estudio de Mercado' },
-  { id: 7, descripcion: 'Marca Registrada' },
-  { id: 8, descripcion: 'Redes Sociales' },
-  { id: 9, descripcion: 'Etiqueta' },
-  { id: 10, descripcion: 'Publicidad' },
-  { id: 11, descripcion: 'Registro Artesanal/MIPYMES' },
-  { id: 12, descripcion: 'Manual BPM' },
-  { id: 13, descripcion: 'Permisos Sanitarios' },
-  { id: 14, descripcion: 'Procedimientos de Producción' },
-  { id: 15, descripcion: 'Costos de Producción' },
-  { id: 16, descripcion: 'Patente Municipal' },
-  { id: 17, descripcion: 'Personal Capacitado' },
-  { id: 18, descripcion: 'Otro' },
-]
+import { EnterpriseCatalogs } from '../types/props.type'
 
 interface EnterpriseStepProps {
   onNext: () => void
   onPrevious: () => void
+  catalogs: EnterpriseCatalogs
 }
 
-export function EnterpriseStep({ onNext, onPrevious }: EnterpriseStepProps) {
+export function EnterpriseStep({
+  onNext,
+  onPrevious,
+  catalogs,
+}: EnterpriseStepProps) {
+  const { enterpriseInfrastructures, enterpriseSectors, enterpriseTypes } =
+    catalogs
+
   const hasEnterprise = useWizardStore((state) => state.hasEnterprise())
   const enterpriseData = useWizardStore(
     (state) => state.formData.emprendimiento
@@ -180,7 +152,7 @@ export function EnterpriseStep({ onNext, onPrevious }: EnterpriseStepProps) {
                   <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
-                  {SECTOR_OPTIONS.map((option) => (
+                  {enterpriseSectors.data.map((option) => (
                     <SelectItem key={option.id} value={option.id.toString()}>
                       {option.descripcion}
                     </SelectItem>
@@ -207,7 +179,7 @@ export function EnterpriseStep({ onNext, onPrevious }: EnterpriseStepProps) {
                   <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
-                  {TIPO_OPTIONS.map((option) => (
+                  {enterpriseTypes.data.map((option) => (
                     <SelectItem key={option.id} value={option.id.toString()}>
                       {option.descripcion}
                     </SelectItem>
@@ -230,7 +202,7 @@ export function EnterpriseStep({ onNext, onPrevious }: EnterpriseStepProps) {
               Selecciona los recursos con los que ya cuenta tu emprendimiento
             </p>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {RECURSOS_OPTIONS.map((option) => {
+              {enterpriseInfrastructures.data.map((option) => {
                 const checked = field.value.includes(option.id)
 
                 function handleCheckedChange(isChecked: boolean) {

@@ -16,20 +16,6 @@ import { useWizardStore } from '../store/wizard.store'
 import type { SituacionActualForm } from '../types/wizard-form.type'
 import { CurrentSituationCatalogs } from '../types/props.type'
 
-// TODO: reemplazar por datos reales de catocupacion y catnivelingresos
-const OCUPACION_OPTIONS = [
-  { id: 1, descripcion: 'Sin empleo' },
-  { id: 2, descripcion: 'Ama de casa' },
-  { id: 3, descripcion: 'Dependiente privado' },
-  { id: 4, descripcion: 'Estudiante' },
-  { id: 5, descripcion: 'Servidor público' },
-  { id: 6, descripcion: 'Artesano' },
-  { id: 7, descripcion: 'Jornalero' },
-  { id: 8, descripcion: 'Emprendedor' },
-  { id: 9, descripcion: 'Jubilado' },
-  { id: 10, descripcion: 'Otro' },
-]
-
 const OCUPACION_OTRA_ID = 10
 
 interface CurrentSituationStepProps {

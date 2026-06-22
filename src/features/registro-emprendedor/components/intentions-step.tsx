@@ -8,37 +8,22 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useWizardStore } from '../store/wizard.store'
 import type { IntencionesForm } from '../types/wizard-form.type'
-
-// TODO: pendiente catálogo "sectores de interés", no existe aún en backend
-const SECTORES_INTERES_OPTIONS = [
-  { id: 1, descripcion: 'Artesanías' },
-  { id: 2, descripcion: 'Textil' },
-  { id: 3, descripcion: 'Ornamentación' },
-  { id: 4, descripcion: 'Manualidades' },
-  { id: 5, descripcion: 'Procesados' },
-  { id: 6, descripcion: 'Bisutería' },
-  { id: 7, descripcion: 'Salud y Nutrición' },
-  { id: 8, descripcion: 'Tecnología' },
-  { id: 9, descripcion: 'Lencería' },
-  { id: 10, descripcion: 'Licores' },
-  { id: 11, descripcion: 'Servicios Profesionales' },
-  { id: 12, descripcion: 'Calzado' },
-  { id: 13, descripcion: 'Productos de Limpieza' },
-  { id: 14, descripcion: 'Belleza' },
-  { id: 15, descripcion: 'Productos del Campo' },
-  { id: 16, descripcion: 'Gastronomía' },
-  { id: 17, descripcion: 'Productos para Mascotas' },
-  { id: 18, descripcion: 'Dulces y Postres' },
-  { id: 19, descripcion: 'Otro' },
-]
+import { IntentionsCatalogs } from '../types/props.type'
 
 interface IntentionsStepProps {
   onNext: () => void
   onPrevious: () => void
+  catalogs: IntentionsCatalogs
 }
 
-export function IntentionsStep({ onNext, onPrevious }: IntentionsStepProps) {
+export function IntentionsStep({
+  onNext,
+  onPrevious,
+  catalogs,
+}: IntentionsStepProps) {
   const intenciones = useWizardStore((state) => state.formData.intenciones)
+
+  const { interestsSectors } = catalogs
   const updateIntentions = useWizardStore((state) => state.updateIntentions)
 
   const { control, handleSubmit } = useForm<IntencionesForm>({
@@ -123,7 +108,7 @@ export function IntentionsStep({ onNext, onPrevious }: IntentionsStepProps) {
               Selecciona los sectores en los que estás interesado/a
             </p>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {SECTORES_INTERES_OPTIONS.map((option) => {
+              {interestsSectors.data.map((option) => {
                 const checked = field.value.includes(option.id)
 
                 function handleCheckedChange(isChecked: boolean) {

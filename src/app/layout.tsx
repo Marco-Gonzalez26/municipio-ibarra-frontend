@@ -20,7 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${interSans.className}  h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}
+      <body className="min-h-full flex flex-col">
+        {children}
         <Toaster richColors position="top-right" />
       </body>
     </html>

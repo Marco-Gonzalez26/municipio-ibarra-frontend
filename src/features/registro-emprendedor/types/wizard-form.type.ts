@@ -1,3 +1,8 @@
+export interface PagoForm {
+  valor_pago_inicial: number | null
+  codigo_pago: string
+}
+
 export interface DatosPersonalesForm {
   nombres: string
   apellidos: string
@@ -63,6 +68,7 @@ export interface AsistenciaTecnicaForm {
 }
 
 export interface RegistroEmprendedorState {
+  pago: PagoForm
   datosPersonales: DatosPersonalesForm
   situacionActual: SituacionActualForm
   intenciones: IntencionesForm
@@ -71,6 +77,7 @@ export interface RegistroEmprendedorState {
 }
 
 export type WizardStep =
+  | 'pago'
   | 'datos-personales'
   | 'situacion-actual'
   | 'intenciones'
@@ -78,6 +85,8 @@ export type WizardStep =
   | 'asistencia-tecnica'
 
 export const WIZARD_STEPS: { key: WizardStep; label: string }[] = [
+  { key: 'pago', label: 'Pago' },
+
   { key: 'datos-personales', label: 'Datos Personales' },
   { key: 'situacion-actual', label: 'Situación Actual' },
   { key: 'intenciones', label: 'Intenciones' },
