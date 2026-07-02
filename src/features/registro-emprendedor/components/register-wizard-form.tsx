@@ -95,7 +95,7 @@ export function RegisterWizard({
         state.asistenciaTecnica.areas_asistencia
       )
       useWizardStore.getState().reset()
-      router.push('/')
+      router.push('/inicio')
     } catch (error) {
       console.log({ error })
       // manejar error, mostrar feedback al usuario

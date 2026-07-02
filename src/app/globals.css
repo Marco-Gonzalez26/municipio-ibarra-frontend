@@ -128,3 +128,9 @@
     @apply font-sans;
   }
 }
+
+.footer-bg-image {
+  background-image: url('/images/politicalwp_crowd.jpg');
+  background-size: cover;
+  background-position: center;
+}

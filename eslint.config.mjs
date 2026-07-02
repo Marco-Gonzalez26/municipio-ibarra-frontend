@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    'src/hooks/use-mobile.ts',
   ]),
 ])
 

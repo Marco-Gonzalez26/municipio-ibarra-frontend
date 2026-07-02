@@ -1,9 +1,15 @@
+import Image from 'next/image'
+
 export const Header = () => {
   return (
-    <header className="bg-background border-b">
+    <header className="bg-background ">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <div className="flex items-center gap-4 size-12 justify-center rounded-full bg-primary text-primary-foreground">
-          <span className="text-xl font-bold">GAD</span>
+        <div className="flex items-center gap-4  justify-center rounded-full ">
+          <img
+            src="/images/escudo.png"
+            alt="Escudo"
+            className="object-contain w-48"
+          />
         </div>
         <p className="text-sm font-bold leading-tight text-foreground">
           Sistema de Registro y Gestion de Emprendedores
