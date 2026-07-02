@@ -91,12 +91,23 @@ export type FormularioAsistRequerimientoCreateDTO = Omit<
 >
 
 // Respuestas del Backend
+
+export interface EmprendedoresResponse {
+  ok: boolean
+  total: number
+  emprendedores: Emprendedor[]
+}
 export interface EmprendedorResponse {
   ok: boolean
   emprendedor: Emprendedor
 }
 
 export interface FormularioReferenciaGeneralResponse {
+  ok: boolean
+  total: number
+  formularios_referencia_general: FormularioReferenciaGeneral[]
+}
+export interface FormularioReferenciaGeneralCreateResponse {
   ok: boolean
   formulario_referencia_general: FormularioReferenciaGeneral
 }

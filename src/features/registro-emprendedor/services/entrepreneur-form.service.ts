@@ -10,12 +10,18 @@ import type {
   FormularioAsistRequerimientoCreateDTO,
   FormularioReferenciaGeneralResponse,
   FormularioAsistenciaTecnicaResponse,
+  FormularioReferenciaGeneralCreateResponse,
 } from '@/types/form.type'
 
 export const entrepeneurFormService = {
   // Formulario referencia general
+
+  getAllRefGeneral: () =>
+    api.get<FormularioReferenciaGeneralResponse>(
+      '/formulariosreferenciageneral'
+    ),
   createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
-    api.post<FormularioReferenciaGeneralResponse>(
+    api.post<FormularioReferenciaGeneralCreateResponse>(
       '/formulariosreferenciageneral',
       {
         body: payload,

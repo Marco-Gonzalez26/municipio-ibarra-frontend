@@ -1,0 +1,119 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  ClipboardList,
+  Building2,
+} from 'lucide-react'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from '@/components/ui/sidebar'
+import { cn } from '@/lib/utils'
+
+const NAV_ITEMS = [
+  {
+    label: 'Principal',
+    items: [
+      { title: 'Inicio', url: '/inicio', icon: LayoutDashboard },
+      { title: 'Emprendedores', url: '/emprendedores', icon: Users },
+    ],
+  },
+  {
+    label: 'Formularios',
+    items: [
+      {
+        title: 'Ref. Generales',
+        url: '/formularios/referencia',
+        icon: FileText,
+      },
+      {
+        title: 'Asistencia Técnica',
+        url: '/formularios/asistencia',
+        icon: ClipboardList,
+      },
+    ],
+  },
+]
+
+export function AppSidebar() {
+  const pathname = usePathname()
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/inicio">
+                <img
+                  className="flex size-8 items-center justify-center  "
+                  src="/images/escudo-ibarra.png"
+                  alt="Logo"
+                  width="100"
+                  height="100"
+                />
+
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="text-xs font-semibold">
+                    Municipalidad Ibarra
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Emprendedores
+                  </span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        {NAV_ITEMS.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.url}
+                      tooltip={item.title}
+                    >
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <div className="p-2 text-xs text-muted-foreground">
+          © 2026 Municipalidad de Ibarra
+        </div>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
+  )
+}

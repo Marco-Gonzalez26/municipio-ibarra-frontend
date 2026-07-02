@@ -1,11 +1,13 @@
-import React from 'react'
-
 export const Footer = () => {
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-foreground text-background footer-bg-image">
       <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-12 md:grid-cols-3">
         <div>
-          <p className="text-lg font-bold">Municipalidad del Cantón Ibarra</p>
+          <img
+            src="/images/escudo-1.png"
+            alt="Escudo"
+            className="object-contain w-48"
+          />
           <p className="mt-2 text-sm text-background/70">
             Sistema de Registro y Gestión de Emprendedores
           </p>
