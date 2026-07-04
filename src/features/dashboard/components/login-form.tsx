@@ -3,6 +3,7 @@
 import { UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
+import Link from 'next/link'
 
 import type { LoginForm } from '../types/login-form.type'
 import { login } from '@/features/dashboard/services/auth.service'
@@ -21,7 +22,7 @@ export const Login = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        Usuario
+                        Correo Electrónico
                     </label>
                     <input
                         type="text"
@@ -46,6 +47,14 @@ export const Login = () => {
                     Ingresar
                 </Button>
             </form>
+            <div className="flex gap-x-4">
+              <Link href="/">
+                  Volver al inicio
+              </Link>
+              <Link href="/registro">
+                  Notienes cuenta? Regístrate
+              </Link>
+            </div>
         </div>
     )
 }

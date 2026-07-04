@@ -15,7 +15,7 @@ export default async function LoginPage() {
 
             <div className="container mx-auto px-4 py-20">
                 <small className="text-muted-foreground text-xs font-bold">
-                    Bienvenido a la administración de usuarios.
+                    Sistema de Gestión de Emprendedores.
                 </small>
                 <Login/>
             </div>
