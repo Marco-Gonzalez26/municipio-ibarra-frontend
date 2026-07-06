@@ -30,6 +30,9 @@ const NAV_ITEMS = [
     items: [
       { title: 'Inicio', url: '/inicio', icon: LayoutDashboard },
       { title: 'Emprendedores', url: '/emprendedores', icon: Users },
+      { title: 'Asesorias', url: '/asesorias', icon: FileText },
+      { title: 'Reportes', url: '/reportes', icon: ClipboardList },
+      { title: 'Usuarios', url: '/usuarios', icon: Users },
     ],
   },
   {
@@ -88,7 +91,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} className="mt-1">
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.url}

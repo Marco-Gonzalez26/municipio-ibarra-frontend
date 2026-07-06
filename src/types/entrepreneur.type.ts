@@ -37,3 +37,9 @@ export type EmprendedorCreateDTO = Omit<
   Emprendedor,
   'id' | 'fecha_registro' | 'activo'
 >
+
+export interface EmprendedorListResponse {
+  ok: boolean
+  total: number
+  emprendedores: Emprendedor[]
+}

@@ -1,5 +1,5 @@
 export default async function DashboardReportesPage() {
-return (
+  return (
     <>
       <h1 className="text-sm font-medium">Gestión de Usuarios</h1>
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -7,10 +7,7 @@ return (
           Administra los usuarios del sistema y sus roles.
         </p>
       </div>
-      <div className="flex flex-1 flex-col gap-4 p-4">
-       
-        
-      </div>
+      <div className="flex flex-1 flex-col gap-4 p-4"></div>
     </>
   )
 }
