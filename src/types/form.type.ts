@@ -116,3 +116,9 @@ export interface FormularioAsistenciaTecnicaResponse {
   ok: boolean
   data: FormularioAsistenciaTecnica
 }
+
+export interface FormularioReferenciaGeneralListResponse {
+  ok: boolean
+  total: number
+  formularios_referencia_general: FormularioReferenciaGeneral[]
+}

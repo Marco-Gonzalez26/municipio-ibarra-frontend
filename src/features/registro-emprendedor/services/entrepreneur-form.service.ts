@@ -1,4 +1,5 @@
 import { api } from '@/lib/https'
+
 import type {
   FormularioReferenciaGeneralCreateDTO,
   FormularioRefSector,
@@ -11,14 +12,15 @@ import type {
   FormularioReferenciaGeneralResponse,
   FormularioAsistenciaTecnicaResponse,
   FormularioReferenciaGeneralCreateResponse,
+  FormularioReferenciaGeneralListResponse,
 } from '@/types/form.type'
 
 export const entrepeneurFormService = {
   // Formulario referencia general
 
-  getAllRefGeneral: () =>
-    api.get<FormularioReferenciaGeneralResponse>(
-      '/formulariosreferenciageneral'
+  getAllReferenciaGeneral: (page = 1, limit = 15) =>
+    api.get<FormularioReferenciaGeneralListResponse>(
+      `/formulariosreferenciageneral?page=${page}&limit=${limit}`
     ),
   createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
     api.post<FormularioReferenciaGeneralCreateResponse>(
