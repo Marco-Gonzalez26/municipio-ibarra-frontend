@@ -39,7 +39,10 @@ export function EntrepreneurDetailDialog({
         <Separator />
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <InfoItem label="Nombre Completo" value={entrepreneur.nombres_apellidos} />
+          <InfoItem
+            label="Nombre Completo"
+            value={entrepreneur.nombres_apellidos}
+          />
           <InfoItem label="Cédula" value={entrepreneur.cedula} />
           <InfoItem label="Correo" value={entrepreneur.email} />
           <InfoItem label="Celular" value={entrepreneur.celular} />

@@ -8,7 +8,9 @@ interface UsuariosPageProps {
   searchParams: Promise<{ page?: string }>
 }
 
-export default async function UsuariosPage({ searchParams }: UsuariosPageProps) {
+export default async function UsuariosPage({
+  searchParams,
+}: UsuariosPageProps) {
   const { page: pageParam } = await searchParams
   const page = Number(pageParam ?? 1)
   const usersRes = await userService.getAll(page, LIMIT)

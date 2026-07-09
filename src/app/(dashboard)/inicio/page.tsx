@@ -72,9 +72,7 @@ export default async function HomeDashboardPage() {
 
       <main className="flex flex-1 flex-col gap-6 p-4">
         <section className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Resumen general
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight">Resumen general</h2>
           <p className="text-sm text-muted-foreground">
             Visualización rápida de emprendedores, emprendimientos, usuarios y
             estados del registro.
@@ -149,9 +147,7 @@ export default async function HomeDashboardPage() {
                 className="flex flex-col gap-2 rounded-lg border p-3 md:flex-row md:items-center md:justify-between"
               >
                 <div>
-                  <p className="font-medium">
-                    {emprendedor.nombres_apellidos}
-                  </p>
+                  <p className="font-medium">{emprendedor.nombres_apellidos}</p>
                   <p className="text-sm text-muted-foreground">
                     Cédula: {emprendedor.cedula} · {emprendedor.parroquia}
                   </p>

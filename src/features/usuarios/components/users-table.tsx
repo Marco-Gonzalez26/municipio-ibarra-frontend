@@ -145,7 +145,10 @@ export function UsersTable({ users }: UsersTableProps) {
         </Table>
       </div>
 
-      <UserDetailDialog user={selectedUser} onClose={() => setSelectedUser(null)} />
+      <UserDetailDialog
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+      />
 
       <UserFormDialog
         key={editingUser?.id ?? 'empty-user'}
@@ -195,7 +198,10 @@ function UserDetailDialog({
             <InfoItem label="Apellidos" value={user.apellidos} />
             <InfoItem label="Correo" value={user.email} />
             <InfoItem label="Rol" value={user.rol} />
-            <InfoItem label="Estado" value={user.activo ? 'Activo' : 'Inactivo'} />
+            <InfoItem
+              label="Estado"
+              value={user.activo ? 'Activo' : 'Inactivo'}
+            />
             <InfoItem label="Fecha" value={formatDate(user.fecha_registro)} />
           </div>
         ) : null}
@@ -321,7 +327,11 @@ function UserFormDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit">Guardar</Button>

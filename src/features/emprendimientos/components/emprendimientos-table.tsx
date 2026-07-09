@@ -155,11 +155,15 @@ export function EmprendimientosTable({
                     {emprendedor?.nombres_apellidos ?? 'No encontrado'}
                   </TableCell>
                   <TableCell>{emprendedor?.cedula ?? '-'}</TableCell>
-                  <TableCell>{getTipoOferta(formulario.id_tipo_oferta)}</TableCell>
+                  <TableCell>
+                    {getTipoOferta(formulario.id_tipo_oferta)}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={estado.variant}>{estado.label}</Badge>
                   </TableCell>
-                  <TableCell>{formatDate(formulario.fecha_formulario)}</TableCell>
+                  <TableCell>
+                    {formatDate(formulario.fecha_formulario)}
+                  </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
                       <Button
@@ -254,7 +258,10 @@ function EmprendimientoDetailDialog({
   onClose: () => void
 }) {
   return (
-    <Dialog open={Boolean(formulario)} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={Boolean(formulario)}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Detalles del emprendimiento</DialogTitle>
@@ -274,7 +281,10 @@ function EmprendimientoDetailDialog({
               value={entrepreneur?.nombres_apellidos ?? 'No encontrado'}
             />
             <InfoItem label="Cédula" value={entrepreneur?.cedula ?? '-'} />
-            <InfoItem label="Tipo" value={getTipoOferta(formulario.id_tipo_oferta)} />
+            <InfoItem
+              label="Tipo"
+              value={getTipoOferta(formulario.id_tipo_oferta)}
+            />
             <InfoItem
               label="Estado"
               value={
@@ -282,7 +292,10 @@ function EmprendimientoDetailDialog({
                 'INGRESADO'
               }
             />
-            <InfoItem label="Fecha" value={formatDate(formulario.fecha_formulario)} />
+            <InfoItem
+              label="Fecha"
+              value={formatDate(formulario.fecha_formulario)}
+            />
             <InfoItem
               label="Código de pago"
               value={formulario.codigo_pago || 'Sin código'}
@@ -336,10 +349,13 @@ function EmprendimientoFormDialog({
     onSubmit({
       ...values,
       id_emprendedor: Number(values.id_emprendedor),
-      id_tipo_oferta: values.id_tipo_oferta ? Number(values.id_tipo_oferta) : null,
+      id_tipo_oferta: values.id_tipo_oferta
+        ? Number(values.id_tipo_oferta)
+        : null,
       id_estado_emprendedor: Number(values.id_estado_emprendedor),
       valor_pago_inicial:
-        values.valor_pago_inicial === null || values.valor_pago_inicial === undefined
+        values.valor_pago_inicial === null ||
+        values.valor_pago_inicial === undefined
           ? null
           : Number(values.valor_pago_inicial),
     })
@@ -482,7 +498,11 @@ function EmprendimientoFormDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit">Guardar</Button>
@@ -503,7 +523,10 @@ function DeleteEmprendimientoDialog({
   onConfirm: () => void
 }) {
   return (
-    <Dialog open={Boolean(formulario)} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={Boolean(formulario)}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

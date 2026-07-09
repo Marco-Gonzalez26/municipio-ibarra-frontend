@@ -17,7 +17,9 @@ type UserResponseShape = {
 type RawUsersResponse = Usuario[] | UserResponseShape
 
 // Acepta varias respuestas del backend sin romper la tabla.
-function normalizeUsersResponse(response: RawUsersResponse): UsuarioListResponse {
+function normalizeUsersResponse(
+  response: RawUsersResponse
+): UsuarioListResponse {
   if (Array.isArray(response)) {
     return {
       ok: true,
