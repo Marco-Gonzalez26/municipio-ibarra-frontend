@@ -2,6 +2,8 @@ import { Building2 } from 'lucide-react'
 import { RegisterWizard } from '@/features/registro-emprendedor/components/register-wizard-form'
 import { catalogService } from '@/features/registro-emprendedor/services/catalog.service'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   const [
     maritalStatus,
