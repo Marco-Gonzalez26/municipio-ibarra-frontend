@@ -33,3 +33,5 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{vars.NEXT_PUBLIC_BASE_URL}}
