@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -27,93 +28,76 @@ export function EntrepreneurDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-3xl min-w-xl w-full "
-        showCloseButton
-        aria-describedby="alert-dialog-description"
-      >
+      <DialogContent className="max-w-3xl min-w-xl w-full" showCloseButton>
         <DialogHeader>
           <DialogTitle>Detalles del Emprendedor</DialogTitle>
+          <DialogDescription>
+            Información general del emprendedor y de su formulario registrado.
+          </DialogDescription>
         </DialogHeader>
 
         <Separator />
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <div>
-            <p className="text-xs text-muted-foreground">Nombre Completo</p>
-            <p className="text-sm font-medium">
-              {entrepreneur.nombres_apellidos}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Cédula</p>
-            <p className="text-sm font-medium">{entrepreneur.cedula}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Correo</p>
-            <p className="text-sm font-medium">{entrepreneur.email}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Celular</p>
-            <p className="text-sm font-medium">{entrepreneur.celular}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Edad</p>
-            <p className="text-sm font-medium">{entrepreneur.edad}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Ciudad</p>
-            <p className="text-sm font-medium">{entrepreneur.ciudad}</p>
-          </div>
+          <InfoItem
+            label="Nombre Completo"
+            value={entrepreneur.nombres_apellidos}
+          />
+          <InfoItem label="Cédula" value={entrepreneur.cedula} />
+          <InfoItem label="Correo" value={entrepreneur.email} />
+          <InfoItem label="Celular" value={entrepreneur.celular} />
+          <InfoItem label="Edad" value={String(entrepreneur.edad ?? '-')} />
+          <InfoItem label="Ciudad" value={entrepreneur.ciudad ?? '-'} />
         </div>
 
-        {formulario && (
+        {formulario ? (
           <>
             <Separator />
             <p className="text-sm font-semibold">
               Información del Emprendimiento
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Nombre</p>
-                <p className="text-sm font-medium">
-                  {formulario.nombre_emprendimiento ?? 'No especificado'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Pago Inicial</p>
-                <p className="text-sm font-medium">
-                  {formulario.valor_pago_inicial
+              <InfoItem
+                label="Nombre"
+                value={formulario.nombre_emprendimiento ?? 'No especificado'}
+              />
+              <InfoItem
+                label="Pago Inicial"
+                value={
+                  formulario.valor_pago_inicial
                     ? `$${formulario.valor_pago_inicial}`
-                    : 'No registrado'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Código de Pago</p>
-                <p className="text-sm font-medium">
-                  {formulario.codigo_pago ?? 'No registrado'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Intención de Emprender
-                </p>
-                <p className="text-sm font-medium">
-                  {formulario.intencion_emprender ? 'Sí' : 'No'}
-                </p>
-              </div>
-              {formulario.motivo_intencion_emprender && (
+                    : 'No registrado'
+                }
+              />
+              <InfoItem
+                label="Código de Pago"
+                value={formulario.codigo_pago ?? 'No registrado'}
+              />
+              <InfoItem
+                label="Intención de Emprender"
+                value={formulario.intencion_emprender ? 'Sí' : 'No'}
+              />
+              {formulario.motivo_intencion_emprender ? (
                 <div className="col-span-2">
-                  <p className="text-xs text-muted-foreground">Motivación</p>
-                  <p className="text-sm font-medium">
-                    {formulario.motivo_intencion_emprender}
-                  </p>
+                  <InfoItem
+                    label="Motivación"
+                    value={formulario.motivo_intencion_emprender}
+                  />
                 </div>
-              )}
+              ) : null}
             </div>
           </>
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
+  )
+}
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium">{value}</p>
+    </div>
   )
 }

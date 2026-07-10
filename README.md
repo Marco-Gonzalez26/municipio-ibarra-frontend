@@ -53,12 +53,13 @@ Sistema interno desarrollado para el Municipio de San Miguel de Ibarra.
 - `refactor: extract auth hook`
 - `docs: update README`
 
-  
   ## Colaboradores
+
 - Marco Gonzalez
 - Sayuri Cerna
 - Pablo Miranda
 
   ## Colaboradores Documentacion
+
 - Wilthon Baque
 - Juan Quito

@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
-  Users,
-  FileText,
   ClipboardList,
-  Building2,
+  FileText,
+  LayoutDashboard,
+  Store,
+  UserCog,
+  Users,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -22,7 +23,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
   {
@@ -30,9 +30,10 @@ const NAV_ITEMS = [
     items: [
       { title: 'Inicio', url: '/inicio', icon: LayoutDashboard },
       { title: 'Emprendedores', url: '/emprendedores', icon: Users },
-      { title: 'Asesorias', url: '/asesorias', icon: FileText },
+      { title: 'Emprendimientos', url: '/emprendimientos', icon: Store },
+      { title: 'Asesorías', url: '/asesorias', icon: FileText },
       { title: 'Reportes', url: '/reportes', icon: ClipboardList },
-      { title: 'Usuarios', url: '/usuarios', icon: Users },
+      { title: 'Usuarios', url: '/usuarios', icon: UserCog },
     ],
   },
   {
@@ -63,9 +64,9 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/inicio">
                 <img
-                  className="flex size-8 items-center justify-center  "
+                  className="flex size-8 items-center justify-center"
                   src="/images/escudo-ibarra.png"
-                  alt="Logo"
+                  alt="Logo Municipio de Ibarra"
                   width="100"
                   height="100"
                 />
