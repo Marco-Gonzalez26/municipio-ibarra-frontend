@@ -1,18 +1,20 @@
 'use client'
 
-import { UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import type { LoginForm } from '../types/login-form.type'
 import { login } from '@/features/dashboard/services/auth.service'
 
 export const Login = () => {
-  const { control, handleSubmit } = useForm<LoginForm>({})
+  const router = useRouter()
+  const { handleSubmit } = useForm<LoginForm>({})
 
-  function onSubmit(data: LoginForm) {
-    login(data)
+  async function onSubmit(data: LoginForm) {
+    await login(data)
+    router.push('/inicio')
   }
 
   return (
@@ -45,9 +47,9 @@ export const Login = () => {
           Ingresar
         </Button>
       </form>
-      <div className="flex gap-x-4">
+      <div className="mt-4 flex gap-x-4">
         <Link href="/">Volver al inicio</Link>
-        <Link href="/registro">Notienes cuenta? Regístrate</Link>
+        <Link href="/registro">No tienes cuenta? Regístrate</Link>
       </div>
     </div>
   )
