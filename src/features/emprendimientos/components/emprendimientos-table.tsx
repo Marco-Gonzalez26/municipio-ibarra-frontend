@@ -68,6 +68,9 @@ export function EmprendimientosTable({
   entrepreneurs,
   formularios,
 }: EmprendimientosTableProps) {
+
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Edición visual hasta conectar endpoints de emprendimientos.
   const [rows, setRows] = useState<FormularioReferenciaGeneral[]>(formularios)
   const [selectedFormulario, setSelectedFormulario] =
@@ -84,6 +87,11 @@ export function EmprendimientosTable({
       ),
     [entrepreneurs]
   )
+
+  const filteredRows = rows.filter((row) => {
+    const searchString = `${row.nombre_emprendimiento}`.toLowerCase();
+    return searchString.includes(searchTerm.toLowerCase());
+  });
 
   function getEntrepreneur(idEmprendedor: number) {
     return entrepreneursById.get(idEmprendedor) ?? null
@@ -116,6 +124,13 @@ export function EmprendimientosTable({
 
   return (
     <>
+    <input
+        type="text"
+        placeholder="Buscar por emprendimiento..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ padding: '8px', marginBottom: '20px', width: '400px', fontSize: '14px', borderRadius: '4px', border: '1px solid #d40924' }}
+      />
       <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
         <Table>
           <TableHeader>
@@ -138,7 +153,7 @@ export function EmprendimientosTable({
           </TableHeader>
 
           <TableBody>
-            {rows.map((formulario) => {
+            {filteredRows.map((formulario) => {
               const emprendedor = getEntrepreneur(formulario.id_emprendedor)
               const estado =
                 ESTADO_MAP[formulario.id_estado_emprendedor] ?? ESTADO_MAP[1]
