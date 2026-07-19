@@ -43,6 +43,12 @@ export interface FormularioRefSector {
 
 export type FormularioRefSectorCreateDTO = Omit<FormularioRefSector, 'id'>
 
+export interface FormularioRefSectorListResponse {
+  ok: boolean
+  total: number
+  formularios_ref_sector: FormularioRefSector[]
+}
+
 // Formulario Ref Infraestructura
 
 export interface FormularioRefInfraestructura {
