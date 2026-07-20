@@ -59,7 +59,8 @@ Sistema interno desarrollado para el Municipio de San Miguel de Ibarra.
 - Sayuri Cerna
 - Pablo Miranda
 - Wilthon Baque
-- Henry Alvarez 
+- Henry Alvarez
+- Jeremy Haro 
 
   ## Colaboradores Documentacion
 
