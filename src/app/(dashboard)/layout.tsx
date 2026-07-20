@@ -1,16 +1,19 @@
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { getSession } from '@/features/auth/services/session.service'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getSession()
+
   return (
     <TooltipProvider>
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar user={session?.usuario} />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

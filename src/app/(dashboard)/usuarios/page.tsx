@@ -1,6 +1,10 @@
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { UsersTable } from '@/features/usuarios/components/users-table'
 import { userService } from '@/features/usuarios/services/user.service'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
 
 const LIMIT = 15
 
@@ -13,7 +17,10 @@ export default async function UsuariosPage({
 }: UsuariosPageProps) {
   const { page: pageParam } = await searchParams
   const page = Number(pageParam ?? 1)
-  const usersRes = await userService.getAll(page, LIMIT)
+  const session = await requireSession()
+  const usersRes = await withSessionRedirect(() =>
+    userService.getAll(page, LIMIT, session.token)
+  )
   const users = Array.isArray(usersRes.usuarios) ? usersRes.usuarios : []
 
   return (
