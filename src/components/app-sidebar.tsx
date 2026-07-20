@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  Briefcase,
   ClipboardList,
   FileText,
   LayoutDashboard,
+  Megaphone,
   LogOut,
   Store,
   UserCog,
@@ -34,7 +36,6 @@ const NAV_ITEMS = [
       { title: 'Inicio', url: '/inicio', icon: LayoutDashboard },
       { title: 'Emprendedores', url: '/emprendedores', icon: Users },
       { title: 'Emprendimientos', url: '/emprendimientos', icon: Store },
-      { title: 'Asesorías', url: '/asesorias', icon: FileText },
       { title: 'Reportes', url: '/reportes', icon: ClipboardList },
       { title: 'Usuarios', url: '/usuarios', icon: UserCog },
     ],
@@ -51,6 +52,21 @@ const NAV_ITEMS = [
         title: 'Asistencia Técnica',
         url: '/formularios/asistencia',
         icon: ClipboardList,
+      },
+    ],
+  },
+  {
+    label: 'Asesorías',
+    items: [
+      {
+        title: 'Modelo de negocio',
+        url: '/asesorias/modelo-negocio',
+        icon: Briefcase,
+      },
+      {
+        title: 'Modelo de marketing',
+        url: '/asesorias/modelo-marketing',
+        icon: Megaphone,
       },
     ],
   },
