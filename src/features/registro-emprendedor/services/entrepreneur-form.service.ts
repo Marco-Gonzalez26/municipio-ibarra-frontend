@@ -1,4 +1,4 @@
-import { api } from '@/lib/https'
+import { api, authHeader } from '@/lib/https'
 
 import type {
   FormularioReferenciaGeneralCreateDTO,
@@ -18,9 +18,10 @@ import type {
 export const entrepeneurFormService = {
   // Formulario referencia general
 
-  getAllReferenciaGeneral: (page = 1, limit = 15) =>
+  getAllReferenciaGeneral: (page = 1, limit = 15, token?: string) =>
     api.get<FormularioReferenciaGeneralListResponse>(
-      `/formulariosreferenciageneral?page=${page}&limit=${limit}`
+      `/formulariosreferenciageneral?page=${page}&limit=${limit}`,
+      { headers: authHeader(token) }
     ),
   createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
     api.post<FormularioReferenciaGeneralCreateResponse>(

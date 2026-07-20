@@ -1,4 +1,4 @@
-import { api } from '@/lib/https'
+import { api, authHeader, ApiError } from '@/lib/https'
 import { mockUsers } from '../data/mock-users'
 import type {
   Usuario,
@@ -82,14 +82,21 @@ function normalizeUsersResponse(
 }
 
 export const userService = {
-  async getAll(page = 1, limit = 15): Promise<UsuarioListResponse> {
+  async getAll(
+    page = 1,
+    limit = 15,
+    token?: string
+  ): Promise<UsuarioListResponse> {
     try {
       const response = await api.get<RawUsersResponse>(
-        `/usuarios?page=${page}&limit=${limit}`
+        `/usuarios?page=${page}&limit=${limit}`,
+        { headers: authHeader(token) }
       )
 
       return normalizeUsersResponse(response)
     } catch (error) {
+      if (error instanceof ApiError && error.status === 401) throw error
+
       console.warn('No se pudo cargar /usuarios. Usando datos mock.', error)
       return {
         ok: true,

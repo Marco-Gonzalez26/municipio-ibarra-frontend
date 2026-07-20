@@ -5,9 +5,15 @@ import {
   Store,
   Users,
 } from 'lucide-react'
+import { unstable_rethrow } from 'next/navigation'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
 import { userService } from '@/features/usuarios/services/user.service'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
+import { authHeader } from '@/lib/https'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
 import type {
@@ -37,12 +43,17 @@ function getApiBaseUrl() {
   return apiBaseUrl.replace(/\/$/, '')
 }
 
-async function requestJson<T>(path: string, errorMessage: string): Promise<T> {
+async function requestJson<T>(
+  path: string,
+  errorMessage: string,
+  token?: string
+): Promise<T> {
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: 'GET',
     cache: 'no-store',
     headers: {
       Accept: 'application/json',
+      ...authHeader(token),
     },
   })
 
@@ -53,10 +64,13 @@ async function requestJson<T>(path: string, errorMessage: string): Promise<T> {
   return (await response.json()) as T
 }
 
-async function getAsistenciasTecnicas(): Promise<AsistenciaTecnicaResponse> {
+async function getAsistenciasTecnicas(
+  token?: string
+): Promise<AsistenciaTecnicaResponse> {
   const result = await requestJson<AsistenciaTecnicaResponse>(
     '/formularioasistenciatecnica',
-    'Error al consultar asistencias técnicas'
+    'Error al consultar asistencias técnicas',
+    token
   )
 
   if (!result.ok || !Array.isArray(result.data)) {
@@ -66,10 +80,11 @@ async function getAsistenciasTecnicas(): Promise<AsistenciaTecnicaResponse> {
   return result
 }
 
-async function getGeneros(): Promise<CatalogResponse> {
+async function getGeneros(token?: string): Promise<CatalogResponse> {
   const result = await requestJson<CatalogResponse>(
     '/catgenero',
-    'Error al consultar géneros'
+    'Error al consultar géneros',
+    token
   )
 
   if (!Array.isArray(result.data)) {
@@ -79,10 +94,11 @@ async function getGeneros(): Promise<CatalogResponse> {
   return result
 }
 
-async function getSectores(): Promise<CatalogResponse> {
+async function getSectores(token?: string): Promise<CatalogResponse> {
   const result = await requestJson<CatalogResponse>(
     '/catsectoremprendimiento',
-    'Error al consultar sectores'
+    'Error al consultar sectores',
+    token
   )
 
   if (!Array.isArray(result.data)) {
@@ -92,10 +108,13 @@ async function getSectores(): Promise<CatalogResponse> {
   return result
 }
 
-async function getFormulariosSector(): Promise<FormularioSectorResponse> {
+async function getFormulariosSector(
+  token?: string
+): Promise<FormularioSectorResponse> {
   const result = await requestJson<FormularioSectorResponse>(
     '/formulariorefsector',
-    'Error al consultar formularios de sector'
+    'Error al consultar formularios de sector',
+    token
   )
 
   if (!result.ok || !Array.isArray(result.formularios_ref_sector)) {
@@ -120,6 +139,9 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   let totalAsesoriasTecnicas = 0
 
+  const session = await requireSession()
+  const token = session.token
+
   try {
     const [
       entrepreneursRes,
@@ -129,15 +151,17 @@ export async function getDashboardData(): Promise<DashboardData> {
       gendersRes,
       sectorsRes,
       sectorFormsRes,
-    ] = await Promise.all([
-      entrepreneurService.getAll(1, LIMIT),
-      entrepeneurFormService.getAllReferenciaGeneral(1, LIMIT),
-      userService.getAll(1, LIMIT),
-      getAsistenciasTecnicas(),
-      getGeneros(),
-      getSectores(),
-      getFormulariosSector(),
-    ])
+    ] = await withSessionRedirect(() =>
+      Promise.all([
+        entrepreneurService.getAll(1, LIMIT, token),
+        entrepeneurFormService.getAllReferenciaGeneral(1, LIMIT, token),
+        userService.getAll(1, LIMIT, token),
+        getAsistenciasTecnicas(token),
+        getGeneros(token),
+        getSectores(token),
+        getFormulariosSector(token),
+      ])
+    )
 
     emprendedores = entrepreneursRes.emprendedores
     formularios = formsRes.formularios_referencia_general
@@ -162,6 +186,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
     parroquias = buildParishChart(emprendedores)
   } catch (error) {
+    unstable_rethrow(error)
     console.error('Error al cargar el dashboard:', error)
 
     hasApiError = true

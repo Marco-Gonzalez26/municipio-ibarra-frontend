@@ -4,6 +4,10 @@ import { entrepreneurService } from '@/features/registro-emprendedor/services/en
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
 import { EntrepreneursTable } from '@/features/emprendedores/components/entrepreneurs-table'
 import { TablePagination } from '@/features/emprendedores/components/table-pagination'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
 
 const LIMIT = 15
 
@@ -16,11 +20,18 @@ export default async function EmprendedoresPage({
 }: EmprendedoresPageProps) {
   const { page: pageParam } = await searchParams
   const page = Number(pageParam ?? 1)
+  const session = await requireSession()
 
-  const [entrepreneursRes, formularsRes] = await Promise.all([
-    entrepreneurService.getAll(page, LIMIT),
-    entrepeneurFormService.getAllReferenciaGeneral(page, LIMIT),
-  ])
+  const [entrepreneursRes, formularsRes] = await withSessionRedirect(() =>
+    Promise.all([
+      entrepreneurService.getAll(page, LIMIT, session.token),
+      entrepeneurFormService.getAllReferenciaGeneral(
+        page,
+        LIMIT,
+        session.token
+      ),
+    ])
+  )
 
   const totalPages = Math.ceil(entrepreneursRes.total / LIMIT)
 

@@ -1,8 +1,13 @@
+import { unstable_rethrow } from 'next/navigation'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EmprendimientosTable } from '@/features/emprendimientos/components/emprendimientos-table'
 import { TablePagination } from '@/features/emprendedores/components/table-pagination'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
 
@@ -17,6 +22,7 @@ export default async function EmprendimientosPage({
 }: EmprendimientosPageProps) {
   const { page: pageParam } = await searchParams
   const page = Number(pageParam ?? 1)
+  const session = await requireSession()
 
   let entrepreneurs: Emprendedor[] = []
   let formularios: FormularioReferenciaGeneral[] = []
@@ -24,10 +30,16 @@ export default async function EmprendimientosPage({
 
   try {
     // Se usa referencia general porque el front aún no tiene servicio propio.
-    const [entrepreneursRes, formulariosRes] = await Promise.all([
-      entrepreneurService.getAll(page, LIMIT),
-      entrepeneurFormService.getAllReferenciaGeneral(page, LIMIT),
-    ])
+    const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
+      Promise.all([
+        entrepreneurService.getAll(page, LIMIT, session.token),
+        entrepeneurFormService.getAllReferenciaGeneral(
+          page,
+          LIMIT,
+          session.token
+        ),
+      ])
+    )
 
     entrepreneurs = Array.isArray(entrepreneursRes.emprendedores)
       ? entrepreneursRes.emprendedores
@@ -44,6 +56,7 @@ export default async function EmprendimientosPage({
     )
     total = formulariosRes.total ?? formularios.length
   } catch (error) {
+    unstable_rethrow(error)
     console.error('No se pudieron cargar los emprendimientos', error)
   }
 

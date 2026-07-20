@@ -3,6 +3,10 @@ import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EditEntrepreneurForm } from '@/features/emprendedores/components/edit-entrepreneur-form'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
 
 interface EditEntrepreneurPageProps {
   params: Promise<{ id: string }>
@@ -12,7 +16,10 @@ export default async function EditEntrepreneurPage({
   params,
 }: EditEntrepreneurPageProps) {
   const { id } = await params
-  const entrepreneur = await entrepreneurService.getById(Number(id))
+  const session = await requireSession()
+  const entrepreneur = await withSessionRedirect(() =>
+    entrepreneurService.getById(Number(id), session.token)
+  )
 
   if (!entrepreneur) notFound()
 
