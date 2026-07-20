@@ -61,6 +61,7 @@ Sistema interno desarrollado para el Municipio de San Miguel de Ibarra.
 - Wilthon Baque
 - Henry Alvarez
 - Juan Ramirez
+- Jeremy Haro 
 
   ## Colaboradores Documentacion
 

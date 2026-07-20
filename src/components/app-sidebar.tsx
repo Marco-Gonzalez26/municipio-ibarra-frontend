@@ -8,6 +8,7 @@ import {
   FileText,
   LayoutDashboard,
   Megaphone,
+  LogOut,
   Store,
   UserCog,
   Users,
@@ -25,6 +26,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { logoutAction } from '@/features/auth/actions/auth.actions'
+import type { AuthUser } from '@/features/auth/types/auth.type'
 
 const NAV_ITEMS = [
   {
@@ -69,7 +72,11 @@ const NAV_ITEMS = [
   },
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  user?: AuthUser
+}
+
+export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -128,6 +135,21 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        {user && (
+          <SidebarMenu>
+            <SidebarMenuItem className="px-2 text-xs text-muted-foreground">
+              Sesión: {user.nombres}
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <form action={logoutAction}>
+                <SidebarMenuButton type="submit" tooltip="Cerrar sesión">
+                  <LogOut />
+                  <span>Cerrar sesión</span>
+                </SidebarMenuButton>
+              </form>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         <div className="p-2 text-xs text-muted-foreground">
           © 2026 Municipalidad de Ibarra
         </div>
