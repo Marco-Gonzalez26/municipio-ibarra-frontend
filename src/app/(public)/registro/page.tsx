@@ -1,4 +1,9 @@
-import { ArrowLeft, ArrowLeftCircle, Building2, ChevronLeft } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowLeftCircle,
+  Building2,
+  ChevronLeft,
+} from 'lucide-react'
 import { RegisterWizard } from '@/features/registro-emprendedor/components/register-wizard-form'
 import { catalogService } from '@/features/registro-emprendedor/services/catalog.service'
 import {
@@ -23,7 +28,6 @@ export default async function Page() {
           <Button asChild variant="ghost" className="flex items-center">
             <Link href="/">
               <ArrowLeft className="size-6" />
-        
             </Link>
           </Button>
           <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-lg">
