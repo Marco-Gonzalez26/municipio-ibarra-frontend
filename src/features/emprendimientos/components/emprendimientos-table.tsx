@@ -68,8 +68,7 @@ export function EmprendimientosTable({
   entrepreneurs,
   formularios,
 }: EmprendimientosTableProps) {
-
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Edición visual hasta conectar endpoints de emprendimientos.
   const [rows, setRows] = useState<FormularioReferenciaGeneral[]>(formularios)
@@ -89,9 +88,9 @@ export function EmprendimientosTable({
   )
 
   const filteredRows = rows.filter((row) => {
-    const searchString = `${row.nombre_emprendimiento}`.toLowerCase();
-    return searchString.includes(searchTerm.toLowerCase());
-  });
+    const searchString = `${row.nombre_emprendimiento}`.toLowerCase()
+    return searchString.includes(searchTerm.toLowerCase())
+  })
 
   function getEntrepreneur(idEmprendedor: number) {
     return entrepreneursById.get(idEmprendedor) ?? null
@@ -124,12 +123,19 @@ export function EmprendimientosTable({
 
   return (
     <>
-    <input
+      <input
         type="text"
         placeholder="Buscar por emprendimiento..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ padding: '8px', marginBottom: '20px', width: '400px', fontSize: '14px', borderRadius: '4px', border: '1px solid #d40924' }}
+        style={{
+          padding: '8px',
+          marginBottom: '20px',
+          width: '400px',
+          fontSize: '14px',
+          borderRadius: '4px',
+          border: '1px solid #d40924',
+        }}
       />
       <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
         <Table>

@@ -51,12 +51,13 @@ export function EntrepreneursTable({
     name: string
   } | null>(null)
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredEntrepeneurs = entrepreneurs.filter((entrepeneur) => {
-    const searchString = `${entrepeneur.nombres_apellidos} ${entrepeneur.cedula}`.toLowerCase();
-    return searchString.includes(searchTerm.toLowerCase());
-  });
+    const searchString =
+      `${entrepeneur.nombres_apellidos} ${entrepeneur.cedula}`.toLowerCase()
+    return searchString.includes(searchTerm.toLowerCase())
+  })
 
   function getFormulario(idEmprendedor: number) {
     return formularios.find((f) => f.id_emprendedor === idEmprendedor) ?? null
@@ -81,7 +82,14 @@ export function EntrepreneursTable({
         placeholder="Buscar por nombre, cédula..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ padding: '8px', marginBottom: '20px', width: '400px', fontSize: '14px', borderRadius: '4px', border: '1px solid #d40924' }}
+        style={{
+          padding: '8px',
+          marginBottom: '20px',
+          width: '400px',
+          fontSize: '14px',
+          borderRadius: '4px',
+          border: '1px solid #d40924',
+        }}
       />
       <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         <Table>
