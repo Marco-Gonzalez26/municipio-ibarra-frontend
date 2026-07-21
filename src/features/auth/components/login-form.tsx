@@ -14,7 +14,11 @@ import { Input } from '@/components/ui/input'
 import { loginAction } from '../actions/auth.actions'
 import type { LoginCredentials } from '../types/auth.type'
 
-export const Login = () => {
+interface LoginProps {
+  redirect_url?: string
+}
+
+export const Login = ({ redirect_url }: LoginProps) => {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const {
@@ -26,7 +30,8 @@ export const Login = () => {
   async function onSubmit(data: LoginCredentials) {
     try {
       await loginAction(data)
-      router.push('/inicio')
+      const redirectUrl = redirect_url ?? '/inicio'
+      router.push(redirectUrl)
     } catch (error) {
       toast.error('No se pudo iniciar sesión', {
         description:

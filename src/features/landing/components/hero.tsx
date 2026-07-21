@@ -1,8 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { LogIn, Search, UserPlus } from 'lucide-react'
+import { Session } from '@/features/auth/types/auth.type'
+import { LayoutDashboard, LogIn, Search, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 
-export function Hero() {
+interface HeroProps {
+  session: Session | null
+}
+export function Hero({ session }: HeroProps) {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute top-0 left-0 -z-10 h-full w-full bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(226,17,26,0.08)_100%)]" />
@@ -23,16 +27,29 @@ export function Hero() {
               Registrar Emprendimiento
             </Button>
           </Link>
-          <Link href="/iniciar-sesion">
-            <Button
-              size="lg"
-              variant="outline"
-              className="hover:cursor-pointer"
-            >
-              <LogIn className="size-4" />
-              Iniciar Sesión
-            </Button>
-          </Link>
+          {session ? (
+            <Link href="/inicio">
+              <Button
+                size="lg"
+                variant="outline"
+                className="hover:cursor-pointer"
+              >
+                <LayoutDashboard className="size-4" />
+                Ir al Panel de Control
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/iniciar-sesion">
+              <Button
+                size="lg"
+                variant="outline"
+                className="hover:cursor-pointer"
+              >
+                <LogIn className="size-4" />
+                Iniciar Sesión
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="mx-auto mt-12 max-w-md rounded-xl border bg-card p-6 text-left shadow-sm">

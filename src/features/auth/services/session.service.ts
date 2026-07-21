@@ -18,9 +18,14 @@ export async function getSession(): Promise<Session | null> {
 }
 
 // Las Server Actions no pasan por proxy.ts, así que revalidan la sesión aquí.
-export async function requireSession(): Promise<Session> {
+export async function requireSession(redirectTo?: string): Promise<Session> {
   const session = await getSession()
-  if (!session) redirect('/iniciar-sesion')
+  if (!session) {
+    const redirectUrl = redirectTo
+      ? `/iniciar-sesion?redirect_url=${encodeURIComponent(redirectTo)}`
+      : '/iniciar-sesion'
+    redirect(redirectUrl)
+  }
   return session
 }
 

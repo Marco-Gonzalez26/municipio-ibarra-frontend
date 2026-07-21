@@ -18,6 +18,7 @@ interface RequestOptions {
   body?: unknown
   cache?: RequestCache
   tags?: string[]
+  token?: string
 }
 
 const httpClient = async <T>(
@@ -30,6 +31,7 @@ const httpClient = async <T>(
     body,
     cache = 'default',
     tags = [],
+    token,
   } = options
 
   const isFormatData = body instanceof FormData
@@ -40,6 +42,7 @@ const httpClient = async <T>(
         ...headers,
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...(token ? { 'token-vinculacion': token } : {}),
       }
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method,

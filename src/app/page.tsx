@@ -2,13 +2,14 @@ import { FeaturesSection } from '@/features/landing/components/features-section'
 import { Footer } from '@/features/landing/components/footer'
 import { Header } from '@/features/landing/components/header'
 import { Hero } from '@/features/landing/components/hero'
-
-export default function Home() {
+import { getSession } from '@/features/auth/services/session.service'
+export default async function Home() {
+  const session = await getSession()
   return (
     <>
       <Header />
       <main>
-        <Hero />
+        <Hero session={session} />
         <FeaturesSection />
       </main>
       <Footer />
