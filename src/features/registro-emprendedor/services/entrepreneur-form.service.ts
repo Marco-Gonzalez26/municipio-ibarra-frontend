@@ -19,7 +19,12 @@ import type {
 export const entrepeneurFormService = {
   // Formulario referencia general
 
-  getAllReferenciaGeneral: (page = 1, limit = 15, idEmprendedor?: number) => {
+  getAllReferenciaGeneral: (
+    page = 1,
+    limit = 15,
+    token?: string,
+    idEmprendedor?: number
+  ) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -27,88 +32,101 @@ export const entrepeneurFormService = {
     if (idEmprendedor) params.set('id_emprendedor', String(idEmprendedor))
 
     return api.get<FormularioReferenciaGeneralListResponse>(
-      `/formulariosreferenciageneral?${params.toString()}`
+      `/formulariosreferenciageneral?${params.toString()}`,
+      { token }
     )
   },
-  getAllReferenciaGeneral: (page = 1, limit = 15, token?: string) =>
-    api.get<FormularioReferenciaGeneralListResponse>(
-      `/formulariosreferenciageneral?page=${page}&limit=${limit}`,
-      { headers: authHeader(token) }
-    ),
-  createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
+  createReferenciaGeneral: (
+    payload: FormularioReferenciaGeneralCreateDTO,
+    token?: string
+  ) =>
     api.post<FormularioReferenciaGeneralCreateResponse>(
       '/formulariosreferenciageneral',
-      {
-        body: payload,
-      }
+      { body: payload, token }
     ),
 
-  // Sectores — uno por uno
-  createRefSector: (payload: FormularioRefSectorCreateDTO) =>
-    api.post<FormularioRefSector>('/formulariorefsector', { body: payload }),
+  createRefSector: (payload: FormularioRefSectorCreateDTO, token?: string) =>
+    api.post<FormularioRefSector>('/formulariorefsector', {
+      body: payload,
+      token,
+    }),
 
-  getRefSectorByFormulario: (idFormularioRef: number) =>
+  getRefSectorByFormulario: (idFormularioRef: number, token?: string) =>
     api.get<FormularioRefSectorListResponse>(
-      `/formulariorefsector?id_formulario_ref=${idFormularioRef}`
+      `/formulariorefsector?id_formulario_ref=${idFormularioRef}`,
+      { token }
     ),
 
-  // Bulk de sectores — itera y hace N POSTs
-  createRefSectores: (idFormulario: number, sectores: number[]) =>
+  createRefSectores: (
+    idFormulario: number,
+    sectores: number[],
+    token?: string
+  ) =>
     Promise.all(
       sectores.map((id_sector) =>
-        entrepeneurFormService.createRefSector({
-          id_formulario_ref: idFormulario,
-          id_sector,
-          sector_otro: null,
-        })
+        entrepeneurFormService.createRefSector(
+          { id_formulario_ref: idFormulario, id_sector, sector_otro: null },
+          token
+        )
       )
     ),
 
-  // Infraestructura — uno por uno
-  createRefInfraestructura: (payload: FormularioRefInfraestructuraCreateDTO) =>
+  createRefInfraestructura: (
+    payload: FormularioRefInfraestructuraCreateDTO,
+    token?: string
+  ) =>
     api.post<FormularioRefInfraestructura>('/formulariorefinfraestructura', {
       body: payload,
+      token,
     }),
 
-  // Bulk de infraestructura
   createRefInfraestructuras: (
     idFormulario: number,
-    infraestructuras: number[]
+    infraestructuras: number[],
+    token?: string
   ) =>
     Promise.all(
       infraestructuras.map((id_infraestructura) =>
-        entrepeneurFormService.createRefInfraestructura({
-          id_formulario_ref: idFormulario,
-          id_infraestructura,
-          descripcion_otro: null,
-        })
+        entrepeneurFormService.createRefInfraestructura(
+          {
+            id_formulario_ref: idFormulario,
+            id_infraestructura,
+            descripcion_otro: null,
+          },
+          token
+        )
       )
     ),
 
-  // Formulario asistencia técnica
-  createAsistenciaTecnica: (payload: FormularioAsistenciaTecnicaCreateDTO) =>
+  createAsistenciaTecnica: (
+    payload: FormularioAsistenciaTecnicaCreateDTO,
+    token?: string
+  ) =>
     api.post<FormularioAsistenciaTecnicaResponse>(
       '/formularioasistenciatecnica',
-      {
-        body: payload,
-      }
+      { body: payload, token }
     ),
 
-  // Requerimientos asistencia — uno por uno
-  createAsistRequerimiento: (payload: FormularioAsistRequerimientoCreateDTO) =>
+  createAsistRequerimiento: (
+    payload: FormularioAsistRequerimientoCreateDTO,
+    token?: string
+  ) =>
     api.post<FormularioAsistRequerimiento>('/formularioasistrequerimiento', {
       body: payload,
+      token,
     }),
 
-  // Bulk de requerimientos
-  createAsistRequerimientos: (idFormulario: number, temas: number[]) =>
+  createAsistRequerimientos: (
+    idFormulario: number,
+    temas: number[],
+    token?: string
+  ) =>
     Promise.all(
       temas.map((id_tema) =>
-        entrepeneurFormService.createAsistRequerimiento({
-          id_formulario_asist: idFormulario,
-          id_tema,
-          requerimiento: null,
-        })
+        entrepeneurFormService.createAsistRequerimiento(
+          { id_formulario_asist: idFormulario, id_tema, requerimiento: null },
+          token
+        )
       )
     ),
 }
