@@ -8,7 +8,6 @@ export interface FichaContexto {
   nombreEmprendimiento: string | null
   sector: string | null
   direccion: string | null
-  datosSimulados: boolean
 }
 
 export interface FichaForm {
@@ -16,4 +15,11 @@ export interface FichaForm {
   productoLinea: string
   analista: string
   observaciones: string
+}
+
+export interface EmprendimientoOpcion {
+  idEmprendedor: number
+  nombreEmprendedor: string
+  cedula: string
+  nombreEmprendimiento: string
 }

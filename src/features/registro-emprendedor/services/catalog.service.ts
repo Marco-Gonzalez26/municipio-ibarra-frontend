@@ -1,4 +1,4 @@
-import { api } from '@/lib/https'
+import { api, authHeader } from '@/lib/https'
 import type {
   CatalogoItem,
   CatalogoItemConOrden,
@@ -89,9 +89,10 @@ export const catalogService = {
     return normalizeResponse(res)
   },
 
-  getEnterpriseSector: async () => {
+  getEnterpriseSector: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
-      '/catsectoremprendimiento'
+      '/catsectoremprendimiento',
+      { headers: authHeader(token) }
     )
     return normalizeResponse(res)
   },

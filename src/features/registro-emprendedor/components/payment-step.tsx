@@ -3,6 +3,7 @@
 import { Controller, useForm } from 'react-hook-form'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Button } from '@/components/ui/button'
 import { useWizardStore } from '../store/wizard.store'
 import type { PagoForm } from '../types/wizard-form.type'
@@ -44,18 +45,11 @@ export function PaymentStep({ onNext }: PaymentStepProps) {
               <FieldLabel htmlFor={field.name}>
                 Valor de Pago Inicial (USD) *
               </FieldLabel>
-              <Input
+              <NumberInput
                 id={field.name}
-                type="number"
-                min={0}
-                step={0.01}
                 placeholder="0.00"
-                value={field.value ?? ''}
-                onChange={(e) =>
-                  field.onChange(
-                    e.target.value === '' ? null : Number(e.target.value)
-                  )
-                }
+                value={field.value ?? 0}
+                onChange={(value) => field.onChange(value || null)}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

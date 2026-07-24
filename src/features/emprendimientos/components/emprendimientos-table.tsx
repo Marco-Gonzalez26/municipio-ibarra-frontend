@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NumberInput } from '@/components/ui/number-input'
 import {
   Table,
   TableBody,
@@ -467,16 +468,13 @@ function EmprendimientoFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="valor_pago_inicial">Pago inicial</Label>
-              <Input
+              <NumberInput
                 id="valor_pago_inicial"
-                type="number"
-                value={values.valor_pago_inicial ?? ''}
-                onChange={(event) =>
+                value={values.valor_pago_inicial ?? 0}
+                onChange={(value) =>
                   setValues((current) => ({
                     ...current,
-                    valor_pago_inicial: event.target.value
-                      ? Number(event.target.value)
-                      : null,
+                    valor_pago_inicial: value || null,
                   }))
                 }
               />

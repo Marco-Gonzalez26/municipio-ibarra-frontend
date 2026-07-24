@@ -1,6 +1,7 @@
 'use client'
 
-import type { Control } from 'react-hook-form'
+import { forwardRef, useEffect, useImperativeHandle } from 'react'
+import type { Control, UseFormSetValue } from 'react-hook-form'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,8 @@ import {
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
 import type { CostosForm } from '../types/canvas.type'
 import { calculateFinancialProjection } from '../utils/financial-projection'
-import { StepFooter, StepHeader } from './step-shell'
+import { NumberInput } from '@/components/ui/number-input'
+import { StepFooter, StepHeader, type StepHandle } from './step-shell'
 
 interface CostosStepProps {
   onNext: () => void
@@ -29,41 +31,65 @@ function money(value: number) {
   return `$${value.toFixed(2)}`
 }
 
-export function CostosStep({ onNext, onPrevious }: CostosStepProps) {
-  const updateCostos = useModeloNegocioWizardStore(
-    (state) => state.updateCostos
-  )
-
-  const { control, handleSubmit, getValues } = useForm<CostosForm>({
-    defaultValues: useModeloNegocioWizardStore.getState().formData.costos,
-  })
-
-  function onSubmit(data: CostosForm) {
-    updateCostos(data)
-    onNext()
+function limpiarCostos(data: CostosForm): CostosForm {
+  return {
+    ...data,
+    insumos: data.insumos.filter(
+      (item) =>
+        item.categoria.trim() !== '' &&
+        Number(item.cantidad) > 0 &&
+        Number(item.costoUnit) > 0
+    ),
+    fijos: data.fijos.filter(
+      (item) => item.detalle.trim() !== '' && Number(item.valor) > 0
+    ),
+    inversion: data.inversion.filter(
+      (item) => item.categoria.trim() !== '' && Number(item.costo) > 0
+    ),
   }
-
-  function onSaveDraft() {
-    updateCostos(getValues())
-    toast.success('Borrador guardado')
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <StepHeader
-        title="Estructura de costos"
-        subtitle="Costos variables, fijos, inversión inicial y proyección financiera."
-      />
-
-      <InsumosTable control={control} />
-      <FijosTable control={control} />
-      <InversionTable control={control} />
-      <ProyeccionSection control={control} />
-
-      <StepFooter onPrevious={onPrevious} onSaveDraft={onSaveDraft} />
-    </form>
-  )
 }
+
+export const CostosStep = forwardRef<StepHandle, CostosStepProps>(
+  function CostosStep({ onNext, onPrevious }, ref) {
+    const updateCostos = useModeloNegocioWizardStore(
+      (state) => state.updateCostos
+    )
+
+    const { control, handleSubmit, getValues, setValue } = useForm<CostosForm>({
+      defaultValues: useModeloNegocioWizardStore.getState().formData.costos,
+    })
+
+    useImperativeHandle(ref, () => ({
+      saveDraft: () => updateCostos(limpiarCostos(getValues())),
+    }))
+
+    function onSubmit(data: CostosForm) {
+      updateCostos(limpiarCostos(data))
+      onNext()
+    }
+
+    function onSaveDraft() {
+      updateCostos(limpiarCostos(getValues()))
+      toast.success('Borrador guardado')
+    }
+
+    return (
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <StepHeader
+          title="Estructura de costos"
+          subtitle="Costos variables, fijos, inversión inicial y proyección financiera."
+        />
+
+        <InsumosTable control={control} />
+        <FijosTable control={control} />
+        <InversionTable control={control} />
+        <ProyeccionSection control={control} setValue={setValue} />
+
+        <StepFooter onPrevious={onPrevious} onSaveDraft={onSaveDraft} />
+      </form>
+    )
+  }
+)
 
 function InsumosTable({ control }: { control: Control<CostosForm> }) {
   const { fields, append, remove } = useFieldArray({
@@ -118,13 +144,10 @@ function InsumosTable({ control }: { control: Control<CostosForm> }) {
                     name={`insumos.${index}.cantidad`}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        type="number"
-                        step="1"
+                      <NumberInput
                         value={field.value}
-                        onChange={(event) =>
-                          field.onChange(Number(event.target.value) || 0)
-                        }
+                        onChange={field.onChange}
+                        allowDecimals={false}
                       />
                     )}
                   />
@@ -141,13 +164,9 @@ function InsumosTable({ control }: { control: Control<CostosForm> }) {
                     name={`insumos.${index}.costoUnit`}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        type="number"
-                        step="0.01"
+                      <NumberInput
                         value={field.value}
-                        onChange={(event) =>
-                          field.onChange(Number(event.target.value) || 0)
-                        }
+                        onChange={field.onChange}
                       />
                     )}
                   />
@@ -229,13 +248,9 @@ function FijosTable({ control }: { control: Control<CostosForm> }) {
                   name={`fijos.${index}.valor`}
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      type="number"
-                      step="0.01"
+                    <NumberInput
                       value={field.value}
-                      onChange={(event) =>
-                        field.onChange(Number(event.target.value) || 0)
-                      }
+                      onChange={field.onChange}
                     />
                   )}
                 />
@@ -316,13 +331,9 @@ function InversionTable({ control }: { control: Control<CostosForm> }) {
                   name={`inversion.${index}.costo`}
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      type="number"
-                      step="0.01"
+                    <NumberInput
                       value={field.value}
-                      onChange={(event) =>
-                        field.onChange(Number(event.target.value) || 0)
-                      }
+                      onChange={field.onChange}
                     />
                   )}
                 />
@@ -362,31 +373,88 @@ function InversionTable({ control }: { control: Control<CostosForm> }) {
 }
 
 const SUPUESTOS: {
-  id: keyof CostosForm['proyeccion']
+  id: keyof Omit<CostosForm['proyeccion'], 'costosFijos'>
   label: string
   prefix?: string
   suffix?: string
 }[] = [
   { id: 'precio', label: 'Precio de venta', prefix: '$' },
-  { id: 'costosFijos', label: 'Costos fijos (trim.)', prefix: '$' },
   { id: 'growth', label: 'Crecimiento / trim.', suffix: '%' },
   { id: 'startUnits', label: 'Unidades T1' },
   { id: 'varRatio', label: 'Costos variables', suffix: '% ing.' },
   { id: 'margen', label: 'Margen de ganancia', suffix: '%' },
 ]
 
-function ProyeccionSection({ control }: { control: Control<CostosForm> }) {
+function ProyeccionSection({
+  control,
+  setValue,
+}: {
+  control: Control<CostosForm>
+  setValue: UseFormSetValue<CostosForm>
+}) {
   const supuestos = useWatch({ control, name: 'proyeccion' })
-  const { filas, ingresosPorAnio } = calculateFinancialProjection(supuestos)
+  const fijos = useWatch({ control, name: 'fijos' }) ?? []
+  const productos = useModeloNegocioWizardStore(
+    (state) => state.formData.ingresos.productos
+  )
+
+  const costosFijosTrimestral =
+    fijos.reduce((sum, row) => sum + (Number(row?.valor) || 0), 0) * 3
+
+  const preciosValidos = productos
+    .map((producto) => Number(producto.precio) || 0)
+    .filter((precio) => precio > 0)
+  const precioSugerido = preciosValidos.length
+    ? Number(
+        (
+          preciosValidos.reduce((sum, precio) => sum + precio, 0) /
+          preciosValidos.length
+        ).toFixed(2)
+      )
+    : 0
+
+  useEffect(() => {
+    setValue('proyeccion.costosFijos', Number(costosFijosTrimestral.toFixed(2)))
+  }, [costosFijosTrimestral, setValue])
+
+  useEffect(() => {
+    if ((supuestos.precio ?? 0) === 0 && precioSugerido > 0) {
+      setValue('proyeccion.precio', precioSugerido)
+    }
+    // Solo se autocompleta mientras el analista no haya escrito un precio propio.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [precioSugerido])
+
+  const { filas, ingresosPorAnio } = calculateFinancialProjection({
+    ...supuestos,
+    costosFijos: costosFijosTrimestral,
+  })
 
   return (
     <Field>
       <FieldLabel>Proyección financiera (5 años · 20 trimestres)</FieldLabel>
       <p className="text-xs text-muted-foreground">
         Los valores se calculan automáticamente a partir de los supuestos.
+        &quot;Costos fijos (trim.)&quot; se toma de la tabla de costos fijos
+        mensuales de arriba y &quot;Precio de venta&quot; se sugiere a partir
+        del precio promedio de tus productos.
       </p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+        <div className="rounded-lg border bg-muted/40 p-2.5">
+          <p className="mb-1 text-[11px] text-muted-foreground">
+            Costos fijos (trim.)
+          </p>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-semibold text-muted-foreground">
+              $
+            </span>
+            <span className="text-sm font-semibold text-foreground">
+              {costosFijosTrimestral.toFixed(2)}
+            </span>
+          </div>
+        </div>
+
         {SUPUESTOS.map((supuesto) => (
           <Controller
             key={supuesto.id}
@@ -403,14 +471,10 @@ function ProyeccionSection({ control }: { control: Control<CostosForm> }) {
                       {supuesto.prefix}
                     </span>
                   )}
-                  <input
-                    type="number"
-                    step="0.01"
+                  <NumberInput
                     value={field.value}
-                    onChange={(event) =>
-                      field.onChange(Number(event.target.value) || 0)
-                    }
-                    className="w-full min-w-0 bg-transparent text-sm font-semibold text-foreground outline-none"
+                    onChange={field.onChange}
+                    className="h-auto rounded-none border-0 bg-transparent p-0 text-sm font-semibold text-foreground shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0"
                   />
                   {supuesto.suffix && (
                     <span className="text-[11px] whitespace-nowrap text-muted-foreground">

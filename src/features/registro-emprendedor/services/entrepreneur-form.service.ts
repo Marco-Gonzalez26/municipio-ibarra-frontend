@@ -19,7 +19,12 @@ import type {
 export const entrepeneurFormService = {
   // Formulario referencia general
 
-  getAllReferenciaGeneral: (page = 1, limit = 15, idEmprendedor?: number) => {
+  getAllReferenciaGeneral: (
+    page = 1,
+    limit = 15,
+    token?: string,
+    idEmprendedor?: number
+  ) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -27,14 +32,10 @@ export const entrepeneurFormService = {
     if (idEmprendedor) params.set('id_emprendedor', String(idEmprendedor))
 
     return api.get<FormularioReferenciaGeneralListResponse>(
-      `/formulariosreferenciageneral?${params.toString()}`
+      `/formulariosreferenciageneral?${params.toString()}`,
+      { headers: authHeader(token) }
     )
   },
-  getAllReferenciaGeneral: (page = 1, limit = 15, token?: string) =>
-    api.get<FormularioReferenciaGeneralListResponse>(
-      `/formulariosreferenciageneral?page=${page}&limit=${limit}`,
-      { headers: authHeader(token) }
-    ),
   createReferenciaGeneral: (payload: FormularioReferenciaGeneralCreateDTO) =>
     api.post<FormularioReferenciaGeneralCreateResponse>(
       '/formulariosreferenciageneral',
@@ -47,9 +48,10 @@ export const entrepeneurFormService = {
   createRefSector: (payload: FormularioRefSectorCreateDTO) =>
     api.post<FormularioRefSector>('/formulariorefsector', { body: payload }),
 
-  getRefSectorByFormulario: (idFormularioRef: number) =>
+  getRefSectorByFormulario: (idFormularioRef: number, token?: string) =>
     api.get<FormularioRefSectorListResponse>(
-      `/formulariorefsector?id_formulario_ref=${idFormularioRef}`
+      `/formulariorefsector?id_formulario_ref=${idFormularioRef}`,
+      { headers: authHeader(token) }
     ),
 
   // Bulk de sectores — itera y hace N POSTs

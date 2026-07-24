@@ -4,11 +4,15 @@ import { WIZARD_STEPS, type WizardStep } from '../types/wizard-form.type'
 
 interface WizardStepperProps {
   currentStep: WizardStep
+  onStepClick: (step: WizardStep) => void
 }
 
 const GROUPS = Array.from(new Set(WIZARD_STEPS.map((step) => step.group)))
 
-export function WizardStepper({ currentStep }: WizardStepperProps) {
+export function WizardStepper({
+  currentStep,
+  onStepClick,
+}: WizardStepperProps) {
   const currentIndex = WIZARD_STEPS.findIndex(
     (step) => step.key === currentStep
   )
@@ -28,10 +32,12 @@ export function WizardStepper({ currentStep }: WizardStepperProps) {
             const isActive = index === currentIndex
 
             return (
-              <div
+              <button
                 key={step.key}
+                type="button"
+                onClick={() => onStepClick(step.key)}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium',
+                  'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-muted/50',
                   isActive && 'bg-primary/10 text-foreground',
                   !isActive && 'text-muted-foreground'
                 )}
@@ -50,7 +56,7 @@ export function WizardStepper({ currentStep }: WizardStepperProps) {
                   {isCompleted ? <Check className="size-3.5" /> : index + 1}
                 </span>
                 <span>{step.label}</span>
-              </div>
+              </button>
             )
           })}
         </div>
