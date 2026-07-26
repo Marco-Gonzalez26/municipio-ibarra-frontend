@@ -25,6 +25,94 @@ function normalizeResponse<T extends { activo: boolean | number }>(
   }
 }
 export const catalogService = {
+  getAllCatalogs: async (token: string) => {
+    const opts = { token }
+    const [
+      maritalStatus,
+      genders,
+      occupations,
+      ageRanges,
+      ethnicities,
+      educationLevels,
+      disabilityTypes,
+      assistanceAreas,
+      incomeLevels,
+      entrepreneurSituations,
+      enterpriseTypes,
+      enterpriseSectors,
+      enterpriseInfrastructures,
+      themeAssistanceAreas,
+    ] = await Promise.all([
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catestadocivil', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catgenero', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catocupacion', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<RangoEdadItem>>('/catrangoedad', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catetnia', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catnivelestudios', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/cattipodiscapacidad', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItemConOrden>>('/catareaasistencia', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catnivelingresos', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catsituacionemprendedor', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/cattipooferta', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catsectoremprendimiento', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<CatalogoItem>>('/catinfraestructura', opts)
+        .then(normalizeResponse),
+      api
+        .get<CatalogoResponse<TemaAsistenciaItem>>('/cattemaasistencia', opts)
+        .then(normalizeResponse),
+    ])
+
+    return {
+      personalDataCatalogs: {
+        maritalStatus,
+        genders,
+        occupations,
+        ageRanges,
+        ethnicities,
+        educationLevels,
+        disabilityTypes,
+      },
+      technicalAssistanceCatalogs: { assistanceAreas, themeAssistanceAreas },
+      currentSituationCatalogs: {
+        incomeLevels,
+        entrepreneurSituations,
+        entrepreneurOccupations: occupations,
+      },
+      enterpriseCatalogs: {
+        enterpriseTypes,
+        enterpriseSectors,
+        enterpriseInfrastructures,
+        assistanceAreas,
+        themeAssistanceAreas,
+      },
+      intentionsCatalogs: { interestsSectors: enterpriseSectors },
+    }
+  },
   getMaritalStatus: async () => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>('/catestadocivil')
     return normalizeResponse(res)

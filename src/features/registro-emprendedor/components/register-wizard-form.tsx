@@ -23,6 +23,7 @@ import type {
 } from '../types/props.type'
 import { PaymentStep } from './payment-step'
 import { entrepeneurFormService } from '../services/entrepreneur-form.service'
+import { createEntrepreneurAction } from '../actions/create-entrepeneur-and-enterprise-action'
 
 interface RegisterWizardProps {
   personalDataCatalogs: PersonalDataCatalogs
@@ -46,59 +47,15 @@ export function RegisterWizard({
   const router = useRouter()
   async function onFinish() {
     const state = useWizardStore.getState().formData
-    const today = new Date().toISOString().split('T')[0]
-    const dto = mapWizardToEntrepreneurDTO(
-      state,
-      personalDataCatalogs.ageRanges.data
-    )
 
     try {
-      // 1 Crear emprendedor
-      const newEntrepreneur = await entrepreneurService.create(dto)
-      console.log({ newEntrepreneur })
+      await createEntrepreneurAction(state, personalDataCatalogs.ageRanges.data)
       toast.success('¡Emprendedor creado con éxito!', {
         description: 'Información registrada correctamente.',
       })
-
-      // 2 Crear formulario referencia general
-      const newFormRef = await entrepeneurFormService.createReferenciaGeneral(
-        mapWizardToFormularioReferenciaDTO(
-          state,
-          newEntrepreneur.emprendedor.id,
-          today
-        )
-      )
-      //  3 Crear sectores e infraestructura
-      await Promise.all([
-        entrepeneurFormService.createRefSectores(
-          newFormRef.formulario_referencia_general.id,
-          state.intenciones.sectores_interes
-        ),
-        entrepeneurFormService.createRefInfraestructuras(
-          newFormRef.formulario_referencia_general.id,
-          state.emprendimiento.recursos_disponibles
-        ),
-      ])
-
-      // 4 Crear formulario asistencia técnica
-      const newFormAsistencia =
-        await entrepeneurFormService.createAsistenciaTecnica(
-          mapWizardToFormularioAsistenciaDTO(
-            state,
-            newEntrepreneur.emprendedor.id,
-            today
-          )
-        )
-
-      await entrepeneurFormService.createAsistRequerimientos(
-        newFormAsistencia.data.id,
-        state.asistenciaTecnica.areas_asistencia
-      )
       useWizardStore.getState().reset()
       router.push('/inicio')
     } catch (error) {
-      console.log({ error })
-      // manejar error, mostrar feedback al usuario
       toast.error('No se pudo enviar la solicitud', {
         description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
       })
