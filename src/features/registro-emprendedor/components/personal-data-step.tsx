@@ -3,6 +3,7 @@
 import { Controller, useForm } from 'react-hook-form'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -458,12 +459,11 @@ export function PersonalDataStep({
               <FieldLabel htmlFor={field.name}>
                 Número de Cargas Familiares
               </FieldLabel>
-              <Input
-                {...field}
+              <NumberInput
                 id={field.name}
-                type="number"
-                min={0}
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                value={field.value}
+                onChange={field.onChange}
+                allowDecimals={false}
                 className="focus:ring-secondary! focus:border-secondary! focus:ring-1!"
               />
             </Field>
@@ -478,12 +478,11 @@ export function PersonalDataStep({
               <FieldLabel htmlFor={field.name}>
                 Familiares con Discapacidad
               </FieldLabel>
-              <Input
-                {...field}
+              <NumberInput
                 id={field.name}
-                type="number"
-                min={0}
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                value={field.value}
+                onChange={field.onChange}
+                allowDecimals={false}
                 className="focus:ring-secondary! focus:border-secondary! focus:ring-1!"
               />
             </Field>

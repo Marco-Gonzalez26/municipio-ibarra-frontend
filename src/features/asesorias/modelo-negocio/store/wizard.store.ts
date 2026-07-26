@@ -21,6 +21,7 @@ interface ModeloNegocioWizardStoreState {
 
   ensureEmprendedor: (idEmprendedor: number, contexto: FichaContexto) => void
   registrarProgreso: (estado: ModeloNegocioEstado) => void
+  eliminarModelo: (idEmprendedor: number) => void
   setCurrentStep: (step: WizardStep) => void
   goToNextStep: () => void
   goToPreviousStep: () => void
@@ -109,6 +110,12 @@ export const useModeloNegocioWizardStore =
               },
             },
           })
+        },
+
+        eliminarModelo: (idEmprendedor) => {
+          const registro = { ...get().registro }
+          delete registro[idEmprendedor]
+          set({ registro })
         },
 
         setCurrentStep: (step) => set({ currentStep: step }),

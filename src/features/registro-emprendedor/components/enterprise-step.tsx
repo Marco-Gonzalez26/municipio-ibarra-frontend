@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Info } from 'lucide-react'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -113,11 +114,11 @@ export function EnterpriseStep({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>Año de Creación *</FieldLabel>
-              <Input
+              <NumberInput
                 id={field.name}
-                type="number"
-                value={field.value ?? ''}
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                value={field.value ?? 0}
+                onChange={field.onChange}
+                allowDecimals={false}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

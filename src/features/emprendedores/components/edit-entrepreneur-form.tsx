@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { NumberInput } from '@/components/ui/number-input'
 import { Switch } from '@/components/ui/switch'
 import { updateEntrepreneurAction } from '@/features/emprendedores/actions/update-entrepreneur.action'
 import type {
@@ -191,7 +192,18 @@ export function EditEntrepreneurForm({
 
           <Field>
             <FieldLabel htmlFor="edad">Edad</FieldLabel>
-            <Input id="edad" type="number" {...register('edad')} />
+            <Controller
+              name="edad"
+              control={control}
+              render={({ field }) => (
+                <NumberInput
+                  id="edad"
+                  value={field.value}
+                  onChange={field.onChange}
+                  allowDecimals={false}
+                />
+              )}
+            />
           </Field>
 
           <Field>
@@ -225,10 +237,17 @@ export function EditEntrepreneurForm({
             <FieldLabel htmlFor="cantidad_cargas_familiares">
               Cargas familiares
             </FieldLabel>
-            <Input
-              id="cantidad_cargas_familiares"
-              type="number"
-              {...register('cantidad_cargas_familiares')}
+            <Controller
+              name="cantidad_cargas_familiares"
+              control={control}
+              render={({ field }) => (
+                <NumberInput
+                  id="cantidad_cargas_familiares"
+                  value={field.value}
+                  onChange={field.onChange}
+                  allowDecimals={false}
+                />
+              )}
             />
           </Field>
 
@@ -236,10 +255,17 @@ export function EditEntrepreneurForm({
             <FieldLabel htmlFor="cargas_con_discapacidad">
               Cargas con discapacidad
             </FieldLabel>
-            <Input
-              id="cargas_con_discapacidad"
-              type="number"
-              {...register('cargas_con_discapacidad')}
+            <Controller
+              name="cargas_con_discapacidad"
+              control={control}
+              render={({ field }) => (
+                <NumberInput
+                  id="cargas_con_discapacidad"
+                  value={field.value}
+                  onChange={field.onChange}
+                  allowDecimals={false}
+                />
+              )}
             />
           </Field>
 

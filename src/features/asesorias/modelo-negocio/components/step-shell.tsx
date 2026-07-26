@@ -3,6 +3,10 @@
 import { Button } from '@/components/ui/button'
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
 
+export interface StepHandle {
+  saveDraft: () => void
+}
+
 interface StepHeaderProps {
   title: string
   subtitle: string

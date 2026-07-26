@@ -30,6 +30,8 @@ export async function requireSession(redirectTo?: string): Promise<Session> {
 }
 
 // El backend responde 401 tanto si falta el token como si expiró.
+// No se borra la cookie aquí: Next.js no permite modificar cookies desde un
+// Server Component, solo redirigir. El próximo login la sobrescribe igual.
 export async function withSessionRedirect<T>(
   request: () => Promise<T>
 ): Promise<T> {
@@ -37,8 +39,6 @@ export async function withSessionRedirect<T>(
     return await request()
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      const cookieStore = await cookies()
-      cookieStore.delete(SESSION_COOKIE)
       redirect('/iniciar-sesion')
     }
     throw error

@@ -1,9 +1,20 @@
-import { AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
+import { unstable_rethrow } from 'next/navigation'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  requireSession,
+  withSessionRedirect,
+} from '@/features/auth/services/session.service'
+import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
+import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
 import { ModeloNegocioListado } from '@/features/asesorias/modelo-negocio/components/modelo-negocio-listado'
 import { ModeloNegocioWizard } from '@/features/asesorias/modelo-negocio/components/modelo-negocio-wizard'
 import { fichaContextoService } from '@/features/asesorias/modelo-negocio/services/ficha-contexto.service'
+import type {
+  FichaContexto,
+  EmprendimientoOpcion,
+} from '@/features/asesorias/modelo-negocio/types/ficha.type'
+
+const LIMIT_EMPRENDIMIENTOS = 200
 
 interface ModeloNegocioPageProps {
   searchParams: Promise<{ id?: string }>
@@ -14,46 +25,74 @@ export default async function ModeloNegocioPage({
 }: ModeloNegocioPageProps) {
   const { id } = await searchParams
   const idEmprendedor = id ? Number(id) : null
-  const contexto = idEmprendedor
-    ? await fichaContextoService.getByEmprendedorId(idEmprendedor)
-    : null
+  const session = await requireSession()
+
+  let contexto: FichaContexto | null = null
+  if (idEmprendedor) {
+    try {
+      contexto = await withSessionRedirect(() =>
+        fichaContextoService.getByEmprendedorId(idEmprendedor, session.token)
+      )
+    } catch (error) {
+      unstable_rethrow(error)
+      console.error('No se pudo cargar la ficha del emprendedor', error)
+    }
+  }
+
+  let emprendimientos: EmprendimientoOpcion[] = []
+  if (!contexto) {
+    try {
+      const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
+        Promise.all([
+          entrepreneurService.getAll(1, LIMIT_EMPRENDIMIENTOS, session.token),
+          entrepeneurFormService.getAllReferenciaGeneral(
+            1,
+            LIMIT_EMPRENDIMIENTOS,
+            session.token
+          ),
+        ])
+      )
+
+      const entrepreneursById = new Map(
+        entrepreneursRes.emprendedores.map((emprendedor) => [
+          emprendedor.id,
+          emprendedor,
+        ])
+      )
+
+      emprendimientos = formulariosRes.formularios_referencia_general
+        .filter((formulario) => formulario.tiene_emprendimiento)
+        .map((formulario) => {
+          const emprendedor = entrepreneursById.get(formulario.id_emprendedor)
+          return {
+            idEmprendedor: formulario.id_emprendedor,
+            nombreEmprendedor: emprendedor?.nombres_apellidos ?? 'Sin nombre',
+            cedula: emprendedor?.cedula ?? '-',
+            nombreEmprendimiento:
+              formulario.nombre_emprendimiento ?? 'Sin nombre',
+          }
+        })
+    } catch (error) {
+      unstable_rethrow(error)
+      console.error('No se pudieron cargar los emprendimientos', error)
+    }
+  }
 
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
         <SidebarTrigger className="-ml-1" />
-        <h1 className="text-sm font-medium">Asesorías · Modelo de negocio</h1>
+        <h1 className="text-sm font-medium">Asesorías - Modelo de negocio</h1>
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         {contexto && idEmprendedor ? (
-          <>
-            {contexto.datosSimulados && (
-              <div className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800 shadow-sm">
-                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
-                <p>
-                  No se pudo conectar con el backend (requiere autenticación aún
-                  no implementada). Se están mostrando datos de referencia para
-                  poder continuar con la demostración.
-                </p>
-              </div>
-            )}
-            <ModeloNegocioWizard
-              idEmprendedor={idEmprendedor}
-              contexto={contexto}
-            />
-          </>
+          <ModeloNegocioWizard
+            idEmprendedor={idEmprendedor}
+            contexto={contexto}
+          />
         ) : (
-          <>
-            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
-              Selecciona un emprendedor desde{' '}
-              <Link href="/emprendedores" className="text-primary underline">
-                Emprendedores
-              </Link>{' '}
-              para generar su modelo de negocio.
-            </div>
-            <ModeloNegocioListado />
-          </>
+          <ModeloNegocioListado emprendimientos={emprendimientos} />
         )}
       </div>
     </>
