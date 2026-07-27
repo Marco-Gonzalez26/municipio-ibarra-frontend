@@ -28,6 +28,15 @@ export async function requireSession(redirectTo?: string): Promise<Session> {
   }
   return session
 }
+export async function requireAdmin(): Promise<Session> {
+  const session = await requireSession('/usuarios')
+
+  if (session.usuario.rol?.codigo !== 'ADMIN') {
+    redirect('/inicio')
+  }
+
+  return session
+}
 
 // El backend responde 401 tanto si falta el token como si expiró.
 // No se borra la cookie aquí: Next.js no permite modificar cookies desde un

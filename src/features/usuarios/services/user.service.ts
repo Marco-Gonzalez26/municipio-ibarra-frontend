@@ -1,123 +1,81 @@
-import { api, authHeader, ApiError } from '@/lib/https'
-import { mockUsers } from '../data/mock-users'
+import { api, authHeader } from '@/lib/https'
 import type {
   Usuario,
   UsuarioCreateDTO,
   UsuarioListResponse,
+  UsuarioUpdateDTO,
 } from '../types/user.type'
 
-type UserResponseShape = {
-  ok?: boolean
-  total?: number
-  usuarios?: Usuario[]
-  users?: Usuario[]
-  data?: Usuario[] | { usuarios?: Usuario[]; users?: Usuario[] }
-}
-
-type RawUsersResponse = Usuario[] | UserResponseShape
-
-// Acepta varias respuestas del backend sin romper la tabla.
-function normalizeUsersResponse(
-  response: RawUsersResponse
-): UsuarioListResponse {
-  if (Array.isArray(response)) {
-    return {
-      ok: true,
-      total: response.length,
-      usuarios: response,
-    }
-  }
-
-  const payload: UserResponseShape = response
-
-  if (Array.isArray(payload.usuarios)) {
-    return {
-      ok: payload.ok ?? true,
-      total: payload.total ?? payload.usuarios.length,
-      usuarios: payload.usuarios,
-    }
-  }
-
-  if (Array.isArray(payload.users)) {
-    return {
-      ok: payload.ok ?? true,
-      total: payload.total ?? payload.users.length,
-      usuarios: payload.users,
-    }
-  }
-
-  if (Array.isArray(payload.data)) {
-    return {
-      ok: payload.ok ?? true,
-      total: payload.total ?? payload.data.length,
-      usuarios: payload.data,
-    }
-  }
-
-  if (payload.data && !Array.isArray(payload.data)) {
-    const data = payload.data
-
-    if (Array.isArray(data.usuarios)) {
-      return {
-        ok: payload.ok ?? true,
-        total: payload.total ?? data.usuarios.length,
-        usuarios: data.usuarios,
-      }
-    }
-
-    if (Array.isArray(data.users)) {
-      return {
-        ok: payload.ok ?? true,
-        total: payload.total ?? data.users.length,
-        usuarios: data.users,
-      }
-    }
-  }
-
-  return {
-    ok: true,
-    total: mockUsers.length,
-    usuarios: mockUsers,
-  }
+interface UsersApiResponse {
+  total: number
+  pages: number
+  currentPage: number
+  data: Usuario[]
 }
 
 export const userService = {
   async getAll(
     page = 1,
     limit = 15,
-    token?: string
+    token: string,
+    search = ''
   ): Promise<UsuarioListResponse> {
-    try {
-      const response = await api.get<RawUsersResponse>(
-        `/usuarios?page=${page}&limit=${limit}`,
-        { headers: authHeader(token) }
-      )
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    })
 
-      return normalizeUsersResponse(response)
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) throw error
+    if (search.trim()) {
+      params.set('busqueda', search.trim())
+    }
 
-      console.warn('No se pudo cargar /usuarios. Usando datos mock.', error)
-      return {
-        ok: true,
-        total: mockUsers.length,
-        usuarios: mockUsers,
+    const response = await api.get<UsersApiResponse>(
+      `/usuarios?${params.toString()}`,
+      {
+        headers: authHeader(token),
       }
+    )
+
+    return {
+      total: response.total,
+      pages: response.pages,
+      currentPage: response.currentPage,
+      usuarios: response.data,
     }
   },
 
-  getById: (id: number) => api.get<Usuario>(`/usuarios/${id}`),
-
-  create: (payload: UsuarioCreateDTO) =>
-    api.post<{ ok: boolean; usuario: Usuario }>('/usuarios', {
-      body: payload,
+  getById: (id: number, token: string) =>
+    api.get<Usuario>(`/usuarios/${id}`, {
+      headers: authHeader(token),
     }),
 
-  update: (id: number, payload: UsuarioCreateDTO) =>
-    api.put<{ ok: boolean; usuario: Usuario }>(`/usuarios/${id}`, {
+  create: (payload: UsuarioCreateDTO, token: string) =>
+    api.post<{ msg: string; data?: Usuario }>('/usuarios', {
       body: payload,
+      headers: authHeader(token),
     }),
 
-  remove: (id: number) =>
-    api.delete<{ ok: boolean; msg: string }>(`/usuarios/${id}`),
+  update: (id: number, payload: UsuarioUpdateDTO, token: string) =>
+    api.put<{ msg: string; data?: Usuario }>(`/usuarios/${id}`, {
+      body: payload,
+      headers: authHeader(token),
+    }),
+
+  remove: (id: number, token: string) =>
+    api.delete<{ msg: string }>(`/usuarios/${id}`, {
+      headers: authHeader(token),
+    }),
+
+  changeStatus: (id: number, idEstado: number, token: string) =>
+    api.patch<{ msg: string }>(`/usuarios/${id}`, {
+      body: {
+        id_estado: idEstado,
+      },
+      headers: authHeader(token),
+    }),
+
+  resetAttempts: (id: number, token: string) =>
+    api.patch<{ msg: string }>(`/usuarios/intentos/${id}`, {
+      headers: authHeader(token),
+    }),
 }
