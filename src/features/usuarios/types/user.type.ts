@@ -1,44 +1,50 @@
-export interface Usuario {
-  id: number
-  cuenta: string
-  correo: string
-  id_estado: number
-  fecha_vigencia_desde: string
-  fecha_vigencia_hasta: string | null
-  nombres: string
-  apellidos: string
-  intentos_fallidos: number
-  fecha_ultimo_acceso: string | null
-  requiere_cambio_pass: boolean
-  activo: boolean
-  fecha_registro: string
-  fecha_actualizacion: string
-}
-
-export interface UsuarioListResponse {
-  total: number
-  pages: number
-  currentPage: number
-  usuarios: Usuario[]
-}
-
-export interface UsuarioCreateDTO {
-  cuenta: string
-  correo: string
-  contrasena: string
-  id_estado: number
-  fecha_vigencia_desde: string
-  fecha_vigencia_hasta: string | null
-  nombres: string
-  apellidos: string
-  intentos_fallidos: number
-  requiere_cambio_pass: boolean
-  activo: boolean
-}
-
-export interface UsuarioUpdateDTO {
-  cuenta: string
-  correo: string
-  nombres: string
-  apellidos: string
-}
+export const mockUsers: Usuario[] = [
+  {
+    id: 1,
+    cuenta: 'admin.ibarra',
+    correo: 'admin@ibarra.gob.ec',
+    id_estado: 1,
+    fecha_vigencia_desde: '2026-07-08',
+    fecha_vigencia_hasta: '2028-06-21',
+    nombres: 'Administrador',
+    apellidos: 'Municipal',
+    intentos_fallidos: 0,
+    fecha_ultimo_acceso: null,
+    requiere_cambio_pass: false,
+    activo: true,
+    fecha_registro: '2026-07-08T00:00:00.000Z',
+    fecha_actualizacion: '2026-07-08T00:00:00.000Z',
+  },
+  {
+    id: 2,
+    cuenta: 'tecnico.ibarra',
+    correo: 'tecnico@ibarra.gob.ec',
+    id_estado: 1,
+    fecha_vigencia_desde: '2026-07-08',
+    fecha_vigencia_hasta: '2028-06-21',
+    nombres: 'Técnico',
+    apellidos: 'Municipal',
+    intentos_fallidos: 0,
+    fecha_ultimo_acceso: null,
+    requiere_cambio_pass: false,
+    activo: true,
+    fecha_registro: '2026-07-08T00:00:00.000Z',
+    fecha_actualizacion: '2026-07-08T00:00:00.000Z',
+  },
+  {
+    id: 3,
+    cuenta: 'consulta.ibarra',
+    correo: 'consulta@ibarra.gob.ec',
+    id_estado: 2,
+    fecha_vigencia_desde: '2026-07-08',
+    fecha_vigencia_hasta: null,
+    nombres: 'Consulta',
+    apellidos: 'Institucional',
+    intentos_fallidos: 0,
+    fecha_ultimo_acceso: null,
+    requiere_cambio_pass: false,
+    activo: false,
+    fecha_registro: '2026-07-08T00:00:00.000Z',
+    fecha_actualizacion: '2026-07-08T00:00:00.000Z',
+  },
+]
