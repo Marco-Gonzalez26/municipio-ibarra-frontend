@@ -84,8 +84,7 @@ export function DeactivateUserDialog({
         </DialogHeader>
 
         <div className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
-          El usuario no será eliminado físicamente. Quedará desactivado y no
-          debería poder utilizar el sistema.
+          El usuario quedará desactivado y no podrá utilizar el sistema.
         </div>
 
         {error ? (
