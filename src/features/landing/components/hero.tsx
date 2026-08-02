@@ -21,23 +21,25 @@ export function Hero({ session }: HeroProps) {
         </p>
 
         <div className="mt-8 flex items-center justify-center gap-4">
-          <Link href="/registro">
-            <Button size="lg" className="hover:cursor-pointer">
-              <UserPlus className="size-4" />
-              Registrar Emprendimiento
-            </Button>
-          </Link>
           {session ? (
-            <Link href="/inicio">
-              <Button
-                size="lg"
-                variant="outline"
-                className="hover:cursor-pointer"
-              >
-                <LayoutDashboard className="size-4" />
-                Ir al Panel de Control
-              </Button>
-            </Link>
+            <>
+              <Link href="/registro">
+                <Button size="lg" className="hover:cursor-pointer">
+                  <UserPlus className="size-4" />
+                  Registrar Emprendimiento
+                </Button>
+              </Link>
+              <Link href="/inicio">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="hover:cursor-pointer"
+                >
+                  <LayoutDashboard className="size-4" />
+                  Ir al Panel de Control
+                </Button>
+              </Link>
+            </>
           ) : (
             <Link href="/iniciar-sesion">
               <Button
