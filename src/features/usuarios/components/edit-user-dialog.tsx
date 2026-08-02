@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState, useTransition } from 'react'
+import { FormEvent, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
@@ -48,32 +48,28 @@ const EMPTY_VALUES: EditUserValues = {
   fechaExpiracion: '',
   activo: true,
 }
+function createInitialValues(user: UsuarioConRol | null): EditUserValues {
+  if (!user) {
+    return EMPTY_VALUES
+  }
 
+  return {
+    nombres: user.nombres,
+    apellidos: user.apellidos,
+    cuenta: user.cuenta,
+    correo: user.correo,
+    idRol: user.rol ? String(user.rol.id) : '',
+    fechaExpiracion: user.asignacionRol?.fecha_expiracion ?? '',
+    activo: user.activo && user.id_estado === 1,
+  }
+}
 export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [values, setValues] = useState<EditUserValues>(EMPTY_VALUES)
+  const [values, setValues] = useState<EditUserValues>(() =>
+    createInitialValues(user)
+  )
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (!user) {
-      setValues(EMPTY_VALUES)
-      setError('')
-      return
-    }
-
-    setValues({
-      nombres: user.nombres,
-      apellidos: user.apellidos,
-      cuenta: user.cuenta,
-      correo: user.correo,
-      idRol: user.rol ? String(user.rol.id) : '',
-      fechaExpiracion: user.asignacionRol?.fecha_expiracion ?? '',
-      activo: user.activo,
-    })
-
-    setError('')
-  }, [user])
 
   function updateValue<K extends keyof EditUserValues>(
     field: K,
