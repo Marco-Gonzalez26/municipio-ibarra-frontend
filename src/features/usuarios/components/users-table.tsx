@@ -1,19 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { CreateUserDialog } from './create-user-dialog'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Eye, Pencil, Plus, Trash2, Unlock } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
-import { EditUserDialog } from './edit-user-dialog'
-import { DeactivateUserDialog } from './deactivate-user-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,6 +12,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { CreateUserDialog } from './create-user-dialog'
+import { DeactivateUserDialog } from './deactivate-user-dialog'
+import { EditUserDialog } from './edit-user-dialog'
+import { UnlockUserDialog } from './unlock-user-dialog'
 
 import type { Role } from '../types/user-role.type'
 import type { UsuarioConRol } from '../utils/merge-users-with-roles'
@@ -38,6 +40,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
   const [editingUser, setEditingUser] = useState<UsuarioConRol | null>(null)
   const [deactivatingUser, setDeactivatingUser] =
     useState<UsuarioConRol | null>(null)
+  const [unlockingUser, setUnlockingUser] = useState<UsuarioConRol | null>(null)
   const filteredUsers = users.filter((user) => {
     const searchString = `
       ${user.nombres}
@@ -74,7 +77,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
         </Button>
       </div>
 
-      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary *:text-center">
@@ -92,7 +95,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
 
               <TableHead className="text-primary-foreground">Fecha</TableHead>
 
-              <TableHead className="text-primary-foreground text-right">
+              <TableHead className="text-right text-primary-foreground">
                 Acciones
               </TableHead>
             </TableRow>
@@ -101,6 +104,8 @@ export function UsersTable({ users, roles }: UsersTableProps) {
           <TableBody>
             {filteredUsers.map((user) => {
               const isActive = user.activo && user.id_estado === 1
+
+              const isBlocked = user.intentos_fallidos >= 5
 
               return (
                 <TableRow key={user.id} className="text-center">
@@ -119,9 +124,13 @@ export function UsersTable({ users, roles }: UsersTableProps) {
                   <TableCell>{user.rol?.nombre ?? 'Sin rol'}</TableCell>
 
                   <TableCell>
-                    <Badge variant={isActive ? 'default' : 'secondary'}>
-                      {isActive ? 'ACTIVO' : 'INACTIVO'}
-                    </Badge>
+                    {isBlocked ? (
+                      <Badge variant="destructive">BLOQUEADO</Badge>
+                    ) : isActive ? (
+                      <Badge variant="default">ACTIVO</Badge>
+                    ) : (
+                      <Badge variant="secondary">INACTIVO</Badge>
+                    )}
                   </TableCell>
 
                   <TableCell>{formatDate(user.fecha_registro)}</TableCell>
@@ -132,6 +141,8 @@ export function UsersTable({ users, roles }: UsersTableProps) {
                         type="button"
                         size="icon"
                         variant="ghost"
+                        title="Ver detalle"
+                        aria-label={`Ver usuario ${user.nombres}`}
                         onClick={() => setSelectedUser(user)}
                       >
                         <Eye className="size-4 text-blue-500" />
@@ -141,7 +152,10 @@ export function UsersTable({ users, roles }: UsersTableProps) {
                         type="button"
                         size="icon"
                         variant="ghost"
+                        title="Editar usuario"
+                        aria-label={`Editar usuario ${user.nombres}`}
                         onClick={() => setEditingUser(user)}
+                        disabled={!isActive}
                       >
                         <Pencil className="size-4 text-yellow-500" />
                       </Button>
@@ -155,8 +169,30 @@ export function UsersTable({ users, roles }: UsersTableProps) {
                         title={
                           isActive ? 'Desactivar usuario' : 'Usuario inactivo'
                         }
+                        aria-label={`Desactivar usuario ${user.nombres}`}
                       >
                         <Trash2 className="size-4 text-red-500" />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setUnlockingUser(user)}
+                        disabled={!isBlocked || !isActive}
+                        title={
+                          isBlocked && isActive
+                            ? 'Desbloquear usuario'
+                            : 'El usuario no está bloqueado'
+                        }
+                        aria-label={`Desbloquear usuario ${user.nombres}`}
+                      >
+                        <Unlock
+                          className={
+                            isBlocked && isActive
+                              ? 'size-4 text-green-600'
+                              : 'size-4 text-muted-foreground'
+                          }
+                        />
                       </Button>
                     </div>
                   </TableCell>
@@ -183,19 +219,27 @@ export function UsersTable({ users, roles }: UsersTableProps) {
         roles={roles}
         onClose={() => setSelectedUser(null)}
       />
+
       <CreateUserDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         roles={roles}
       />
+
       <EditUserDialog
         user={editingUser}
         roles={roles}
         onClose={() => setEditingUser(null)}
       />
+
       <DeactivateUserDialog
         user={deactivatingUser}
         onClose={() => setDeactivatingUser(null)}
+      />
+
+      <UnlockUserDialog
+        user={unlockingUser}
+        onClose={() => setUnlockingUser(null)}
       />
     </>
   )
@@ -210,6 +254,22 @@ function UserDetailDialog({
   roles: Role[]
   onClose: () => void
 }) {
+  const isActive = Boolean(user?.activo) && user?.id_estado === 1
+
+  const isBlocked = (user?.intentos_fallidos ?? 0) >= 5
+
+  function getUserStatus() {
+    if (isBlocked) {
+      return 'Bloqueado'
+    }
+
+    if (isActive) {
+      return 'Activo'
+    }
+
+    return 'Inactivo'
+  }
+
   return (
     <Dialog
       open={Boolean(user)}
@@ -245,9 +305,11 @@ function UserDetailDialog({
               value={user.rol?.nombre ?? 'Sin rol asignado'}
             />
 
+            <InfoItem label="Estado" value={getUserStatus()} />
+
             <InfoItem
-              label="Estado"
-              value={user.activo ? 'Activo' : 'Inactivo'}
+              label="Intentos fallidos"
+              value={String(user.intentos_fallidos)}
             />
 
             <InfoItem
@@ -271,6 +333,20 @@ function UserDetailDialog({
             />
 
             <InfoItem label="Roles disponibles" value={String(roles.length)} />
+
+            <InfoItem
+              label="Asignación de rol"
+              value={
+                user.asignacionRol
+                  ? `ASG-${user.asignacionRol.id}`
+                  : 'Sin asignación'
+              }
+            />
+
+            <InfoItem
+              label="Cambio de contraseña requerido"
+              value={user.requiere_cambio_pass ? 'Sí' : 'No'}
+            />
           </div>
         ) : null}
       </DialogContent>
