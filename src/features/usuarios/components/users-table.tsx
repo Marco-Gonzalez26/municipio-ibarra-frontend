@@ -227,6 +227,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
       />
 
       <EditUserDialog
+        key={editingUser?.id ?? 'edit-user-closed'}
         user={editingUser}
         roles={roles}
         onClose={() => setEditingUser(null)}
