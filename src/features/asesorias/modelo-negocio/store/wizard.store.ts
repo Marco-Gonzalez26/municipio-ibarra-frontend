@@ -7,6 +7,7 @@ import { initialState } from './initial-state'
 import {
   saveStepAction,
   createModeloAction,
+  updateModeloAction,
 } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const STEP_ORDER: WizardStep[] = WIZARD_STEPS.map((step) => step.key)
@@ -151,13 +152,6 @@ export const useModeloNegocioWizardStore =
 
     saveCurrentStep: async () => {
       const { modeloNegocioId, currentStep, formData, contexto } = get()
-      console.log(
-        'saveCurrentStep',
-        modeloNegocioId,
-        currentStep,
-        formData,
-        contexto
-      )
       let activeId = modeloNegocioId
 
       if (!activeId) {
@@ -175,7 +169,6 @@ export const useModeloNegocioWizardStore =
             formData.ficha.analista,
             formData.ficha.observaciones
           )
-          console.log('createModeloAction', result)
           activeId = result.modelo.id
           set({ modeloNegocioId: activeId })
         } catch (error) {
@@ -187,7 +180,16 @@ export const useModeloNegocioWizardStore =
       }
 
       try {
-        await saveStepAction(activeId, currentStep, formData)
+        if (currentStep === 'ficha') {
+          await updateModeloAction(activeId, {
+            n_tramite: formData.ficha.numeroTramite,
+            producto_linea: formData.ficha.productoLinea,
+            analista: formData.ficha.analista,
+            observaciones: formData.ficha.observaciones,
+          })
+        } else {
+          await saveStepAction(activeId, currentStep, formData)
+        }
         set({ isDirty: false })
         toast.success('Guardado correctamente')
       } catch (error) {

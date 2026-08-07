@@ -194,6 +194,23 @@ export async function createModeloAction(
   })
 }
 
+export async function updateModeloAction(
+  modeloId: number,
+  data: {
+    n_tramite?: string
+    producto_linea?: string
+    analista?: string
+    observaciones?: string
+  }
+) {
+  const session = await import('@/features/auth/services/session.service').then((m) =>
+    m.getSession()
+  )
+  if (!session) throw new Error('Sesión no encontrada')
+
+  return modeloNegocioService.update(modeloId, data, session.token)
+}
+
 export async function saveStepAction(
   modeloId: number,
   stepKey: string,
