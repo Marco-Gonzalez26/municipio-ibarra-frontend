@@ -22,6 +22,7 @@ export const fichaContextoService = {
     const formulario = formulariosRes.formularios_referencia_general[0] ?? null
 
     let sector: string | null = null
+    let idSector: number | null = null
     if (formulario) {
       const sectoresRes = await entrepeneurFormService.getRefSectorByFormulario(
         formulario.id,
@@ -29,6 +30,7 @@ export const fichaContextoService = {
       )
       const sectorAsignado = sectoresRes.formularios_ref_sector[0] ?? null
       if (sectorAsignado) {
+        idSector = sectorAsignado.id_sector
         sector =
           sectorAsignado.sector_otro ??
           sectoresCatalogo.data.find(
@@ -46,6 +48,7 @@ export const fichaContextoService = {
       correo: emprendedor.email,
       fechaIngreso: formulario?.fecha_formulario ?? emprendedor.fecha_registro,
       nombreEmprendimiento: formulario?.nombre_emprendimiento ?? null,
+      idSector,
       sector,
       direccion: emprendedor.parroquia || null,
     }

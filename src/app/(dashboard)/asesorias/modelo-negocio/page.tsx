@@ -88,6 +88,7 @@ export default async function ModeloNegocioPage({
                 matchingFormulario.fecha_formulario ?? emprendedor.fecha_registro,
               nombreEmprendimiento:
                 matchingFormulario.nombre_emprendimiento ?? null,
+              idSector: null,
               sector: null,
               direccion: emprendedor.parroquia || null,
             }

@@ -7,7 +7,7 @@ import type {
 } from '../types/wizard-form.type'
 import { WIZARD_STEPS } from '../types/wizard-form.type'
 import { initialState } from './initial-state'
-import { saveStepAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import { saveStepAction, createModeloAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const STEP_ORDER: WizardStep[] = WIZARD_STEPS.map((step) => step.key)
 
@@ -22,7 +22,7 @@ interface ModeloNegocioWizardStoreState {
   setModeloNegocioId: (id: number | null) => void
   ensureEmprendedor: (idEmprendedor: number, contexto: FichaContexto) => void
   setCurrentStep: (step: WizardStep) => void
-  goToNextStep: () => void
+  goToNextStep: () => Promise<void>
   goToPreviousStep: () => void
 
   updateFicha: (data: Partial<ModeloNegocioState['ficha']>) => void
@@ -106,8 +106,9 @@ export const useModeloNegocioWizardStore =
 
     setCurrentStep: (step) => set({ currentStep: step }),
 
-    goToNextStep: () => {
+    goToNextStep: async () => {
       const { currentStep } = get()
+      await get().saveCurrentStep()
       const nextIndex = STEP_ORDER.indexOf(currentStep) + 1
       if (nextIndex < STEP_ORDER.length) {
         set({ currentStep: STEP_ORDER[nextIndex] })
@@ -149,14 +150,37 @@ export const useModeloNegocioWizardStore =
     },
 
     saveCurrentStep: async () => {
-      const { modeloNegocioId, currentStep, formData } = get()
-      if (!modeloNegocioId) {
-        toast.error('No hay modelo de negocio activo para guardar')
-        return
+      const { modeloNegocioId, currentStep, formData, contexto } = get()
+
+      let activeId = modeloNegocioId
+
+      if (!activeId) {
+        if (!contexto) {
+          toast.error('No hay emprendimiento seleccionado')
+          return
+        }
+        try {
+          const result = await createModeloAction(
+            formData.ficha.numeroTramite,
+            contexto.fechaIngreso,
+            contexto.nombreEmprendimiento ?? contexto.nombreEmprendedor,
+            contexto.idSector ?? 1,
+            formData.ficha.productoLinea,
+            formData.ficha.analista,
+            formData.ficha.observaciones
+          )
+          activeId = result.modelo_negocio.id
+          set({ modeloNegocioId: activeId })
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : 'Error al crear modelo'
+          toast.error(`Error al crear modelo: ${message}`)
+          return
+        }
       }
 
       try {
-        await saveStepAction(modeloNegocioId, currentStep, formData)
+        await saveStepAction(activeId, currentStep, formData)
         set({ isDirty: false })
         toast.success('Guardado correctamente')
       } catch (error) {
