@@ -239,7 +239,8 @@ export async function saveStepAction(
   if (pasoNumero) {
     try {
       const progreso = await modeloNegocioService.getProgreso(modeloId, session.token)
-      const paso = progreso.pasos.find((p) => p.paso_numero === pasoNumero)
+      const pasos = Array.isArray(progreso.pasos) ? progreso.pasos : Array.isArray(progreso) ? progreso : []
+      const paso = pasos.find((p) => p.paso_numero === pasoNumero)
       if (paso && !paso.estado) {
         await modeloNegocioService.markPaso(paso.id, session.token)
       }
@@ -277,7 +278,8 @@ export async function loadModeloAction(modeloId: number) {
     ])
 
   // Find first incomplete step
-  const sortedPasos = [...progreso.pasos].sort((a, b) => a.paso_numero - b.paso_numero)
+  const pasos = Array.isArray(progreso.pasos) ? progreso.pasos : Array.isArray(progreso) ? progreso : []
+  const sortedPasos = [...pasos].sort((a, b) => a.paso_numero - b.paso_numero)
   const incompletePaso = sortedPasos.find((p) => !p.estado)
   const firstIncompleteStep = STEP_NUMBER_TO_KEY[incompletePaso?.paso_numero ?? 1] ?? 'ficha'
 
