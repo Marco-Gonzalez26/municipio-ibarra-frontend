@@ -25,7 +25,7 @@ export interface ModeloNegocioCreateDTO {
 }
 
 export interface ModeloNegocioListResponse {
-  modelo: ModeloNegocioDTO[]
+  modelos: ModeloNegocioDTO[]
   total: number
   page: number
   limit: number

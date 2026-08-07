@@ -42,7 +42,7 @@ export default async function ModeloNegocioPage({
       const modeloRes = await withSessionRedirect(() =>
         modeloNegocioService.getById(parsedId, session.token)
       )
-      modeloNegocioId = modeloRes.modelo_negocio.id
+      modeloNegocioId = modeloRes.modelo.id
 
       // We have a modelo, but we need the emprendedor context
       // Since modelo_negocio doesn't have id_emprendedor, we try to find it
@@ -71,7 +71,7 @@ export default async function ModeloNegocioPage({
           (formulario) =>
             formulario.tiene_emprendimiento &&
             formulario.nombre_emprendimiento ===
-              modeloRes.modelo_negocio.nombre_emprendimiento
+              modeloRes.modelo.nombre_emprendimiento
         )
 
         if (matchingFormulario) {
@@ -133,7 +133,7 @@ export default async function ModeloNegocioPage({
           ])
         )
 
-      modelosIniciales = modelosRes.modelo ?? []
+      modelosIniciales = modelosRes.modelos ?? []
       const entrepreneursById = new Map(
         (entrepreneursRes.emprendedores ?? []).map((emprendedor) => [
           emprendedor.id,

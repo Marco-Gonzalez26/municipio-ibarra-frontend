@@ -262,7 +262,7 @@ export async function loadModeloAction(modeloId: number) {
     modeloNegocioService.getProgreso(modeloId, session.token),
   ])
 
-  const modelo = modeloRes.modelo_negocio
+  const modelo = modeloRes.modelo
 
   // Load all sections in parallel
   const [introduccion, contexto, propuestaValor, clientesCanales, recursosActividades, conclusiones, foda] =

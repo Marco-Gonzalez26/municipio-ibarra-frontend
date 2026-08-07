@@ -176,8 +176,7 @@ export const useModeloNegocioWizardStore =
             formData.ficha.observaciones
           )
           console.log('createModeloAction', result)
-          const nuevo = result.modelo_negocio ?? result
-          activeId = nuevo.id
+          activeId = result.modelo.id
           set({ modeloNegocioId: activeId })
         } catch (error) {
           const message =

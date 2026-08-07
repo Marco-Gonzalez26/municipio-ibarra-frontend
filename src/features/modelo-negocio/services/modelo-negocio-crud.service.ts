@@ -38,12 +38,12 @@ export const modeloNegocioService = {
   },
 
   getById: (id: number, token?: string) =>
-    api.get<{ modelo_negocio: ModeloNegocioDTO }>(`/sime/modelonegocio/${id}`, {
+    api.get<{ modelo: ModeloNegocioDTO }>(`/sime/modelonegocio/${id}`, {
       token,
     }),
 
   create: (payload: ModeloNegocioCreateDTO, token?: string) =>
-    api.post<{ modelo_negocio: ModeloNegocioDTO; msg: string }>(
+    api.post<{ ok: boolean; modelo: ModeloNegocioDTO }>(
       '/sime/modelonegocio',
       { body: payload, token }
     ),
