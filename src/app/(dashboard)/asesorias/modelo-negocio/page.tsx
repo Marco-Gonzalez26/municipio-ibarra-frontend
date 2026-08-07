@@ -132,16 +132,15 @@ export default async function ModeloNegocioPage({
           ])
         )
 
-      modelosIniciales = modelosRes.modelo_negocios
-
+      modelosIniciales = modelosRes.modelo_negocios ?? []
       const entrepreneursById = new Map(
-        entrepreneursRes.emprendedores.map((emprendedor) => [
+        (entrepreneursRes.emprendedores ?? []).map((emprendedor) => [
           emprendedor.id,
           emprendedor,
         ])
       )
 
-      emprendimientos = formulariosRes.formularios_referencia_general
+      emprendimientos = (formulariosRes.formularios_referencia_general ?? [])
         .filter((formulario) => formulario.tiene_emprendimiento)
         .map((formulario) => {
           const emprendedor = entrepreneursById.get(formulario.id_emprendedor)
