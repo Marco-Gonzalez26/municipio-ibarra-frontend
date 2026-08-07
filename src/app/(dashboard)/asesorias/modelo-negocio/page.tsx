@@ -133,7 +133,7 @@ export default async function ModeloNegocioPage({
           ])
         )
 
-      modelosIniciales = modelosRes.modelo_negocios ?? []
+      modelosIniciales = modelosRes.modelo ?? []
       const entrepreneursById = new Map(
         (entrepreneursRes.emprendedores ?? []).map((emprendedor) => [
           emprendedor.id,

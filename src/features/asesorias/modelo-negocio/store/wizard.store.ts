@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 import { toast } from 'sonner'
 import type { FichaContexto } from '../types/ficha.type'
-import type {
-  ModeloNegocioState,
-  WizardStep,
-} from '../types/wizard-form.type'
+import type { ModeloNegocioState, WizardStep } from '../types/wizard-form.type'
 import { WIZARD_STEPS } from '../types/wizard-form.type'
 import { initialState } from './initial-state'
-import { saveStepAction, createModeloAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import {
+  saveStepAction,
+  createModeloAction,
+} from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const STEP_ORDER: WizardStep[] = WIZARD_STEPS.map((step) => step.key)
 
@@ -151,7 +151,13 @@ export const useModeloNegocioWizardStore =
 
     saveCurrentStep: async () => {
       const { modeloNegocioId, currentStep, formData, contexto } = get()
-
+      console.log(
+        'saveCurrentStep',
+        modeloNegocioId,
+        currentStep,
+        formData,
+        contexto
+      )
       let activeId = modeloNegocioId
 
       if (!activeId) {
@@ -169,7 +175,9 @@ export const useModeloNegocioWizardStore =
             formData.ficha.analista,
             formData.ficha.observaciones
           )
-          activeId = result.modelo_negocio.id
+          console.log('createModeloAction', result)
+          const nuevo = result.modelo_negocio ?? result
+          activeId = nuevo.id
           set({ modeloNegocioId: activeId })
         } catch (error) {
           const message =
