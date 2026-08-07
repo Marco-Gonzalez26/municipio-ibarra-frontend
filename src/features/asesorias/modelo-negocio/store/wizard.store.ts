@@ -18,6 +18,7 @@ interface ModeloNegocioWizardStoreState {
   contexto: FichaContexto | null
   currentStep: WizardStep
   isDirty: boolean
+  isSaving: boolean
   formData: ModeloNegocioState
 
   setModeloNegocioId: (id: number | null) => void
@@ -86,6 +87,7 @@ export const useModeloNegocioWizardStore =
     contexto: null,
     currentStep: 'ficha',
     isDirty: false,
+    isSaving: false,
     formData: initialState.formData,
 
     setModeloNegocioId: (id) => set({ modeloNegocioId: id }),
@@ -101,6 +103,7 @@ export const useModeloNegocioWizardStore =
         contexto,
         currentStep: 'ficha',
         isDirty: false,
+        isSaving: false,
         formData: initialState.formData,
       })
     },
@@ -154,9 +157,12 @@ export const useModeloNegocioWizardStore =
       const { modeloNegocioId, currentStep, formData, contexto } = get()
       let activeId = modeloNegocioId
 
+      set({ isSaving: true })
+
       if (!activeId) {
         if (!contexto) {
           toast.error('No hay emprendimiento seleccionado')
+          set({ isSaving: false })
           return
         }
         try {
@@ -175,6 +181,7 @@ export const useModeloNegocioWizardStore =
           const message =
             error instanceof Error ? error.message : 'Error al crear modelo'
           toast.error(`Error al crear modelo: ${message}`)
+          set({ isSaving: false })
           return
         }
       }
@@ -196,6 +203,8 @@ export const useModeloNegocioWizardStore =
         const message =
           error instanceof Error ? error.message : 'Error al guardar'
         toast.error(`Error al guardar: ${message}`)
+      } finally {
+        set({ isSaving: false })
       }
     },
 
@@ -206,6 +215,7 @@ export const useModeloNegocioWizardStore =
         formData: initialState.formData,
         idEmprendedor: null,
         isDirty: false,
+        isSaving: false,
         contexto: null,
       }),
   }))

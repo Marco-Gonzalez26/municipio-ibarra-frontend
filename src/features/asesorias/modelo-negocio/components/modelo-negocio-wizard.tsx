@@ -206,9 +206,10 @@ export function ModeloNegocioWizard({
   )
 
   const stepRef = useRef<StepHandle>(null)
+  const isSaving = useModeloNegocioWizardStore((state) => state.isSaving)
 
   async function handleStepClick(step: WizardStep) {
-    if (step === currentStep) return
+    if (step === currentStep || isSaving) return
     await stepRef.current?.saveDraft()
     setCurrentStep(step)
   }
