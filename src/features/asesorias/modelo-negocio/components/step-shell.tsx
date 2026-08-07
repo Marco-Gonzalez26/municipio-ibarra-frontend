@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
 
 export interface StepHandle {
-  saveDraft: () => void
+  saveDraft: () => void | Promise<void>
 }
 
 interface StepHeaderProps {
@@ -36,9 +36,9 @@ export function StepFooter({
     (state) => state.saveCurrentStep
   )
 
-  function handleSaveDraft() {
+  async function handleSaveDraft() {
     onSaveDraft()
-    saveCurrentStep()
+    await saveCurrentStep()
   }
 
   return (

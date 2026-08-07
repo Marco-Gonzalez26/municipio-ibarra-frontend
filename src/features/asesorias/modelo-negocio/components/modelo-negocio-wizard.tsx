@@ -32,10 +32,15 @@ interface ModeloNegocioWizardProps {
   analistaNombre?: string
 }
 
-function mapServerSectionsToFormData(sections: Record<string, unknown>): ModeloNegocioState {
+function mapServerSectionsToFormData(
+  sections: Record<string, unknown>,
+  modelo: { n_tramite?: string | null; producto_linea?: string | null; analista?: string | null; observaciones?: string | null }
+): ModeloNegocioState {
   const intro = sections.introduccion as { introduccion: string; importancia: string } | null
   const ctx = sections.contexto as { antecedentes: string; justificacion: string; impacto: string; objetivo_general: string } | null
   const propuesta = sections.propuestaValor as { propuesta_valor: string } | null
+  const objetivosEsp = sections.objetivosEspecificos as Array<{ id: number; descripcion: string; orden: number }> | null
+  const propProductos = sections.propuestaProductos as Array<{ id: number; nombre_producto: string; codigo_producto: string }> | null
   const cc = sections.clientesCanales as { segmentos: string; canales: string; relacion: string } | null
   const ra = sections.recursosActividades as { recursos_financieros: string; recursos_fisicos: string; mobiliario: string; local: string; actividades: string; socios: string } | null
   const conc = sections.conclusiones as { conclusiones: string } | null
@@ -50,10 +55,10 @@ function mapServerSectionsToFormData(sections: Record<string, unknown>): ModeloN
 
   return {
     ficha: {
-      numeroTramite: '',
-      productoLinea: '',
-      analista: '',
-      observaciones: '',
+      numeroTramite: modelo?.n_tramite ?? '',
+      productoLinea: modelo?.producto_linea ?? '',
+      analista: modelo?.analista ?? '',
+      observaciones: modelo?.observaciones ?? '',
     },
     introduccion: {
       introduccion: intro?.introduccion ?? '',
@@ -67,11 +72,15 @@ function mapServerSectionsToFormData(sections: Record<string, unknown>): ModeloN
     },
     objetivos: {
       objetivoGeneral: ctx?.objetivo_general ?? '',
-      objetivosEspecificos: [],
+      objetivosEspecificos: objetivosEsp
+        ? objetivosEsp.map((o) => o.descripcion)
+        : [],
     },
     propuesta: {
       propuestaValor: propuesta?.propuesta_valor ?? '',
-      portafolio: [],
+      portafolio: propProductos
+        ? propProductos.map((p) => p.nombre_producto)
+        : [],
     },
     segmentos: {
       segmentos: cc?.segmentos ?? '',
@@ -148,7 +157,7 @@ export function ModeloNegocioWizard({
     setLoading(true)
     try {
       const data = await loadModeloAction(initialModeloId)
-      const formData = mapServerSectionsToFormData(data.sections)
+      const formData = mapServerSectionsToFormData(data.sections, data.modelo)
       const stepMap: Record<string, WizardStep> = {
         ficha: 'ficha',
         introduccion: 'introduccion',
@@ -174,19 +183,6 @@ export function ModeloNegocioWizard({
         formData,
         currentStep: targetStep,
       })
-
-      if (data.modelo.n_tramite) {
-        formData.ficha.numeroTramite = data.modelo.n_tramite
-      }
-      if (data.modelo.producto_linea) {
-        formData.ficha.productoLinea = data.modelo.producto_linea
-      }
-      if (data.modelo.analista) {
-        formData.ficha.analista = data.modelo.analista
-      }
-      if (data.modelo.observaciones) {
-        formData.ficha.observaciones = data.modelo.observaciones
-      }
     } catch (error) {
       console.error('Error loading modelo:', error)
     } finally {
@@ -211,9 +207,9 @@ export function ModeloNegocioWizard({
 
   const stepRef = useRef<StepHandle>(null)
 
-  function handleStepClick(step: WizardStep) {
+  async function handleStepClick(step: WizardStep) {
     if (step === currentStep) return
-    stepRef.current?.saveDraft()
+    await stepRef.current?.saveDraft()
     setCurrentStep(step)
   }
 

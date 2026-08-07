@@ -61,6 +61,7 @@ export interface PropuestaValorDTO {
 }
 
 export interface PropuestaProductoDTO {
+  id?: number
   codigo_producto: string
   id_propuesta: number
   id_modelo: number

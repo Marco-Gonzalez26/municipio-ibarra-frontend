@@ -65,7 +65,7 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
       saveDraft: () => updateAnexos(getValues()),
     }))
 
-    function onSubmit(data: AnexosForm) {
+    async function onSubmit(data: AnexosForm) {
       const pendientes = getIncompleteSteps({
         ...formData,
         anexos: data,
@@ -83,7 +83,7 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
       }
 
       updateAnexos(data)
-      saveCurrentStep()
+      await saveCurrentStep()
       toast.success('Modelo de negocio guardado')
       router.push('/asesorias/modelo-negocio')
     }
