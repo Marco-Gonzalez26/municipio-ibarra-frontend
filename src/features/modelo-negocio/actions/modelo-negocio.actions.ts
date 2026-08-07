@@ -257,7 +257,7 @@ async function saveIngresos(
     const result = await modeloNegocioService.createFuenteIngreso(
       modeloId,
       {
-        descripcion: formData.ingresos.ingresosTexto,
+        fuente_ingreso: formData.ingresos.ingresosTexto,
         monto_estimado: null,
       },
       token

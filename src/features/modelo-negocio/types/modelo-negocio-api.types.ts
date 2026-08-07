@@ -79,7 +79,7 @@ export interface ClientesCanalesDTO {
 export interface FuenteIngresoDTO {
   id: number
   id_modelo: number
-  descripcion: string
+  fuente_ingreso: string
   monto_estimado: number | null
 }
 
