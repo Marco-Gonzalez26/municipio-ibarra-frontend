@@ -30,24 +30,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useModeloNegocioWizardStore } from '../store/wizard.store'
+import type { ModeloNegocioDTO } from '@/features/modelo-negocio/types/modelo-negocio-api.types'
 import type { EmprendimientoOpcion } from '../types/ficha.type'
-import type {
-  ModeloNegocioEstado,
-  ModeloNegocioRegistro,
-} from '../types/wizard-form.type'
 import { SeleccionarEmprendimientoDialog } from './seleccionar-emprendimiento-dialog'
+import { deleteModeloAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const ESTADO_MAP: Record<
-  ModeloNegocioEstado,
-  { label: string; variant: 'secondary' | 'default' }
+  number,
+  { label: string; variant: 'secondary' | 'default' | 'destructive' | 'outline' }
 > = {
-  borrador: { label: 'BORRADOR', variant: 'secondary' },
-  completado: { label: 'COMPLETADO', variant: 'default' },
+  1: { label: 'BORRADOR', variant: 'secondary' },
+  2: { label: 'EN REVISIÓN', variant: 'outline' },
+  3: { label: 'APROBADO', variant: 'default' },
+  4: { label: 'RECHAZADO', variant: 'destructive' },
 }
 
-type FiltroEstado = 'todos' | ModeloNegocioEstado
-type CampoOrden = 'nombreEmprendimiento' | 'actualizadoEn'
+type CampoOrden = 'nombre_emprendimiento' | 'fecha_actualizacion'
 type DireccionOrden = 'asc' | 'desc'
 
 function formatFecha(value: string) {
@@ -59,7 +57,6 @@ function formatFecha(value: string) {
   })
 }
 
-// Fecha local en formato YYYY-MM-DD, para comparar contra los input[type=date].
 function toLocalDate(value: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return ''
@@ -68,43 +65,45 @@ function toLocalDate(value: string) {
 }
 
 interface ModeloNegocioListadoProps {
+  modelosIniciales: ModeloNegocioDTO[]
   emprendimientos: EmprendimientoOpcion[]
 }
 
 export function ModeloNegocioListado({
+  modelosIniciales,
   emprendimientos,
 }: ModeloNegocioListadoProps) {
-  const registro = useModeloNegocioWizardStore((state) => state.registro)
-  const eliminarModelo = useModeloNegocioWizardStore(
-    (state) => state.eliminarModelo
-  )
-
+  const [modelos, setModelos] = useState(modelosIniciales)
   const [busqueda, setBusqueda] = useState('')
-  const [estado, setEstado] = useState<FiltroEstado>('todos')
+  const [estado, setEstado] = useState<string>('todos')
   const [fechaDesde, setFechaDesde] = useState('')
   const [fechaHasta, setFechaHasta] = useState('')
   const [orden, setOrden] = useState<{
     campo: CampoOrden
     direccion: DireccionOrden
-  }>({ campo: 'actualizadoEn', direccion: 'desc' })
+  }>({ campo: 'fecha_actualizacion', direccion: 'desc' })
   const [dialogoAbierto, setDialogoAbierto] = useState(false)
   const [modeloAEliminar, setModeloAEliminar] =
-    useState<ModeloNegocioRegistro | null>(null)
+    useState<ModeloNegocioDTO | null>(null)
 
-  const modelos = useMemo(() => {
+  const modelosFiltrados = useMemo(() => {
     const termino = busqueda.trim().toLowerCase()
 
-    const filtrados = Object.values(registro).filter((modelo) => {
-      if (estado !== 'todos' && modelo.estado !== estado) return false
+    const filtrados = modelos.filter((modelo) => {
+      if (estado !== 'todos' && modelo.id_estado !== Number(estado)) return false
 
       if (termino) {
-        const texto = [modelo.nombreEmprendedor, modelo.nombreEmprendimiento]
+        const texto = [
+          modelo.nombre_emprendimiento,
+          modelo.n_tramite,
+          modelo.analista,
+        ]
           .join(' ')
           .toLowerCase()
         if (!texto.includes(termino)) return false
       }
 
-      const fecha = toLocalDate(modelo.actualizadoEn)
+      const fecha = toLocalDate(modelo.fecha_actualizacion)
       if (fechaDesde && fecha < fechaDesde) return false
       if (fechaHasta && fecha > fechaHasta) return false
 
@@ -113,22 +112,22 @@ export function ModeloNegocioListado({
 
     const factor = orden.direccion === 'asc' ? 1 : -1
     return filtrados.sort((a, b) => {
-      if (orden.campo === 'nombreEmprendimiento') {
+      if (orden.campo === 'nombre_emprendimiento') {
         return (
           factor *
-          (a.nombreEmprendimiento ?? '').localeCompare(
-            b.nombreEmprendimiento ?? '',
+          (a.nombre_emprendimiento ?? '').localeCompare(
+            b.nombre_emprendimiento ?? '',
             'es'
           )
         )
       }
       return (
         factor *
-        (new Date(a.actualizadoEn).getTime() -
-          new Date(b.actualizadoEn).getTime())
+        (new Date(a.fecha_actualizacion).getTime() -
+          new Date(b.fecha_actualizacion).getTime())
       )
     })
-  }, [registro, busqueda, estado, fechaDesde, fechaHasta, orden])
+  }, [modelos, busqueda, estado, fechaDesde, fechaHasta, orden])
 
   function alternarOrden(campo: CampoOrden) {
     setOrden((prev) =>
@@ -141,9 +140,14 @@ export function ModeloNegocioListado({
     )
   }
 
-  function confirmarEliminar() {
+  async function confirmarEliminar() {
     if (modeloAEliminar) {
-      eliminarModelo(modeloAEliminar.idEmprendedor)
+      try {
+        await deleteModeloAction(modeloAEliminar.id)
+        setModelos((prev) => prev.filter((m) => m.id !== modeloAEliminar.id))
+      } catch (error) {
+        console.error('Error deleting modelo:', error)
+      }
     }
     setModeloAEliminar(null)
   }
@@ -154,7 +158,7 @@ export function ModeloNegocioListado({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
           <Field label="Buscar">
             <Input
-              placeholder="Emprendedor o emprendimiento..."
+              placeholder="Emprendimiento, trámite o analista..."
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
               className="lg:w-56"
@@ -164,15 +168,17 @@ export function ModeloNegocioListado({
           <Field label="Estado">
             <Select
               value={estado}
-              onValueChange={(value) => setEstado(value as FiltroEstado)}
+              onValueChange={(value) => setEstado(value)}
             >
               <SelectTrigger className="w-full lg:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="borrador">Borrador</SelectItem>
-                <SelectItem value="completado">Completado</SelectItem>
+                <SelectItem value="1">Borrador</SelectItem>
+                <SelectItem value="2">En Revisión</SelectItem>
+                <SelectItem value="3">Aprobado</SelectItem>
+                <SelectItem value="4">Rechazado</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -208,23 +214,26 @@ export function ModeloNegocioListado({
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary *:text-center">
               <TableHead className="text-primary-foreground">
-                Emprendedor
+                N.º Trámite
               </TableHead>
               <TableHead className="text-primary-foreground">
                 <OrdenarBoton
                   label="Emprendimiento"
-                  activo={orden.campo === 'nombreEmprendimiento'}
+                  activo={orden.campo === 'nombre_emprendimiento'}
                   direccion={orden.direccion}
-                  onClick={() => alternarOrden('nombreEmprendimiento')}
+                  onClick={() => alternarOrden('nombre_emprendimiento')}
                 />
+              </TableHead>
+              <TableHead className="text-primary-foreground">
+                Analista
               </TableHead>
               <TableHead className="text-primary-foreground">Estado</TableHead>
               <TableHead className="text-primary-foreground">
                 <OrdenarBoton
                   label="Última actualización"
-                  activo={orden.campo === 'actualizadoEn'}
+                  activo={orden.campo === 'fecha_actualizacion'}
                   direccion={orden.direccion}
-                  onClick={() => alternarOrden('actualizadoEn')}
+                  onClick={() => alternarOrden('fecha_actualizacion')}
                 />
               </TableHead>
               <TableHead className="text-right text-primary-foreground">
@@ -233,28 +242,29 @@ export function ModeloNegocioListado({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {modelos.map((modelo) => {
-              const estadoInfo = ESTADO_MAP[modelo.estado]
-              const esBorrador = modelo.estado === 'borrador'
+            {modelosFiltrados.map((modelo) => {
+              const estadoInfo = ESTADO_MAP[modelo.id_estado] ?? ESTADO_MAP[1]
+              const esBorrador = modelo.id_estado === 1
               return (
-                <TableRow key={modelo.idEmprendedor} className="text-center">
+                <TableRow key={modelo.id} className="text-center">
                   <TableCell className="font-medium">
-                    {modelo.nombreEmprendedor}
+                    {modelo.n_tramite}
                   </TableCell>
                   <TableCell>
-                    {modelo.nombreEmprendimiento ?? 'Sin nombre'}
+                    {modelo.nombre_emprendimiento ?? 'Sin nombre'}
                   </TableCell>
+                  <TableCell>{modelo.analista}</TableCell>
                   <TableCell>
                     <Badge variant={estadoInfo.variant}>
                       {estadoInfo.label}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatFecha(modelo.actualizadoEn)}</TableCell>
+                  <TableCell>{formatFecha(modelo.fecha_actualizacion)}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="outline" size="sm" asChild>
                         <Link
-                          href={`/asesorias/modelo-negocio?id=${modelo.idEmprendedor}`}
+                          href={`/asesorias/modelo-negocio?id=${modelo.id}`}
                         >
                           Continuar
                         </Link>
@@ -276,13 +286,13 @@ export function ModeloNegocioListado({
               )
             })}
 
-            {modelos.length === 0 ? (
+            {modelosFiltrados.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  {Object.keys(registro).length === 0
+                  {modelos.length === 0
                     ? 'Aún no hay modelos de negocio guardados.'
                     : 'Ningún modelo coincide con los filtros.'}
                 </TableCell>
@@ -296,7 +306,6 @@ export function ModeloNegocioListado({
         open={dialogoAbierto}
         onOpenChange={setDialogoAbierto}
         emprendimientos={emprendimientos}
-        modelosGuardados={registro}
       />
 
       <EliminarBorradorDialog
@@ -357,7 +366,7 @@ function EliminarBorradorDialog({
   onClose,
   onConfirm,
 }: {
-  modelo: ModeloNegocioRegistro | null
+  modelo: ModeloNegocioDTO | null
   onClose: () => void
   onConfirm: () => void
 }) {
@@ -372,7 +381,7 @@ function EliminarBorradorDialog({
           <DialogDescription>
             ¿Seguro que quieres eliminar el borrador de{' '}
             <span className="font-semibold text-foreground">
-              {modelo?.nombreEmprendimiento ?? 'este emprendimiento'}
+              {modelo?.nombre_emprendimiento ?? 'este emprendimiento'}
             </span>
             ? Esta acción no se puede deshacer.
           </DialogDescription>

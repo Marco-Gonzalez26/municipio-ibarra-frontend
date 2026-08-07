@@ -51,8 +51,8 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
     const updateAnexos = useModeloNegocioWizardStore(
       (state) => state.updateAnexos
     )
-    const registrarProgreso = useModeloNegocioWizardStore(
-      (state) => state.registrarProgreso
+    const saveCurrentStep = useModeloNegocioWizardStore(
+      (state) => state.saveCurrentStep
     )
     const formData = useModeloNegocioWizardStore((state) => state.formData)
     const canvas = deriveCanvas(formData)
@@ -83,7 +83,7 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
       }
 
       updateAnexos(data)
-      registrarProgreso('completado')
+      saveCurrentStep()
       toast.success('Modelo de negocio guardado')
       router.push('/asesorias/modelo-negocio')
     }

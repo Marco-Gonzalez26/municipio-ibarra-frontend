@@ -9,12 +9,15 @@ import { entrepeneurFormService } from '@/features/registro-emprendedor/services
 import { ModeloNegocioListado } from '@/features/asesorias/modelo-negocio/components/modelo-negocio-listado'
 import { ModeloNegocioWizard } from '@/features/asesorias/modelo-negocio/components/modelo-negocio-wizard'
 import { fichaContextoService } from '@/features/asesorias/modelo-negocio/services/ficha-contexto.service'
+import { modeloNegocioService } from '@/features/modelo-negocio/services/modelo-negocio-crud.service'
 import type {
   FichaContexto,
   EmprendimientoOpcion,
 } from '@/features/asesorias/modelo-negocio/types/ficha.type'
+import type { ModeloNegocioDTO } from '@/features/modelo-negocio/types/modelo-negocio-api.types'
 
 const LIMIT_EMPRENDIMIENTOS = 200
+const LIMIT_MODELOS = 200
 
 interface ModeloNegocioPageProps {
   searchParams: Promise<{ id?: string }>
@@ -24,34 +27,112 @@ export default async function ModeloNegocioPage({
   searchParams,
 }: ModeloNegocioPageProps) {
   const { id } = await searchParams
-  const idEmprendedor = id ? Number(id) : null
   const session = await requireSession()
 
+  // If id is provided, try to load the modelo and its context
+  let modeloNegocioId: number | null = null
   let contexto: FichaContexto | null = null
-  if (idEmprendedor) {
+  let emprendedorId: number | null = null
+
+  if (id) {
+    const parsedId = Number(id)
+
+    // First, try to fetch as a modelo_negocio ID
     try {
-      contexto = await withSessionRedirect(() =>
-        fichaContextoService.getByEmprendedorId(idEmprendedor, session.token)
+      const modeloRes = await withSessionRedirect(() =>
+        modeloNegocioService.getById(parsedId, session.token)
       )
-    } catch (error) {
-      unstable_rethrow(error)
-      console.error('No se pudo cargar la ficha del emprendedor', error)
+      modeloNegocioId = modeloRes.modelo_negocio.id
+
+      // We have a modelo, but we need the emprendedor context
+      // Since modelo_negocio doesn't have id_emprendedor, we try to find it
+      // by matching nombre_emprendimiento against the user's emprendimientos
+      try {
+        const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
+          Promise.all([
+            entrepreneurService.getAll(1, LIMIT_EMPRENDIMIENTOS, session.token),
+            entrepeneurFormService.getAllReferenciaGeneral(
+              1,
+              LIMIT_EMPRENDIMIENTOS,
+              session.token
+            ),
+          ])
+        )
+
+        const entrepreneursById = new Map(
+          entrepreneursRes.emprendedores.map((emprendedor) => [
+            emprendedor.id,
+            emprendedor,
+          ])
+        )
+
+        // Find the matching emprendimiento by nombre
+        const matchingFormulario = formulariosRes.formularios_referencia_general.find(
+          (formulario) =>
+            formulario.tiene_emprendimiento &&
+            formulario.nombre_emprendimiento ===
+              modeloRes.modelo_negocio.nombre_emprendimiento
+        )
+
+        if (matchingFormulario) {
+          emprendedorId = matchingFormulario.id_emprendedor
+          const emprendedor = entrepreneursById.get(emprendedorId)
+          if (emprendedor) {
+            contexto = {
+              idEmprendedor: emprendedor.id,
+              nombreEmprendedor: emprendedor.nombres_apellidos,
+              cedula: emprendedor.cedula,
+              contacto: emprendedor.celular,
+              correo: emprendedor.email,
+              fechaIngreso:
+                matchingFormulario.fecha_formulario ?? emprendedor.fecha_registro,
+              nombreEmprendimiento:
+                matchingFormulario.nombre_emprendimiento ?? null,
+              sector: null,
+              direccion: emprendedor.parroquia || null,
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading emprendedor context:', error)
+      }
+    } catch {
+      // Not a modelo_negocio ID, try as emprendedor ID
+      emprendedorId = parsedId
+      try {
+        contexto = await withSessionRedirect(() =>
+          fichaContextoService.getByEmprendedorId(emprendedorId!, session.token)
+        )
+      } catch (error) {
+        unstable_rethrow(error)
+        console.error('No se pudo cargar la ficha del emprendedor', error)
+      }
     }
   }
 
+  // Load listing data if no contexto (listing mode)
+  let modelosIniciales: ModeloNegocioDTO[] = []
   let emprendimientos: EmprendimientoOpcion[] = []
+
   if (!contexto) {
     try {
-      const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
-        Promise.all([
-          entrepreneurService.getAll(1, LIMIT_EMPRENDIMIENTOS, session.token),
-          entrepeneurFormService.getAllReferenciaGeneral(
-            1,
-            LIMIT_EMPRENDIMIENTOS,
-            session.token
-          ),
-        ])
-      )
+      const [modelosRes, entrepreneursRes, formulariosRes] =
+        await withSessionRedirect(() =>
+          Promise.all([
+            modeloNegocioService.list(
+              { page: 1, limit: LIMIT_MODELOS },
+              session.token
+            ),
+            entrepreneurService.getAll(1, LIMIT_EMPRENDIMIENTOS, session.token),
+            entrepeneurFormService.getAllReferenciaGeneral(
+              1,
+              LIMIT_EMPRENDIMIENTOS,
+              session.token
+            ),
+          ])
+        )
+
+      modelosIniciales = modelosRes.modelo_negocios
 
       const entrepreneursById = new Map(
         entrepreneursRes.emprendedores.map((emprendedor) => [
@@ -74,7 +155,7 @@ export default async function ModeloNegocioPage({
         })
     } catch (error) {
       unstable_rethrow(error)
-      console.error('No se pudieron cargar los emprendimientos', error)
+      console.error('No se pudieron cargar los datos', error)
     }
   }
 
@@ -86,13 +167,18 @@ export default async function ModeloNegocioPage({
       </header>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        {contexto && idEmprendedor ? (
+        {contexto && emprendedorId ? (
           <ModeloNegocioWizard
-            idEmprendedor={idEmprendedor}
+            idEmprendedor={emprendedorId}
             contexto={contexto}
+            modeloNegocioId={modeloNegocioId}
+            analistaNombre={session.usuario.nombres}
           />
         ) : (
-          <ModeloNegocioListado emprendimientos={emprendimientos} />
+          <ModeloNegocioListado
+            modelosIniciales={modelosIniciales}
+            emprendimientos={emprendimientos}
+          />
         )}
       </div>
     </>

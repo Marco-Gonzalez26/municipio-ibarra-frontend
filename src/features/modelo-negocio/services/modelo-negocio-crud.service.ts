@@ -1,0 +1,293 @@
+import { api } from '@/lib/https'
+import type {
+  ModeloNegocioDTO,
+  ModeloNegocioCreateDTO,
+  ModeloNegocioListResponse,
+  IntroduccionDTO,
+  ContextoDTO,
+  ObjetivoEspecificoDTO,
+  PropuestaValorDTO,
+  PropuestaProductoDTO,
+  ClientesCanalesDTO,
+  FuenteIngresoDTO,
+  PortafolioProductoDTO,
+  RecursosActividadesDTO,
+  CostoVariableDTO,
+  CostoFijoDTO,
+  InversionInicialDTO,
+  ProyeccionSupuestosDTO,
+  ConclusionesDTO,
+  FodaDTO,
+  CanvasDTO,
+  ProgresoModeloDTO,
+  PaginationParams,
+} from '../types/modelo-negocio-api.types'
+
+export const modeloNegocioService = {
+  list: (params: PaginationParams, token?: string) => {
+    const searchParams = new URLSearchParams()
+    if (params.page) searchParams.set('page', String(params.page))
+    if (params.limit) searchParams.set('limit', String(params.limit))
+    if (params.search) searchParams.set('search', params.search)
+    if (params.id_estado) searchParams.set('id_estado', String(params.id_estado))
+    const query = searchParams.toString()
+    return api.get<ModeloNegocioListResponse>(
+      `/sime/modelonegocio${query ? `?${query}` : ''}`,
+      { token }
+    )
+  },
+
+  getById: (id: number, token?: string) =>
+    api.get<{ modelo_negocio: ModeloNegocioDTO }>(`/sime/modelonegocio/${id}`, {
+      token,
+    }),
+
+  create: (payload: ModeloNegocioCreateDTO, token?: string) =>
+    api.post<{ modelo_negocio: ModeloNegocioDTO; msg: string }>(
+      '/sime/modelonegocio',
+      { body: payload, token }
+    ),
+
+  update: (id: number, payload: Partial<ModeloNegocioCreateDTO>, token?: string) =>
+    api.put<{ msg: string }>(`/sime/modelonegocio/${id}`, {
+      body: payload,
+      token,
+    }),
+
+  delete: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/modelonegocio/${id}`, { token }),
+
+  changeEstado: (id: number, idEstado: number, motivo?: string, token?: string) =>
+    api.put<{ msg: string }>(`/sime/modelonegocio/${id}/estado`, {
+      body: { id_estado: idEstado, motivo },
+      token,
+    }),
+
+  // ── 1:1 sections (upsert by id_modelo) ──────────────────────────
+
+  getIntroduccion: (idModelo: number, token?: string) =>
+    api.get<{ introduccion: IntroduccionDTO }>(
+      `/sime/mnintroduccion/${idModelo}`,
+      { token }
+    ),
+
+  saveIntroduccion: (idModelo: number, data: Omit<IntroduccionDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnintroduccion/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getContexto: (idModelo: number, token?: string) =>
+    api.get<{ contexto: ContextoDTO }>(`/sime/mncontexto/${idModelo}`, {
+      token,
+    }),
+
+  saveContexto: (idModelo: number, data: Omit<ContextoDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mncontexto/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getPropuestaValor: (idModelo: number, token?: string) =>
+    api.get<{ propuesta_valor: PropuestaValorDTO }>(
+      `/sime/mnpropuestavalor/${idModelo}`,
+      { token }
+    ),
+
+  savePropuestaValor: (idModelo: number, data: Omit<PropuestaValorDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnpropuestavalor/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getClientesCanales: (idModelo: number, token?: string) =>
+    api.get<{ clientes_canales: ClientesCanalesDTO }>(
+      `/sime/mnclientescanales/${idModelo}`,
+      { token }
+    ),
+
+  saveClientesCanales: (idModelo: number, data: Omit<ClientesCanalesDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnclientescanales/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getRecursosActividades: (idModelo: number, token?: string) =>
+    api.get<{ recursos_actividades: RecursosActividadesDTO }>(
+      `/sime/mnrecursosactividades/${idModelo}`,
+      { token }
+    ),
+
+  saveRecursosActividades: (idModelo: number, data: Omit<RecursosActividadesDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnrecursosactividades/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getProyeccionSupuestos: (idModelo: number, token?: string) =>
+    api.get<{ proyeccion_supuestos: ProyeccionSupuestosDTO }>(
+      `/sime/mnproyeccionsupuestos/${idModelo}`,
+      { token }
+    ),
+
+  saveProyeccionSupuestos: (idModelo: number, data: Omit<ProyeccionSupuestosDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnproyeccionsupuestos/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  getConclusiones: (idModelo: number, token?: string) =>
+    api.get<{ conclusiones: ConclusionesDTO }>(
+      `/sime/mnconclusiones/${idModelo}`,
+      { token }
+    ),
+
+  saveConclusiones: (idModelo: number, data: Omit<ConclusionesDTO, 'id' | 'id_modelo'>, token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnconclusiones/${idModelo}`, {
+      body: data,
+      token,
+    }),
+
+  // ── 1:many sections (individual CRUD) ──────────────────────────
+
+  getObjetivosEspecificos: (idModelo: number, token?: string) =>
+    api.get<{ objetivos_especificos: ObjetivoEspecificoDTO[] }>(
+      `/sime/mnobjetivoespecifico/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createObjetivoEspecifico: (data: Omit<ObjetivoEspecificoDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; objetivo_especifico: ObjetivoEspecificoDTO }>(
+      '/sime/mnobjetivoespecifico',
+      { body: data, token }
+    ),
+
+  deleteObjetivoEspecifico: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mnobjetivoespecifico/${id}`, { token }),
+
+  getPropuestaProductos: (idModelo: number, token?: string) =>
+    api.get<{ propuesta_productos: PropuestaProductoDTO[] }>(
+      `/sime/mnpropuestaproducto/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createPropuestaProducto: (data: Omit<PropuestaProductoDTO, 'codigo_producto'>, token?: string) =>
+    api.post<{ msg: string; propuesta_producto: PropuestaProductoDTO }>(
+      '/sime/mnpropuestaproducto',
+      { body: data, token }
+    ),
+
+  deletePropuestaProducto: (codigo: string, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mnpropuestaproducto/${codigo}`, { token }),
+
+  getFuentesIngreso: (idModelo: number, token?: string) =>
+    api.get<{ fuentes_ingreso: FuenteIngresoDTO[] }>(
+      `/sime/mnfuenteingreso/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createFuenteIngreso: (data: Omit<FuenteIngresoDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; fuente_ingreso: FuenteIngresoDTO }>(
+      '/sime/mnfuenteingreso',
+      { body: data, token }
+    ),
+
+  deleteFuenteIngreso: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mnfuenteingreso/${id}`, { token }),
+
+  getPortafolioProductos: (idModelo: number, token?: string) =>
+    api.get<{ portafolio_productos: PortafolioProductoDTO[] }>(
+      `/sime/mnportafolioproducto/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createPortafolioProducto: (data: Omit<PortafolioProductoDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; portafolio_producto: PortafolioProductoDTO }>(
+      '/sime/mnportafolioproducto',
+      { body: data, token }
+    ),
+
+  deletePortafolioProducto: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mnportafolioproducto/${id}`, { token }),
+
+  getCostosVariables: (idModelo: number, token?: string) =>
+    api.get<{ costos_variables: CostoVariableDTO[] }>(
+      `/sime/mncostovariable/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createCostoVariable: (data: Omit<CostoVariableDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; costo_variable: CostoVariableDTO }>(
+      '/sime/mncostovariable',
+      { body: data, token }
+    ),
+
+  deleteCostoVariable: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mncostovariable/${id}`, { token }),
+
+  getCostosFijos: (idModelo: number, token?: string) =>
+    api.get<{ costos_fijos: CostoFijoDTO[] }>(
+      `/sime/mncostofijo/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createCostoFijo: (data: Omit<CostoFijoDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; costo_fijo: CostoFijoDTO }>(
+      '/sime/mncostofijo',
+      { body: data, token }
+    ),
+
+  deleteCostoFijo: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mncostofijo/${id}`, { token }),
+
+  getInversionInicial: (idModelo: number, token?: string) =>
+    api.get<{ inversion_inicial: InversionInicialDTO[] }>(
+      `/sime/mninversioninicial/modelo/${idModelo}`,
+      { token }
+    ),
+
+  createInversionInicial: (data: Omit<InversionInicialDTO, 'id'>, token?: string) =>
+    api.post<{ msg: string; inversion_inicial: InversionInicialDTO }>(
+      '/sime/mninversioninicial',
+      { body: data, token }
+    ),
+
+  deleteInversionInicial: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mninversioninicial/${id}`, { token }),
+
+  getFoda: (idModelo: number, token?: string) =>
+    api.get<{ foda: FodaDTO[] }>(`/sime/mnfoda/modelo/${idModelo}`, {
+      token,
+    }),
+
+  saveFoda: (idModelo: number, data: Omit<FodaDTO, 'id'>[], token?: string) =>
+    api.post<{ msg: string }>(`/sime/mnfoda/${idModelo}`, {
+      body: { foda: data },
+      token,
+    }),
+
+  getCanvas: (idModelo: number, token?: string) =>
+    api.get<{ canvas: CanvasDTO[] }>(`/sime/mncanvas/modelo/${idModelo}`, {
+      token,
+    }),
+
+  saveCanvas: (idModelo: number, data: Omit<CanvasDTO, 'id'>[], token?: string) =>
+    api.post<{ msg: string }>(`/sime/mncanvas/${idModelo}`, {
+      body: { canvas: data },
+      token,
+    }),
+
+  // ── Progress ──────────────────────────────────────────────────
+
+  getProgreso: (idModelo: number, token?: string) =>
+    api.get<{ pasos: ProgresoModeloDTO[] }>(
+      `/sime/mnprogresomodelo/modelo/${idModelo}`,
+      { token }
+    ),
+
+  markPaso: (id: number, token?: string) =>
+    api.put<{ msg: string }>(`/sime/mnprogresomodelo/${id}`, {
+      body: { estado: 1 },
+      token,
+    }),
+}

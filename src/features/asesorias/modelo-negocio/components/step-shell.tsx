@@ -32,13 +32,13 @@ export function StepFooter({
   onSaveDraft,
   submitLabel = 'Siguiente',
 }: StepFooterProps) {
-  const registrarProgreso = useModeloNegocioWizardStore(
-    (state) => state.registrarProgreso
+  const saveCurrentStep = useModeloNegocioWizardStore(
+    (state) => state.saveCurrentStep
   )
 
   function handleSaveDraft() {
     onSaveDraft()
-    registrarProgreso('borrador')
+    saveCurrentStep()
   }
 
   return (

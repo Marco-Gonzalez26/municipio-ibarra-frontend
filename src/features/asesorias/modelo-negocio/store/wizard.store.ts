@@ -1,27 +1,26 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { toast } from 'sonner'
 import type { FichaContexto } from '../types/ficha.type'
 import type {
-  ModeloNegocioEstado,
-  ModeloNegocioRegistro,
   ModeloNegocioState,
   WizardStep,
 } from '../types/wizard-form.type'
 import { WIZARD_STEPS } from '../types/wizard-form.type'
 import { initialState } from './initial-state'
+import { saveStepAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const STEP_ORDER: WizardStep[] = WIZARD_STEPS.map((step) => step.key)
 
 interface ModeloNegocioWizardStoreState {
+  modeloNegocioId: number | null
   idEmprendedor: number | null
   contexto: FichaContexto | null
   currentStep: WizardStep
+  isDirty: boolean
   formData: ModeloNegocioState
-  registro: Record<number, ModeloNegocioRegistro>
 
+  setModeloNegocioId: (id: number | null) => void
   ensureEmprendedor: (idEmprendedor: number, contexto: FichaContexto) => void
-  registrarProgreso: (estado: ModeloNegocioEstado) => void
-  eliminarModelo: (idEmprendedor: number) => void
   setCurrentStep: (step: WizardStep) => void
   goToNextStep: () => void
   goToPreviousStep: () => void
@@ -51,6 +50,14 @@ interface ModeloNegocioWizardStoreState {
   ) => void
   updateAnexos: (data: Partial<ModeloNegocioState['anexos']>) => void
 
+  hydrateFromServer: (data: {
+    modeloNegocioId: number
+    formData: ModeloNegocioState
+    currentStep: WizardStep
+  }) => void
+
+  saveCurrentStep: () => Promise<void>
+
   reset: () => void
 }
 
@@ -63,6 +70,7 @@ type SetFn = (
 function makeUpdater<K extends keyof ModeloNegocioState>(set: SetFn, key: K) {
   return (data: Partial<ModeloNegocioState[K]>) =>
     set((state) => ({
+      isDirty: true,
       formData: {
         ...state.formData,
         [key]: { ...state.formData[key], ...data },
@@ -71,95 +79,100 @@ function makeUpdater<K extends keyof ModeloNegocioState>(set: SetFn, key: K) {
 }
 
 export const useModeloNegocioWizardStore =
-  create<ModeloNegocioWizardStoreState>()(
-    persist(
-      (set, get) => ({
-        idEmprendedor: null,
-        contexto: null,
+  create<ModeloNegocioWizardStoreState>()((set, get) => ({
+    modeloNegocioId: null,
+    idEmprendedor: null,
+    contexto: null,
+    currentStep: 'ficha',
+    isDirty: false,
+    formData: initialState.formData,
+
+    setModeloNegocioId: (id) => set({ modeloNegocioId: id }),
+
+    ensureEmprendedor: (idEmprendedor, contexto) => {
+      if (get().idEmprendedor === idEmprendedor) {
+        set({ contexto })
+        return
+      }
+      set({
+        modeloNegocioId: null,
+        idEmprendedor,
+        contexto,
         currentStep: 'ficha',
-        formData: initialState,
-        registro: {},
+        isDirty: false,
+        formData: initialState.formData,
+      })
+    },
 
-        ensureEmprendedor: (idEmprendedor, contexto) => {
-          if (get().idEmprendedor === idEmprendedor) {
-            set({ contexto })
-            return
-          }
-          const existente = get().registro[idEmprendedor]
-          set({
-            idEmprendedor,
-            contexto,
-            currentStep: 'ficha',
-            formData: existente ? existente.formData : initialState,
-          })
-        },
+    setCurrentStep: (step) => set({ currentStep: step }),
 
-        registrarProgreso: (estado) => {
-          const { idEmprendedor, contexto, formData, registro } = get()
-          if (idEmprendedor === null) return
-          set({
-            registro: {
-              ...registro,
-              [idEmprendedor]: {
-                idEmprendedor,
-                nombreEmprendedor: contexto?.nombreEmprendedor ?? 'Sin nombre',
-                nombreEmprendimiento: contexto?.nombreEmprendimiento ?? null,
-                estado,
-                actualizadoEn: new Date().toISOString(),
-                formData,
-              },
-            },
-          })
-        },
+    goToNextStep: () => {
+      const { currentStep } = get()
+      const nextIndex = STEP_ORDER.indexOf(currentStep) + 1
+      if (nextIndex < STEP_ORDER.length) {
+        set({ currentStep: STEP_ORDER[nextIndex] })
+      }
+    },
 
-        eliminarModelo: (idEmprendedor) => {
-          const registro = { ...get().registro }
-          delete registro[idEmprendedor]
-          set({ registro })
-        },
+    goToPreviousStep: () => {
+      const { currentStep } = get()
+      const prevIndex = STEP_ORDER.indexOf(currentStep) - 1
+      if (prevIndex >= 0) {
+        set({ currentStep: STEP_ORDER[prevIndex] })
+      }
+    },
 
-        setCurrentStep: (step) => set({ currentStep: step }),
+    updateFicha: makeUpdater(set, 'ficha'),
+    updateIntroduccion: makeUpdater(set, 'introduccion'),
+    updateAntecedentes: makeUpdater(set, 'antecedentes'),
+    updateJustificacion: makeUpdater(set, 'justificacion'),
+    updateObjetivos: makeUpdater(set, 'objetivos'),
+    updatePropuesta: makeUpdater(set, 'propuesta'),
+    updateSegmentos: makeUpdater(set, 'segmentos'),
+    updateCanales: makeUpdater(set, 'canales'),
+    updateRelacion: makeUpdater(set, 'relacion'),
+    updateIngresos: makeUpdater(set, 'ingresos'),
+    updateRecursos: makeUpdater(set, 'recursos'),
+    updateActividades: makeUpdater(set, 'actividades'),
+    updateSocios: makeUpdater(set, 'socios'),
+    updateCostos: makeUpdater(set, 'costos'),
+    updateConclusiones: makeUpdater(set, 'conclusiones'),
+    updateAnexos: makeUpdater(set, 'anexos'),
 
-        goToNextStep: () => {
-          const { currentStep } = get()
-          const nextIndex = STEP_ORDER.indexOf(currentStep) + 1
-          if (nextIndex < STEP_ORDER.length) {
-            set({ currentStep: STEP_ORDER[nextIndex] })
-          }
-        },
+    hydrateFromServer: (data) => {
+      set({
+        modeloNegocioId: data.modeloNegocioId,
+        currentStep: data.currentStep,
+        formData: data.formData,
+        isDirty: false,
+      })
+    },
 
-        goToPreviousStep: () => {
-          const { currentStep } = get()
-          const prevIndex = STEP_ORDER.indexOf(currentStep) - 1
-          if (prevIndex >= 0) {
-            set({ currentStep: STEP_ORDER[prevIndex] })
-          }
-        },
+    saveCurrentStep: async () => {
+      const { modeloNegocioId, currentStep, formData } = get()
+      if (!modeloNegocioId) {
+        toast.error('No hay modelo de negocio activo para guardar')
+        return
+      }
 
-        updateFicha: makeUpdater(set, 'ficha'),
-        updateIntroduccion: makeUpdater(set, 'introduccion'),
-        updateAntecedentes: makeUpdater(set, 'antecedentes'),
-        updateJustificacion: makeUpdater(set, 'justificacion'),
-        updateObjetivos: makeUpdater(set, 'objetivos'),
-        updatePropuesta: makeUpdater(set, 'propuesta'),
-        updateSegmentos: makeUpdater(set, 'segmentos'),
-        updateCanales: makeUpdater(set, 'canales'),
-        updateRelacion: makeUpdater(set, 'relacion'),
-        updateIngresos: makeUpdater(set, 'ingresos'),
-        updateRecursos: makeUpdater(set, 'recursos'),
-        updateActividades: makeUpdater(set, 'actividades'),
-        updateSocios: makeUpdater(set, 'socios'),
-        updateCostos: makeUpdater(set, 'costos'),
-        updateConclusiones: makeUpdater(set, 'conclusiones'),
-        updateAnexos: makeUpdater(set, 'anexos'),
+      try {
+        await saveStepAction(modeloNegocioId, currentStep, formData)
+        set({ isDirty: false })
+        toast.success('Guardado correctamente')
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Error al guardar'
+        toast.error(`Error al guardar: ${message}`)
+      }
+    },
 
-        reset: () =>
-          set({
-            currentStep: 'ficha',
-            formData: initialState,
-            idEmprendedor: null,
-          }),
+    reset: () =>
+      set({
+        modeloNegocioId: null,
+        currentStep: 'ficha',
+        formData: initialState.formData,
+        idEmprendedor: null,
+        isDirty: false,
+        contexto: null,
       }),
-      { name: 'modelo-negocio-wizard' }
-    )
-  )
+  }))

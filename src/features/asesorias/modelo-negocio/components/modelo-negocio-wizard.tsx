@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
 import type { FichaContexto } from '../types/ficha.type'
 import type { WizardStep } from '../types/wizard-form.type'
@@ -22,22 +22,181 @@ import { SociosStep } from './socios-step'
 import { CostosStep } from './costos-step'
 import { ConclusionesStep } from './conclusiones-step'
 import { AnexosStep } from './anexos-step'
+import { loadModeloAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import type { ModeloNegocioState } from '../types/wizard-form.type'
 
 interface ModeloNegocioWizardProps {
   idEmprendedor: number
   contexto: FichaContexto
+  modeloNegocioId?: number | null
+  analistaNombre?: string
+}
+
+function mapServerSectionsToFormData(sections: Record<string, unknown>): ModeloNegocioState {
+  const intro = sections.introduccion as { introduccion: string; importancia: string } | null
+  const ctx = sections.contexto as { antecedentes: string; justificacion: string; impacto: string; objetivo_general: string } | null
+  const propuesta = sections.propuestaValor as { propuesta_valor: string } | null
+  const cc = sections.clientesCanales as { segmentos: string; canales: string; relacion: string } | null
+  const ra = sections.recursosActividades as { recursos_financieros: string; recursos_fisicos: string; mobiliario: string; local: string; actividades: string; socios: string } | null
+  const conc = sections.conclusiones as { conclusiones: string } | null
+  const foda = sections.foda as Array<{ id_cuadrante: number; contenido: string }> | null
+
+  const fodaMap: Record<number, string> = {}
+  if (foda) {
+    for (const item of foda) {
+      fodaMap[item.id_cuadrante] = item.contenido
+    }
+  }
+
+  return {
+    ficha: {
+      numeroTramite: '',
+      productoLinea: '',
+      analista: '',
+      observaciones: '',
+    },
+    introduccion: {
+      introduccion: intro?.introduccion ?? '',
+      importancia: intro?.importancia ?? '',
+    },
+    antecedentes: {
+      antecedentes: ctx?.antecedentes ?? '',
+    },
+    justificacion: {
+      justificacion: ctx?.justificacion ?? '',
+    },
+    objetivos: {
+      objetivoGeneral: ctx?.objetivo_general ?? '',
+      objetivosEspecificos: [],
+    },
+    propuesta: {
+      propuestaValor: propuesta?.propuesta_valor ?? '',
+      portafolio: [],
+    },
+    segmentos: {
+      segmentos: cc?.segmentos ?? '',
+    },
+    canales: {
+      canales: cc?.canales ?? '',
+    },
+    relacion: {
+      relacion: cc?.relacion ?? '',
+    },
+    ingresos: {
+      ingresosTexto: '',
+      productos: [],
+    },
+    recursos: {
+      recursosFinancieros: ra?.recursos_financieros ?? '',
+      recursosFisicos: ra?.recursos_fisicos ?? '',
+      mobiliario: ra?.mobiliario ?? '',
+      local: ra?.local ?? '',
+    },
+    actividades: {
+      actividades: ra?.actividades ?? '',
+    },
+    socios: {
+      socios: ra?.socios ?? '',
+    },
+    costos: {
+      insumos: [],
+      fijos: [],
+      inversion: [],
+      proyeccion: {
+        precio: 0,
+        costosFijos: 0,
+        growth: 0,
+        startUnits: 0,
+        varRatio: 0,
+        margen: 0,
+      },
+    },
+    conclusiones: {
+      conclusiones: conc?.conclusiones ?? '',
+    },
+    anexos: {
+      fortalezas: fodaMap[1] ?? '',
+      oportunidades: fodaMap[2] ?? '',
+      debilidades: fodaMap[3] ?? '',
+      amenazas: fodaMap[4] ?? '',
+    },
+  }
 }
 
 export function ModeloNegocioWizard({
   idEmprendedor,
   contexto,
+  modeloNegocioId: initialModeloId,
+  analistaNombre,
 }: ModeloNegocioWizardProps) {
+  const [loading, setLoading] = useState(false)
+  const loadedRef = useRef(false)
   const ensureEmprendedor = useModeloNegocioWizardStore(
     (state) => state.ensureEmprendedor
   )
+  const hydrateFromServer = useModeloNegocioWizardStore(
+    (state) => state.hydrateFromServer
+  )
+
   useEffect(() => {
     ensureEmprendedor(idEmprendedor, contexto)
   }, [idEmprendedor, contexto, ensureEmprendedor])
+
+  const loadModelo = useCallback(async () => {
+    if (!initialModeloId || loadedRef.current) return
+    loadedRef.current = true
+    setLoading(true)
+    try {
+      const data = await loadModeloAction(initialModeloId)
+      const formData = mapServerSectionsToFormData(data.sections)
+      const stepMap: Record<string, WizardStep> = {
+        ficha: 'ficha',
+        introduccion: 'introduccion',
+        antecedentes: 'antecedentes',
+        justificacion: 'justificacion',
+        objetivos: 'objetivos',
+        propuesta: 'propuesta',
+        segmentos: 'segmentos',
+        canales: 'canales',
+        relacion: 'relacion',
+        ingresos: 'ingresos',
+        recursos: 'recursos',
+        actividades: 'actividades',
+        socios: 'socios',
+        costos: 'costos',
+        conclusiones: 'conclusiones',
+        anexos: 'anexos',
+      }
+      const targetStep = stepMap[data.firstIncompleteStep] ?? 'ficha'
+
+      hydrateFromServer({
+        modeloNegocioId: data.modelo.id,
+        formData,
+        currentStep: targetStep,
+      })
+
+      if (data.modelo.n_tramite) {
+        formData.ficha.numeroTramite = data.modelo.n_tramite
+      }
+      if (data.modelo.producto_linea) {
+        formData.ficha.productoLinea = data.modelo.producto_linea
+      }
+      if (data.modelo.analista) {
+        formData.ficha.analista = data.modelo.analista
+      }
+      if (data.modelo.observaciones) {
+        formData.ficha.observaciones = data.modelo.observaciones
+      }
+    } catch (error) {
+      console.error('Error loading modelo:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [initialModeloId, hydrateFromServer])
+
+  useEffect(() => {
+    loadModelo()
+  }, [loadModelo])
 
   const currentStep = useModeloNegocioWizardStore((state) => state.currentStep)
   const setCurrentStep = useModeloNegocioWizardStore(
@@ -58,6 +217,14 @@ export function ModeloNegocioWizard({
     setCurrentStep(step)
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="text-muted-foreground">Cargando modelo de negocio...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
       <div className="rounded-xl border bg-card p-4 shadow-sm">
@@ -69,7 +236,12 @@ export function ModeloNegocioWizard({
 
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         {currentStep === 'ficha' ? (
-          <FichaStep ref={stepRef} contexto={contexto} onNext={goToNextStep} />
+          <FichaStep
+            ref={stepRef}
+            contexto={contexto}
+            analistaNombre={analistaNombre}
+            onNext={goToNextStep}
+          />
         ) : null}
         {currentStep === 'introduccion' ? (
           <IntroduccionStep

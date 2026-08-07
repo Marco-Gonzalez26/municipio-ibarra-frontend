@@ -1,6 +1,15 @@
 import type { ModeloNegocioState } from '../types/wizard-form.type'
 
-export const initialState: ModeloNegocioState = {
+export interface WizardStoreState {
+  modeloNegocioId: number | null
+  isDirty: boolean
+  formData: ModeloNegocioState
+}
+
+export const initialState: WizardStoreState = {
+  modeloNegocioId: null,
+  isDirty: false,
+  formData: {
   ficha: {
     numeroTramite: '',
     productoLinea: '',
@@ -71,5 +80,6 @@ export const initialState: ModeloNegocioState = {
     oportunidades: '',
     debilidades: '',
     amenazas: '',
+  },
   },
 }
