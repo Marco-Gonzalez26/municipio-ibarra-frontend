@@ -40,7 +40,7 @@ function mapServerSectionsToFormData(
   const ctx = sections.contexto as { antecedentes: string; justificacion: string; impacto: string; objetivo_general: string } | null
   const propuesta = sections.propuestaValor as { propuesta_valor: string } | null
   const objetivosEsp = sections.objetivosEspecificos as Array<{ id: number; descripcion: string; orden: number }> | null
-  const propProductos = sections.propuestaProductos as Array<{ id: number; nombre_producto: string; codigo_producto: string }> | null
+  const propProductos = sections.propuestaProductos as Array<{ id: number; nombre: string; codigo_producto: string }> | null
   const cc = sections.clientesCanales as { segmentos: string; canales: string; relacion: string } | null
   const ra = sections.recursosActividades as { recursos_financieros: string; recursos_fisicos: string; mobiliario: string; local: string; actividades: string; socios: string } | null
   const conc = sections.conclusiones as { conclusiones: string } | null
@@ -79,7 +79,7 @@ function mapServerSectionsToFormData(
     propuesta: {
       propuestaValor: propuesta?.propuesta_valor ?? '',
       portafolio: propProductos
-        ? propProductos.map((p) => p.nombre_producto)
+        ? propProductos.map((p) => p.nombre)
         : [],
     },
     segmentos: {

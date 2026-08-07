@@ -64,9 +64,8 @@ export interface PropuestaProductoDTO {
   id?: number
   codigo_producto: string
   id_propuesta: number
-  id_modelo: number
-  nombre_producto: string
-  descripcion: string | null
+  nombre: string
+  imagen: string | null
 }
 
 export interface ClientesCanalesDTO {

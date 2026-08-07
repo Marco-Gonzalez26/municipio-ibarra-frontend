@@ -165,9 +165,9 @@ export const modeloNegocioService = {
   deleteObjetivoEspecifico: (id: number, token?: string) =>
     api.delete<{ msg: string }>(`/sime/mnobjetivoespecifico/${id}`, { token }),
 
-  getPropuestaProductos: (idModelo: number, token?: string) =>
+  getPropuestaProductos: (idPropuesta: number, token?: string) =>
     api.get<{ ok: boolean; data: PropuestaProductoDTO[] }>(
-      `/sime/mnpropuestaproducto/modelo/${idModelo}`,
+      `/sime/mnpropuestaproducto/propuesta/${idPropuesta}`,
       { token }
     ),
 
@@ -186,24 +186,24 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createFuenteIngreso: (data: Omit<FuenteIngresoDTO, 'id'>, token?: string) =>
+  createFuenteIngreso: (idModelo: number, data: Omit<FuenteIngresoDTO, 'id' | 'id_modelo'>, token?: string) =>
     api.post<{ msg: string; fuente_ingreso: FuenteIngresoDTO }>(
-      '/sime/mnfuenteingreso',
+      `/sime/mnfuenteingreso/modelo/${idModelo}`,
       { body: data, token }
     ),
 
   deleteFuenteIngreso: (id: number, token?: string) =>
     api.delete<{ msg: string }>(`/sime/mnfuenteingreso/${id}`, { token }),
 
-  getPortafolioProductos: (idModelo: number, token?: string) =>
+  getPortafolioProductos: (idFuenteIngreso: number, token?: string) =>
     api.get<{ ok: boolean; data: PortafolioProductoDTO[] }>(
-      `/sime/mnportafolioproducto/modelo/${idModelo}`,
+      `/sime/mnportafolioproducto/fuente/${idFuenteIngreso}`,
       { token }
     ),
 
-  createPortafolioProducto: (data: Omit<PortafolioProductoDTO, 'id'>, token?: string) =>
+  createPortafolioProducto: (idFuenteIngreso: number, data: Omit<PortafolioProductoDTO, 'id' | 'id_fuente_ingreso'>, token?: string) =>
     api.post<{ msg: string; portafolio_producto: PortafolioProductoDTO }>(
-      '/sime/mnportafolioproducto',
+      `/sime/mnportafolioproducto/fuente/${idFuenteIngreso}`,
       { body: data, token }
     ),
 

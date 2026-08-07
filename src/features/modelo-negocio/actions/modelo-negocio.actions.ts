@@ -183,19 +183,6 @@ async function savePortafolio(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stepResult: any
 ) {
-  // Get existing products from mnpropuestaproducto (NOT mnportafolioproducto)
-  const existing = await modeloNegocioService
-    .getPropuestaProductos(modeloId, token)
-    .catch(() => ({ ok: false, data: [] as PropuestaProductoDTO[] }))
-  const items = existing?.data ?? []
-  for (const item of items) {
-    if (item.codigo_producto) {
-      await modeloNegocioService
-        .deletePropuestaProducto(item.codigo_producto, token)
-        .catch(() => {})
-    }
-  }
-
   // Get propuesta valor ID: try stepResult first, then GET fallback
   let idPropuesta = stepResult?.propuesta_valor?.id ?? 0
   if (!idPropuesta) {
@@ -206,6 +193,22 @@ async function savePortafolio(
   }
   console.log('[savePortafolio] idPropuesta:', idPropuesta)
 
+  // Delete existing products by propuesta ID
+  if (idPropuesta) {
+    const existing = await modeloNegocioService
+      .getPropuestaProductos(idPropuesta, token)
+      .catch(() => ({ ok: false, data: [] as PropuestaProductoDTO[] }))
+    const items = existing?.data ?? []
+    for (const item of items) {
+      if (item.codigo_producto) {
+        await modeloNegocioService
+          .deletePropuestaProducto(item.codigo_producto, token)
+          .catch(() => {})
+      }
+    }
+  }
+
+  // Create new products
   const productos = formData.propuesta.portafolio
   for (let i = 0; i < productos.length; i++) {
     const nombre = productos[i]
@@ -214,9 +217,8 @@ async function savePortafolio(
         {
           codigo_producto: `PROD-${modeloId}-${i + 1}`,
           id_propuesta: idPropuesta,
-          id_modelo: modeloId,
-          nombre_producto: nombre,
-          descripcion: null,
+          nombre: nombre,
+          imagen: null,
         },
         token
       ).catch((err) => {
@@ -232,28 +234,29 @@ async function saveIngresos(
   formData: ModeloNegocioState,
   token: string
 ) {
+  // Delete existing portafolio products for each fuente, then delete fuentes
   const existing = await modeloNegocioService
     .getFuentesIngreso(modeloId, token)
     .catch(() => ({ ok: false, data: [] as FuenteIngresoDTO[] }))
   const fuentes = existing?.data ?? []
   for (const f of fuentes) {
+    const existingPort = await modeloNegocioService
+      .getPortafolioProductos(f.id, token)
+      .catch(() => ({ ok: false, data: [] as PortafolioProductoDTO[] }))
+    for (const p of existingPort?.data ?? []) {
+      await modeloNegocioService
+        .deletePortafolioProducto(p.id, token)
+        .catch(() => {})
+    }
     await modeloNegocioService.deleteFuenteIngreso(f.id, token).catch(() => {})
   }
-  const existingPort = await modeloNegocioService
-    .getPortafolioProductos(modeloId, token)
-    .catch(() => ({ ok: false, data: [] as PortafolioProductoDTO[] }))
-  const ports = existingPort?.data ?? []
-  for (const p of ports) {
-    await modeloNegocioService
-      .deletePortafolioProducto(p.id, token)
-      .catch(() => {})
-  }
 
+  // Create fuente de ingreso
   let idFuente = 0
   if (formData.ingresos.ingresosTexto.trim()) {
     const result = await modeloNegocioService.createFuenteIngreso(
+      modeloId,
       {
-        id_modelo: modeloId,
         descripcion: formData.ingresos.ingresosTexto,
         monto_estimado: null,
       },
@@ -262,11 +265,12 @@ async function saveIngresos(
     idFuente = result?.fuente_ingreso?.id ?? 0
   }
 
+  // Create portafolio products
   for (const prod of formData.ingresos.productos) {
-    if (prod.producto.trim()) {
+    if (prod.producto.trim() && idFuente) {
       await modeloNegocioService.createPortafolioProducto(
+        idFuente,
         {
-          id_fuente_ingreso: idFuente,
           codigo_producto: null,
           nombre_producto: prod.producto,
           descripcion: prod.descripcion || null,
@@ -513,13 +517,12 @@ export async function loadModeloAction(modeloId: number) {
 
   const modelo = modeloRes.modelo
 
-  // Load all sections in parallel
+  // Load all sections in parallel (except propuestaProductos which needs idPropuesta)
   const [
     introduccion,
     contexto,
     propuestaValor,
     objetivosEspecificos,
-    propuestaProductos,
     clientesCanales,
     recursosActividades,
     conclusiones,
@@ -536,9 +539,6 @@ export async function loadModeloAction(modeloId: number) {
       .getObjetivosEspecificos(modeloId, session.token)
       .catch(() => null),
     modeloNegocioService
-      .getPropuestaProductos(modeloId, session.token)
-      .catch(() => null),
-    modeloNegocioService
       .getClientesCanales(modeloId, session.token)
       .catch(() => null),
     modeloNegocioService
@@ -549,6 +549,14 @@ export async function loadModeloAction(modeloId: number) {
       .catch(() => null),
     modeloNegocioService.getFoda(modeloId, session.token).catch(() => null),
   ])
+
+  // Fetch propuestaProductos using idPropuesta (can't run in parallel)
+  const idPropuesta = propuestaValor?.data?.id ?? 0
+  const propuestaProductos = idPropuesta
+    ? await modeloNegocioService
+        .getPropuestaProductos(idPropuesta, session.token)
+        .catch(() => null)
+    : null
   console.log({
     introduccion,
     contexto,
