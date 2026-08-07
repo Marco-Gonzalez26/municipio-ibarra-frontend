@@ -167,13 +167,13 @@ export const useModeloNegocioWizardStore =
         }
         try {
           const result = await createModeloAction(
-            formData.ficha.numeroTramite,
-            contexto.fechaIngreso,
-            contexto.nombreEmprendimiento ?? contexto.nombreEmprendedor,
+            formData.ficha.numeroTramite || 'SIN TRAMITE',
+            contexto.fechaIngreso || new Date().toISOString().split('T')[0],
+            contexto.nombreEmprendimiento || contexto.nombreEmprendedor || 'Sin nombre',
             contexto.idSector ?? 1,
-            formData.ficha.productoLinea,
-            formData.ficha.analista,
-            formData.ficha.observaciones
+            formData.ficha.productoLinea || 'Sin producto',
+            formData.ficha.analista || 'Sin analista',
+            formData.ficha.observaciones || ''
           )
           activeId = result.modelo.id
           set({ modeloNegocioId: activeId })
