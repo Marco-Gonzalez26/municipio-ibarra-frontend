@@ -260,11 +260,14 @@ export const modeloNegocioService = {
       token,
     }),
 
-  saveFoda: (idModelo: number, data: Omit<FodaDTO, 'id'>[], token?: string) =>
-    api.post<{ msg: string }>(`/sime/mnfoda/${idModelo}`, {
-      body: { foda: data },
+  saveFoda: (idModelo: number, data: { id_cuadrante: number; contenido: string }, token?: string) =>
+    api.post<{ msg: string; data: FodaDTO }>(`/sime/mnfoda/modelo/${idModelo}`, {
+      body: data,
       token,
     }),
+
+  deleteFoda: (id: number, token?: string) =>
+    api.delete<{ msg: string }>(`/sime/mnfoda/${id}`, { token }),
 
   getCanvas: (idModelo: number, token?: string) =>
     api.get<{ ok: boolean; total: number; data: CanvasDTO[] }>(`/sime/mncanvas/modelo/${idModelo}`, {

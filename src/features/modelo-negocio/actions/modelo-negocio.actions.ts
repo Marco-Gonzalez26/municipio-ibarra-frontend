@@ -11,6 +11,7 @@ import type {
   CostoVariableDTO,
   CostoFijoDTO,
   InversionInicialDTO,
+  FodaDTO,
 } from '../types/modelo-negocio-api.types'
 import type { ModeloNegocioState } from '@/features/asesorias/modelo-negocio/types/wizard-form.type'
 
@@ -134,15 +135,6 @@ const SIMPLE_STEP_API_MAP: Record<
     extractKey: (d) => ({
       conclusiones: d.conclusiones.conclusiones,
     }),
-  },
-  anexos: {
-    save: (id, data, t) => modeloNegocioService.saveFoda(id, data, t),
-    extractKey: (d) => [
-      { id_cuadrante: 1, contenido: d.anexos.fortalezas },
-      { id_cuadrante: 2, contenido: d.anexos.oportunidades },
-      { id_cuadrante: 3, contenido: d.anexos.debilidades },
-      { id_cuadrante: 4, contenido: d.anexos.amenazas },
-    ],
   },
 }
 
@@ -283,6 +275,31 @@ async function saveIngresos(
   }
 }
 
+async function saveAnexos(
+  modeloId: number,
+  formData: ModeloNegocioState,
+  token: string
+) {
+  const existing = await modeloNegocioService
+    .getFoda(modeloId, token)
+    .catch(() => ({ ok: false, data: [] as FodaDTO[] }))
+  for (const item of existing?.data ?? []) {
+    await modeloNegocioService.deleteFoda(item.id, token).catch(() => {})
+  }
+
+  const cuadrantes = [
+    { id_cuadrante: 1, contenido: formData.anexos.fortalezas },
+    { id_cuadrante: 2, contenido: formData.anexos.oportunidades },
+    { id_cuadrante: 3, contenido: formData.anexos.debilidades },
+    { id_cuadrante: 4, contenido: formData.anexos.amenazas },
+  ]
+  for (const c of cuadrantes) {
+    if (c.contenido.trim()) {
+      await modeloNegocioService.saveFoda(modeloId, c, token)
+    }
+  }
+}
+
 async function saveCostos(
   modeloId: number,
   formData: ModeloNegocioState,
@@ -378,6 +395,7 @@ const COLLECTION_STEP_HANDLERS: Record<string, CollectionHandler> = {
   propuesta: savePortafolio,
   ingresos: saveIngresos,
   costos: saveCostos,
+  anexos: saveAnexos,
 }
 
 // ── Public server actions ──────────────────────────────────────
