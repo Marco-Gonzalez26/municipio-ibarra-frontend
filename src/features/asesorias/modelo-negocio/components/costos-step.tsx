@@ -69,9 +69,7 @@ export const CostosStep = forwardRef<StepHandle, CostosStepProps>(
       (state) => state.updateCostos
     )
 
-    const costos = useModeloNegocioWizardStore(
-      (state) => state.formData.costos
-    )
+    const costos = useModeloNegocioWizardStore((state) => state.formData.costos)
 
     const { control, handleSubmit, getValues, setValue } = useForm<CostosForm>({
       defaultValues: costos,
@@ -113,7 +111,9 @@ export const CostosStep = forwardRef<StepHandle, CostosStepProps>(
 function useCatalogs() {
   const [categoriasInsumo, setCategoriasInsumo] = useState<CatalogoItem[]>([])
   const [unidadesMedida, setUnidadesMedida] = useState<CatalogoItem[]>([])
-  const [categoriasInversion, setCategoriasInversion] = useState<CatalogoItem[]>([])
+  const [categoriasInversion, setCategoriasInversion] = useState<
+    CatalogoItem[]
+  >([])
 
   useEffect(() => {
     getCategoriasInsumo().then(setCategoriasInsumo)
@@ -466,7 +466,8 @@ function ProyeccionSection({
   const precio = useWatch({ control, name: 'proyeccion.precio' }) ?? 0
   const startUnits = useWatch({ control, name: 'proyeccion.startUnits' }) ?? 0
   const growth = useWatch({ control, name: 'proyeccion.growth' }) ?? 0
-  const annualFixedCostIncrease = useWatch({ control, name: 'proyeccion.annualFixedCostIncrease' }) ?? 0
+  const annualFixedCostIncrease =
+    useWatch({ control, name: 'proyeccion.annualFixedCostIncrease' }) ?? 0
   const margen = useWatch({ control, name: 'proyeccion.margen' }) ?? 0
 
   const fijos = useWatch({ control, name: 'fijos' }) ?? []
@@ -475,8 +476,10 @@ function ProyeccionSection({
     (state) => state.formData.ingresos.productos
   )
 
-  const costosFijosMensual =
-    fijos.reduce((sum, row) => sum + (Number(row?.valor) || 0), 0)
+  const costosFijosMensual = fijos.reduce(
+    (sum, row) => sum + (Number(row?.valor) || 0),
+    0
+  )
   const costosFijosTrimestral = costosFijosMensual * 3
 
   const costoVariableUnitario = insumos.reduce(
@@ -489,7 +492,10 @@ function ProyeccionSection({
   }, [costosFijosTrimestral, setValue])
 
   useEffect(() => {
-    setValue('proyeccion.costoVariableUnitario', Number(costoVariableUnitario.toFixed(2)))
+    setValue(
+      'proyeccion.costoVariableUnitario',
+      Number(costoVariableUnitario.toFixed(2))
+    )
   }, [costoVariableUnitario, setValue])
 
   const preciosValidos = productos
@@ -498,8 +504,7 @@ function ProyeccionSection({
   const precioSugerido = preciosValidos.length
     ? Number(
         (
-          preciosValidos.reduce((sum, p) => sum + p, 0) /
-          preciosValidos.length
+          preciosValidos.reduce((sum, p) => sum + p, 0) / preciosValidos.length
         ).toFixed(2)
       )
     : 0
@@ -536,7 +541,9 @@ function ProyeccionSection({
           control={control}
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Precio de venta unitario</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Precio de venta unitario
+              </FieldLabel>
               <NumberInput
                 id={field.name}
                 value={field.value}
@@ -551,7 +558,9 @@ function ProyeccionSection({
           control={control}
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Unidades iniciales / trimestre</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Unidades iniciales / trimestre
+              </FieldLabel>
               <NumberInput
                 id={field.name}
                 value={field.value}
@@ -567,7 +576,9 @@ function ProyeccionSection({
           control={control}
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Crecimiento trimestral (%)</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Crecimiento trimestral (%)
+              </FieldLabel>
               <NumberInput
                 id={field.name}
                 value={field.value}
@@ -582,7 +593,9 @@ function ProyeccionSection({
           control={control}
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Aumento anual C. fijos (%)</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Aumento anual C. fijos (%)
+              </FieldLabel>
               <NumberInput
                 id={field.name}
                 value={field.value}
@@ -613,19 +626,26 @@ function ProyeccionSection({
       <div>
         <FieldLabel>Resultados calculados</FieldLabel>
         <p className="text-xs text-muted-foreground">
-          Los costos fijos y variables se calculan automáticamente de las tablas anteriores.
+          Los costos fijos y variables se calculan automáticamente de las tablas
+          anteriores.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-lg border bg-muted/40 p-3">
           <p className="text-xs text-muted-foreground">Costos fijos (trim.)</p>
-          <p className="mt-1 text-sm font-semibold">${costosFijosTrimestral.toFixed(2)}</p>
+          <p className="mt-1 text-sm font-semibold">
+            ${costosFijosTrimestral.toFixed(2)}
+          </p>
         </div>
 
         <div className="rounded-lg border bg-muted/40 p-3">
-          <p className="text-xs text-muted-foreground">Costo variable unitario</p>
-          <p className="mt-1 text-sm font-semibold">${costoVariableUnitario.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">
+            Costo variable unitario
+          </p>
+          <p className="mt-1 text-sm font-semibold">
+            ${costoVariableUnitario.toFixed(2)}
+          </p>
         </div>
       </div>
 

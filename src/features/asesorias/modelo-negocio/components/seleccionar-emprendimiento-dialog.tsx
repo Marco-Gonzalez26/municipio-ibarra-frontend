@@ -63,21 +63,21 @@ export function SeleccionarEmprendimientoDialog({
 
         <div className="max-h-96 space-y-2 overflow-y-auto">
           {filtrados.map((opcion) => (
-              <button
-                key={opcion.idEmprendedor}
-                type="button"
-                onClick={() => seleccionar(opcion.idEmprendedor)}
-                className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {opcion.nombreEmprendimiento}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {opcion.nombreEmprendedor} · CI {opcion.cedula}
-                  </p>
-                </div>
-              </button>
+            <button
+              key={opcion.idEmprendedor}
+              type="button"
+              onClick={() => seleccionar(opcion.idEmprendedor)}
+              className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">
+                  {opcion.nombreEmprendimiento}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {opcion.nombreEmprendedor} · CI {opcion.cedula}
+                </p>
+              </div>
+            </button>
           ))}
 
           {filtrados.length === 0 && (

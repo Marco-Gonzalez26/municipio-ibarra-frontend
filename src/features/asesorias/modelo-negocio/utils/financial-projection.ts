@@ -47,7 +47,8 @@ export function calculateFinancialProjection(
     const anio = Math.floor(i / TRIMESTRES_POR_ANIO) + 1
     const trimestre = (i % TRIMESTRES_POR_ANIO) + 1
 
-    const costosFijos = baseCostosFijos * Math.pow(annualIncreaseDecimal, anio - 1)
+    const costosFijos =
+      baseCostosFijos * Math.pow(annualIncreaseDecimal, anio - 1)
     const ingreso = unidadesActuales * precio
     const costosVariables = unidadesActuales * costoVariableUnitario
     const utilidadNeta = ingreso - costosFijos - costosVariables

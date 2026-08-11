@@ -35,9 +35,7 @@ export function AsistenciaTable({
     useState<FormularioAsistenciaTecnica | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const emprendedorMap = new Map(
-    emprendedores.map((e) => [e.id, e])
-  )
+  const emprendedorMap = new Map(emprendedores.map((e) => [e.id, e]))
 
   const filtered = formularios.filter((f) => {
     const emprendedor = emprendedorMap.get(f.id_emprendedor)
@@ -82,7 +80,10 @@ export function AsistenciaTable({
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
                   No se encontraron formularios
                 </TableCell>
               </TableRow>
@@ -92,13 +93,17 @@ export function AsistenciaTable({
                 return (
                   <TableRow key={f.id}>
                     <TableCell className="font-medium">FAT-{f.id}</TableCell>
-                    <TableCell>{emprendedor?.nombres_apellidos ?? 'No encontrado'}</TableCell>
+                    <TableCell>
+                      {emprendedor?.nombres_apellidos ?? 'No encontrado'}
+                    </TableCell>
                     <TableCell>
                       {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
                     </TableCell>
                     <TableCell>{f.nombre_emprendimiento ?? '-'}</TableCell>
                     <TableCell>
-                      <Badge variant={f.tasa_cancelada ? 'default' : 'secondary'}>
+                      <Badge
+                        variant={f.tasa_cancelada ? 'default' : 'secondary'}
+                      >
                         {f.tasa_cancelada ? 'Sí' : 'No'}
                       </Badge>
                     </TableCell>
@@ -131,7 +136,11 @@ export function AsistenciaTable({
       <FormularioDetailDialog
         tipo="asistencia"
         formulario={selectedFormulario}
-        emprendedor={selectedFormulario ? emprendedorMap.get(selectedFormulario.id_emprendedor) ?? null : null}
+        emprendedor={
+          selectedFormulario
+            ? (emprendedorMap.get(selectedFormulario.id_emprendedor) ?? null)
+            : null
+        }
         open={detailOpen}
         onOpenChange={setDetailOpen}
       />

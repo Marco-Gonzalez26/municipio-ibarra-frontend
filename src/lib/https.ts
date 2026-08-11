@@ -56,7 +56,10 @@ const httpClient = async <T>(
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null)
     const message = errorBody?.msg || errorBody?.message || res.statusText
-    console.error(`[API ${method}] ${endpoint} → ${res.status}`, JSON.stringify(errorBody))
+    console.error(
+      `[API ${method}] ${endpoint} → ${res.status}`,
+      JSON.stringify(errorBody)
+    )
     throw new ApiError(message, res.status)
   }
 

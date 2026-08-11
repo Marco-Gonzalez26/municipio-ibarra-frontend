@@ -34,24 +34,89 @@ interface ModeloNegocioWizardProps {
 
 function mapServerSectionsToFormData(
   sections: Record<string, unknown>,
-  modelo: { n_tramite?: string | null; producto_linea?: string | null; analista?: string | null; observaciones?: string | null }
+  modelo: {
+    n_tramite?: string | null
+    producto_linea?: string | null
+    analista?: string | null
+    observaciones?: string | null
+  }
 ): ModeloNegocioState {
-  const intro = sections.introduccion as { introduccion: string; importancia: string } | null
-  const ctx = sections.contexto as { antecedentes: string; justificacion: string; impacto: string; objetivo_general: string } | null
-  const propuesta = sections.propuestaValor as { propuesta_valor: string } | null
-  const objetivosEsp = sections.objetivosEspecificos as Array<{ id: number; descripcion: string; orden: number }> | null
-  const propProductos = sections.propuestaProductos as Array<{ id: number; nombre: string; codigo_producto: string }> | null
-  const cc = sections.clientesCanales as { segmentos: string; canales: string; relacion: string } | null
-  const ra = sections.recursosActividades as { recursos_financieros: string; recursos_fisicos: string; mobiliario: string; local: string; actividades: string; socios: string } | null
+  const intro = sections.introduccion as {
+    introduccion: string
+    importancia: string
+  } | null
+  const ctx = sections.contexto as {
+    antecedentes: string
+    justificacion: string
+    impacto: string
+    objetivo_general: string
+  } | null
+  const propuesta = sections.propuestaValor as {
+    propuesta_valor: string
+  } | null
+  const objetivosEsp = sections.objetivosEspecificos as Array<{
+    id: number
+    descripcion: string
+    orden: number
+  }> | null
+  const propProductos = sections.propuestaProductos as Array<{
+    id: number
+    nombre: string
+    codigo_producto: string
+  }> | null
+  const cc = sections.clientesCanales as {
+    segmentos: string
+    canales: string
+    relacion: string
+  } | null
+  const ra = sections.recursosActividades as {
+    recursos_financieros: string
+    recursos_fisicos: string
+    mobiliario: string
+    local: string
+    actividades: string
+    socios: string
+  } | null
   const conc = sections.conclusiones as { conclusiones: string } | null
-  const foda = sections.foda as Array<{ id_cuadrante: number; contenido: string }> | null
+  const foda = sections.foda as Array<{
+    id_cuadrante: number
+    contenido: string
+  }> | null
 
-  const costosVar = sections.costosVariables as Array<{ id_categoria: number; descripcion: string; cantidad: number; id_unidad: number | null; costo_unitario: number }> | null
-  const costosFij = sections.costosFijos as Array<{ detalle: string; valor: number }> | null
-  const inversion = sections.inversionInicial as Array<{ id_categoria: number; descripcion: string; costo: number }> | null
-  const proj = sections.proyeccionSupuestos as { precio: number; costos_fijos: number; crecimiento: number; start_units: number; var_ratio: number; margen: number } | null
-  const fuentes = sections.fuentesIngreso as Array<{ fuente_ingreso: string; monto_estimado: number | null }> | null
-  const portafolio = sections.portafolioProductos as Array<{ codigo_producto: string | null; orden: number; precio: number; peso: number | null }> | null
+  const costosVar = sections.costosVariables as Array<{
+    id_categoria: number
+    descripcion: string
+    cantidad: number
+    id_unidad: number | null
+    costo_unitario: number
+  }> | null
+  const costosFij = sections.costosFijos as Array<{
+    detalle: string
+    valor: number
+  }> | null
+  const inversion = sections.inversionInicial as Array<{
+    id_categoria: number
+    descripcion: string
+    costo: number
+  }> | null
+  const proj = sections.proyeccionSupuestos as {
+    precio: number
+    costos_fijos: number
+    crecimiento: number
+    start_units: number
+    var_ratio: number
+    margen: number
+  } | null
+  const fuentes = sections.fuentesIngreso as Array<{
+    fuente_ingreso: string
+    monto_estimado: number | null
+  }> | null
+  const portafolio = sections.portafolioProductos as Array<{
+    codigo_producto: string | null
+    orden: number
+    precio: number
+    peso: number | null
+  }> | null
 
   const fodaMap: Record<number, string> = {}
   if (foda) {
@@ -85,9 +150,7 @@ function mapServerSectionsToFormData(
     },
     propuesta: {
       propuestaValor: propuesta?.propuesta_valor ?? '',
-      portafolio: propProductos
-        ? propProductos.map((p) => p.nombre)
-        : [],
+      portafolio: propProductos ? propProductos.map((p) => p.nombre) : [],
     },
     segmentos: {
       segmentos: cc?.segmentos ?? '',
@@ -100,13 +163,14 @@ function mapServerSectionsToFormData(
     },
     ingresos: {
       ingresosTexto: fuentes?.[0]?.fuente_ingreso ?? '',
-      productos: portafolio
-        ?.sort((a, b) => a.orden - b.orden)
-        .map((p) => ({
-          producto: p.codigo_producto ?? '',
-          descripcion: '',
-          precio: p.precio,
-        })) ?? [],
+      productos:
+        portafolio
+          ?.sort((a, b) => a.orden - b.orden)
+          .map((p) => ({
+            producto: p.codigo_producto ?? '',
+            descripcion: '',
+            precio: p.precio,
+          })) ?? [],
     },
     recursos: {
       recursosFinancieros: ra?.recursos_financieros ?? '',
@@ -121,22 +185,25 @@ function mapServerSectionsToFormData(
       socios: ra?.socios ?? '',
     },
     costos: {
-      insumos: costosVar?.map((c) => ({
-        categoriaId: c.id_categoria,
-        descripcion: c.descripcion,
-        cantidad: c.cantidad,
-        unidadId: c.id_unidad,
-        costoUnit: c.costo_unitario,
-      })) ?? [],
-      fijos: costosFij?.map((f) => ({
-        detalle: f.detalle,
-        valor: f.valor,
-      })) ?? [],
-      inversion: inversion?.map((i) => ({
-        categoriaId: i.id_categoria,
-        descripcion: i.descripcion,
-        costo: i.costo,
-      })) ?? [],
+      insumos:
+        costosVar?.map((c) => ({
+          categoriaId: c.id_categoria,
+          descripcion: c.descripcion,
+          cantidad: c.cantidad,
+          unidadId: c.id_unidad,
+          costoUnit: c.costo_unitario,
+        })) ?? [],
+      fijos:
+        costosFij?.map((f) => ({
+          detalle: f.detalle,
+          valor: f.valor,
+        })) ?? [],
+      inversion:
+        inversion?.map((i) => ({
+          categoriaId: i.id_categoria,
+          descripcion: i.descripcion,
+          costo: i.costo,
+        })) ?? [],
       proyeccion: {
         precio: proj?.precio ?? 0,
         costosFijos: proj?.costos_fijos ?? 0,

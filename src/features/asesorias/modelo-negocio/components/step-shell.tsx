@@ -45,17 +45,29 @@ export function StepFooter({
   return (
     <div className="flex justify-between gap-3 border-t pt-6">
       {onPrevious ? (
-        <Button type="button" variant="outline" onClick={onPrevious} disabled={isSaving}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPrevious}
+          disabled={isSaving}
+        >
           Anterior
         </Button>
       ) : (
         <span />
       )}
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={isSaving}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleSaveDraft}
+          disabled={isSaving}
+        >
           Guardar Borrador
         </Button>
-        <Button type="submit" disabled={isSaving}>{submitLabel}</Button>
+        <Button type="submit" disabled={isSaving}>
+          {submitLabel}
+        </Button>
       </div>
     </div>
   )

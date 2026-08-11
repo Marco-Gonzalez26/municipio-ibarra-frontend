@@ -34,11 +34,11 @@ export default async function EmprendimientosPage({
     const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
       Promise.all([
         entrepreneurService.getAll(1, LIMIT_FORMULARIOS, session.token),
-      entrepeneurFormService.getAllReferenciaGeneral(
-        1,
-        LIMIT_FORMULARIOS,
-        session.token
-      ),
+        entrepeneurFormService.getAllReferenciaGeneral(
+          1,
+          LIMIT_FORMULARIOS,
+          session.token
+        ),
       ])
     )
 

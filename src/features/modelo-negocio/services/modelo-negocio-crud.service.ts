@@ -29,7 +29,8 @@ export const modeloNegocioService = {
     if (params.page) searchParams.set('page', String(params.page))
     if (params.limit) searchParams.set('limit', String(params.limit))
     if (params.search) searchParams.set('search', params.search)
-    if (params.id_estado) searchParams.set('id_estado', String(params.id_estado))
+    if (params.id_estado)
+      searchParams.set('id_estado', String(params.id_estado))
     const query = searchParams.toString()
     return api.get<ModeloNegocioListResponse>(
       `/sime/modelonegocio${query ? `?${query}` : ''}`,
@@ -38,17 +39,24 @@ export const modeloNegocioService = {
   },
 
   getById: (id: number, token?: string) =>
-    api.get<{ ok: boolean; modelo: ModeloNegocioDTO }>(`/sime/modelonegocio/${id}`, {
+    api.get<{ ok: boolean; modelo: ModeloNegocioDTO }>(
+      `/sime/modelonegocio/${id}`,
+      {
+        token,
+      }
+    ),
+
+  create: (payload: ModeloNegocioCreateDTO, token?: string) =>
+    api.post<{ ok: boolean; modelo: ModeloNegocioDTO }>('/sime/modelonegocio', {
+      body: payload,
       token,
     }),
 
-  create: (payload: ModeloNegocioCreateDTO, token?: string) =>
-    api.post<{ ok: boolean; modelo: ModeloNegocioDTO }>(
-      '/sime/modelonegocio',
-      { body: payload, token }
-    ),
-
-  update: (id: number, payload: Partial<ModeloNegocioCreateDTO>, token?: string) =>
+  update: (
+    id: number,
+    payload: Partial<ModeloNegocioCreateDTO>,
+    token?: string
+  ) =>
     api.put<{ msg: string }>(`/sime/modelonegocio/${id}`, {
       body: payload,
       token,
@@ -57,7 +65,12 @@ export const modeloNegocioService = {
   delete: (id: number, token?: string) =>
     api.delete<{ msg: string }>(`/sime/modelonegocio/${id}`, { token }),
 
-  changeEstado: (id: number, idEstado: number, motivo?: string, token?: string) =>
+  changeEstado: (
+    id: number,
+    idEstado: number,
+    motivo?: string,
+    token?: string
+  ) =>
     api.put<{ msg: string }>(`/sime/modelonegocio/${id}/estado`, {
       body: { id_estado: idEstado, motivo },
       token,
@@ -71,18 +84,29 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  saveIntroduccion: (idModelo: number, data: Omit<IntroduccionDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveIntroduccion: (
+    idModelo: number,
+    data: Omit<IntroduccionDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mnintroduccion/${idModelo}`, {
       body: data,
       token,
     }),
 
   getContexto: (idModelo: number, token?: string) =>
-    api.get<{ ok: boolean; data: ContextoDTO }>(`/sime/mncontexto/${idModelo}`, {
-      token,
-    }),
+    api.get<{ ok: boolean; data: ContextoDTO }>(
+      `/sime/mncontexto/${idModelo}`,
+      {
+        token,
+      }
+    ),
 
-  saveContexto: (idModelo: number, data: Omit<ContextoDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveContexto: (
+    idModelo: number,
+    data: Omit<ContextoDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mncontexto/${idModelo}`, {
       body: data,
       token,
@@ -94,11 +118,18 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  savePropuestaValor: (idModelo: number, data: Omit<PropuestaValorDTO, 'id' | 'id_modelo'>, token?: string) =>
-    api.post<{ msg: string; propuesta_valor?: PropuestaValorDTO }>(`/sime/mnpropuestavalor/${idModelo}`, {
-      body: data,
-      token,
-    }),
+  savePropuestaValor: (
+    idModelo: number,
+    data: Omit<PropuestaValorDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
+    api.post<{ msg: string; propuesta_valor?: PropuestaValorDTO }>(
+      `/sime/mnpropuestavalor/${idModelo}`,
+      {
+        body: data,
+        token,
+      }
+    ),
 
   getClientesCanales: (idModelo: number, token?: string) =>
     api.get<{ ok: boolean; data: ClientesCanalesDTO }>(
@@ -106,7 +137,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  saveClientesCanales: (idModelo: number, data: Omit<ClientesCanalesDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveClientesCanales: (
+    idModelo: number,
+    data: Omit<ClientesCanalesDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mnclientescanales/${idModelo}`, {
       body: data,
       token,
@@ -118,7 +153,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  saveRecursosActividades: (idModelo: number, data: Omit<RecursosActividadesDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveRecursosActividades: (
+    idModelo: number,
+    data: Omit<RecursosActividadesDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mnrecursosactividades/${idModelo}`, {
       body: data,
       token,
@@ -130,7 +169,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  saveProyeccionSupuestos: (idModelo: number, data: Omit<ProyeccionSupuestosDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveProyeccionSupuestos: (
+    idModelo: number,
+    data: Omit<ProyeccionSupuestosDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mnproyeccionsupuestos/${idModelo}`, {
       body: data,
       token,
@@ -142,7 +185,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  saveConclusiones: (idModelo: number, data: Omit<ConclusionesDTO, 'id' | 'id_modelo'>, token?: string) =>
+  saveConclusiones: (
+    idModelo: number,
+    data: Omit<ConclusionesDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mnconclusiones/${idModelo}`, {
       body: data,
       token,
@@ -156,7 +203,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createObjetivoEspecifico: (idModelo: number, data: Omit<ObjetivoEspecificoDTO, 'id' | 'id_modelo'>, token?: string) =>
+  createObjetivoEspecifico: (
+    idModelo: number,
+    data: Omit<ObjetivoEspecificoDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; objetivo_especifico: ObjetivoEspecificoDTO }>(
       `/sime/mnobjetivoespecifico/modelo/${idModelo}`,
       { body: data, token }
@@ -171,14 +222,19 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createPropuestaProducto: (data: Omit<PropuestaProductoDTO, 'id'>, token?: string) =>
+  createPropuestaProducto: (
+    data: Omit<PropuestaProductoDTO, 'id'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; propuesta_producto: PropuestaProductoDTO }>(
       '/sime/mnpropuestaproducto',
       { body: data, token }
     ),
 
   deletePropuestaProducto: (codigo: string, token?: string) =>
-    api.delete<{ msg: string }>(`/sime/mnpropuestaproducto/${codigo}`, { token }),
+    api.delete<{ msg: string }>(`/sime/mnpropuestaproducto/${codigo}`, {
+      token,
+    }),
 
   getFuentesIngreso: (idModelo: number, token?: string) =>
     api.get<{ ok: boolean; data: FuenteIngresoDTO[] }>(
@@ -186,7 +242,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createFuenteIngreso: (idModelo: number, data: Omit<FuenteIngresoDTO, 'id' | 'id_modelo'>, token?: string) =>
+  createFuenteIngreso: (
+    idModelo: number,
+    data: Omit<FuenteIngresoDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; fuente_ingreso: FuenteIngresoDTO }>(
       `/sime/mnfuenteingreso/modelo/${idModelo}`,
       { body: data, token }
@@ -201,7 +261,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createPortafolioProducto: (idFuenteIngreso: number, data: Omit<PortafolioProductoDTO, 'id' | 'id_fuente_ingreso'>, token?: string) =>
+  createPortafolioProducto: (
+    idFuenteIngreso: number,
+    data: Omit<PortafolioProductoDTO, 'id' | 'id_fuente_ingreso'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; portafolio_producto: PortafolioProductoDTO }>(
       `/sime/mnportafolioproducto/fuente/${idFuenteIngreso}`,
       { body: data, token }
@@ -216,7 +280,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createCostoVariable: (idModelo: number, data: Omit<CostoVariableDTO, 'id' | 'id_modelo'>, token?: string) =>
+  createCostoVariable: (
+    idModelo: number,
+    data: Omit<CostoVariableDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; costo_variable: CostoVariableDTO }>(
       `/sime/mncostovariable/modelo/${idModelo}`,
       { body: data, token }
@@ -231,7 +299,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createCostoFijo: (idModelo: number, data: Omit<CostoFijoDTO, 'id' | 'id_modelo'>, token?: string) =>
+  createCostoFijo: (
+    idModelo: number,
+    data: Omit<CostoFijoDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; costo_fijo: CostoFijoDTO }>(
       `/sime/mncostofijo/modelo/${idModelo}`,
       { body: data, token }
@@ -246,7 +318,11 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createInversionInicial: (idModelo: number, data: Omit<InversionInicialDTO, 'id' | 'id_modelo'>, token?: string) =>
+  createInversionInicial: (
+    idModelo: number,
+    data: Omit<InversionInicialDTO, 'id' | 'id_modelo'>,
+    token?: string
+  ) =>
     api.post<{ msg: string; inversion_inicial: InversionInicialDTO }>(
       `/sime/mninversioninicial/modelo/${idModelo}`,
       { body: data, token }
@@ -256,25 +332,42 @@ export const modeloNegocioService = {
     api.delete<{ msg: string }>(`/sime/mninversioninicial/${id}`, { token }),
 
   getFoda: (idModelo: number, token?: string) =>
-    api.get<{ ok: boolean; total: number; data: FodaDTO[] }>(`/sime/mnfoda/modelo/${idModelo}`, {
-      token,
-    }),
+    api.get<{ ok: boolean; total: number; data: FodaDTO[] }>(
+      `/sime/mnfoda/modelo/${idModelo}`,
+      {
+        token,
+      }
+    ),
 
-  saveFoda: (idModelo: number, data: { id_cuadrante: number; contenido: string }, token?: string) =>
-    api.post<{ msg: string; data: FodaDTO }>(`/sime/mnfoda/modelo/${idModelo}`, {
-      body: data,
-      token,
-    }),
+  saveFoda: (
+    idModelo: number,
+    data: { id_cuadrante: number; contenido: string },
+    token?: string
+  ) =>
+    api.post<{ msg: string; data: FodaDTO }>(
+      `/sime/mnfoda/modelo/${idModelo}`,
+      {
+        body: data,
+        token,
+      }
+    ),
 
   deleteFoda: (id: number, token?: string) =>
     api.delete<{ msg: string }>(`/sime/mnfoda/${id}`, { token }),
 
   getCanvas: (idModelo: number, token?: string) =>
-    api.get<{ ok: boolean; total: number; data: CanvasDTO[] }>(`/sime/mncanvas/modelo/${idModelo}`, {
-      token,
-    }),
+    api.get<{ ok: boolean; total: number; data: CanvasDTO[] }>(
+      `/sime/mncanvas/modelo/${idModelo}`,
+      {
+        token,
+      }
+    ),
 
-  saveCanvas: (idModelo: number, data: Omit<CanvasDTO, 'id'>[], token?: string) =>
+  saveCanvas: (
+    idModelo: number,
+    data: Omit<CanvasDTO, 'id'>[],
+    token?: string
+  ) =>
     api.post<{ msg: string }>(`/sime/mncanvas/${idModelo}`, {
       body: { canvas: data },
       token,

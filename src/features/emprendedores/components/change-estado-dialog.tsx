@@ -39,9 +39,7 @@ export function ChangeEstadoDialog({
     try {
       await changeFormularioEstadoAction(formularioId, estadoId)
       toast.success(
-        isAprobar
-          ? 'Formulario aprobado correctamente'
-          : 'Formulario rechazado'
+        isAprobar ? 'Formulario aprobado correctamente' : 'Formulario rechazado'
       )
       onOpenChange(false)
     } catch (error) {
@@ -50,8 +48,7 @@ export function ChangeEstadoDialog({
           ? 'No se pudo aprobar el formulario'
           : 'No se pudo rechazar el formulario',
         {
-          description:
-            (error as { msg?: string }).msg ?? 'Intente nuevamente.',
+          description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
         }
       )
     } finally {

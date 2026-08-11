@@ -206,18 +206,20 @@ async function savePortafolio(
   for (let i = 0; i < productos.length; i++) {
     const nombre = productos[i]
     if (nombre.trim()) {
-      await modeloNegocioService.createPropuestaProducto(
-        {
-          codigo_producto: `PROD-${modeloId}-${i + 1}`,
-          id_propuesta: idPropuesta,
-          nombre: nombre,
-          imagen: null,
-        },
-        token
-      ).catch((err) => {
-        console.error('[savePortafolio] createPropuestaProducto error:', err)
-        throw err
-      })
+      await modeloNegocioService
+        .createPropuestaProducto(
+          {
+            codigo_producto: `PROD-${modeloId}-${i + 1}`,
+            id_propuesta: idPropuesta,
+            nombre: nombre,
+            imagen: null,
+          },
+          token
+        )
+        .catch((err) => {
+          console.error('[savePortafolio] createPropuestaProducto error:', err)
+          throw err
+        })
     }
   }
 }
@@ -390,7 +392,12 @@ async function saveCostos(
 // ── Special step save handlers ──────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type CollectionHandler = (modeloId: number, formData: ModeloNegocioState, token: string, stepResult: any) => Promise<void>
+type CollectionHandler = (
+  modeloId: number,
+  formData: ModeloNegocioState,
+  token: string,
+  stepResult: any
+) => Promise<void>
 
 const COLLECTION_STEP_HANDLERS: Record<string, CollectionHandler> = {
   objetivos: saveObjetivosEspecificos,
@@ -607,7 +614,9 @@ export async function loadModeloAction(modeloId: number) {
         .catch(() => ({ ok: false, data: [] as PortafolioProductoDTO[] }))
     )
   )
-  const allPortafolioProductos = portafolioByFuente.flatMap((r) => r?.data ?? [])
+  const allPortafolioProductos = portafolioByFuente.flatMap(
+    (r) => r?.data ?? []
+  )
 
   // Find first incomplete step
   const pasos = progreso.data ?? []

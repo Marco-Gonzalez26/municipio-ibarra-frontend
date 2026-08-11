@@ -2,7 +2,15 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowDown, ArrowUp, ArrowUpDown, Send, Check, X, Trash2 } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Send,
+  Check,
+  X,
+  Trash2,
+} from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,11 +42,17 @@ import {
 import type { ModeloNegocioDTO } from '@/features/modelo-negocio/types/modelo-negocio-api.types'
 import type { EmprendimientoOpcion } from '../types/ficha.type'
 import { SeleccionarEmprendimientoDialog } from './seleccionar-emprendimiento-dialog'
-import { deleteModeloAction, changeEstadoAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import {
+  deleteModeloAction,
+  changeEstadoAction,
+} from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const ESTADO_MAP: Record<
   number,
-  { label: string; variant: 'secondary' | 'default' | 'destructive' | 'outline' }
+  {
+    label: string
+    variant: 'secondary' | 'default' | 'destructive' | 'outline'
+  }
 > = {
   1: { label: 'BORRADOR', variant: 'secondary' },
   2: { label: 'EN REVISIÓN', variant: 'outline' },
@@ -95,7 +109,8 @@ export function ModeloNegocioListado({
     const termino = busqueda.trim().toLowerCase()
 
     const filtrados = modelos.filter((modelo) => {
-      if (estado !== 'todos' && modelo.id_estado !== Number(estado)) return false
+      if (estado !== 'todos' && modelo.id_estado !== Number(estado))
+        return false
 
       if (termino) {
         const texto = [
@@ -200,10 +215,7 @@ export function ModeloNegocioListado({
           </Field>
 
           <Field label="Estado">
-            <Select
-              value={estado}
-              onValueChange={(value) => setEstado(value)}
-            >
+            <Select value={estado} onValueChange={(value) => setEstado(value)}>
               <SelectTrigger className="w-full lg:w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -294,7 +306,9 @@ export function ModeloNegocioListado({
                       {estadoInfo.label}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatFecha(modelo.fecha_actualizacion)}</TableCell>
+                  <TableCell>
+                    {formatFecha(modelo.fecha_actualizacion)}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="outline" size="sm" asChild>
@@ -511,7 +525,11 @@ function CambiarEstadoDialog({
             <span className="font-semibold text-foreground">
               {modelo?.nombre_emprendimiento ?? 'este emprendimiento'}
             </span>{' '}
-            a <Badge variant={estadoDestino?.variant}>{estadoDestino?.label}</Badge>.
+            a{' '}
+            <Badge variant={estadoDestino?.variant}>
+              {estadoDestino?.label}
+            </Badge>
+            .
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
@@ -522,7 +540,11 @@ function CambiarEstadoDialog({
             id="motivo-cambio"
             value={motivo}
             onChange={(e) => onMotivoChange(e.target.value)}
-            placeholder={esRechazo ? 'Ingrese el motivo del rechazo...' : 'Motivo del cambio (opcional)...'}
+            placeholder={
+              esRechazo
+                ? 'Ingrese el motivo del rechazo...'
+                : 'Motivo del cambio (opcional)...'
+            }
             rows={3}
           />
         </div>

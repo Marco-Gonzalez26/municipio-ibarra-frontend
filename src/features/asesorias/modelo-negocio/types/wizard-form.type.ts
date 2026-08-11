@@ -81,7 +81,12 @@ export const TABLE_MAP: Record<WizardStep, string[]> = {
   recursos: ['mn_recursos_actividades'],
   actividades: ['mn_recursos_actividades'],
   socios: ['mn_recursos_actividades'],
-  costos: ['mn_costo_variable', 'mn_costo_fijo', 'mn_inversion_inicial', 'mn_proyeccion_supuestos'],
+  costos: [
+    'mn_costo_variable',
+    'mn_costo_fijo',
+    'mn_inversion_inicial',
+    'mn_proyeccion_supuestos',
+  ],
   conclusiones: ['mn_conclusiones'],
   anexos: ['mn_foda', 'mn_canvas'],
 }

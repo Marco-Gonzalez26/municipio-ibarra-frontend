@@ -48,9 +48,7 @@ export function ReferenciaTable({
     useState<FormularioReferenciaGeneral | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const emprendedorMap = new Map(
-    emprendedores.map((e) => [e.id, e])
-  )
+  const emprendedorMap = new Map(emprendedores.map((e) => [e.id, e]))
 
   const filtered = formularios.filter((f) => {
     const emprendedor = emprendedorMap.get(f.id_emprendedor)
@@ -96,7 +94,10 @@ export function ReferenciaTable({
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-muted-foreground"
+                >
                   No se encontraron formularios
                 </TableCell>
               </TableRow>
@@ -110,7 +111,9 @@ export function ReferenciaTable({
                 return (
                   <TableRow key={f.id}>
                     <TableCell className="font-medium">FRG-{f.id}</TableCell>
-                    <TableCell>{emprendedor?.nombres_apellidos ?? 'No encontrado'}</TableCell>
+                    <TableCell>
+                      {emprendedor?.nombres_apellidos ?? 'No encontrado'}
+                    </TableCell>
                     <TableCell>
                       {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
                     </TableCell>
@@ -156,7 +159,11 @@ export function ReferenciaTable({
       <FormularioDetailDialog
         tipo="referencia"
         formulario={selectedFormulario}
-        emprendedor={selectedFormulario ? emprendedorMap.get(selectedFormulario.id_emprendedor) ?? null : null}
+        emprendedor={
+          selectedFormulario
+            ? (emprendedorMap.get(selectedFormulario.id_emprendedor) ?? null)
+            : null
+        }
         open={detailOpen}
         onOpenChange={setDetailOpen}
       />

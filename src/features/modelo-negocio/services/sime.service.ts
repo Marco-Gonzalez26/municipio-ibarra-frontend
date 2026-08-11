@@ -2,7 +2,7 @@ import { api, authHeader } from '@/lib/https'
 import type { CatalogoItem, CatalogoResponse } from '@/types/catalog.type'
 import type {
   CatalogoEstadoModelo,
-  CatalogoItemConCodigoOrden
+  CatalogoItemConCodigoOrden,
 } from '../types/sime.type'
 
 function normalizeActivo<T extends { activo: boolean | number }>(
@@ -40,13 +40,19 @@ export const catalogService = {
       estadoModelo,
     ] = await Promise.all([
       api
-        .get<CatalogoResponse<CatalogoItemConCodigoOrden>>('/sime/catgruposeccion', opts)
+        .get<
+          CatalogoResponse<CatalogoItemConCodigoOrden>
+        >('/sime/catgruposeccion', opts)
         .then(normalizeResponse),
       api
-        .get<CatalogoResponse<CatalogoItemConCodigoOrden>>('/sime/catbloquecanvas', opts)
+        .get<
+          CatalogoResponse<CatalogoItemConCodigoOrden>
+        >('/sime/catbloquecanvas', opts)
         .then(normalizeResponse),
       api
-        .get<CatalogoResponse<CatalogoItemConCodigoOrden>>('/sime/catcuadrantefoda', opts)
+        .get<
+          CatalogoResponse<CatalogoItemConCodigoOrden>
+        >('/sime/catcuadrantefoda', opts)
         .then(normalizeResponse),
       api
         .get<CatalogoResponse<CatalogoItem>>('/sime/catcategoriainsumo', opts)
@@ -55,13 +61,17 @@ export const catalogService = {
         .get<CatalogoResponse<CatalogoItem>>('/sime/catunidadmedida', opts)
         .then(normalizeResponse),
       api
-        .get<CatalogoResponse<CatalogoItem>>('/sime/catcategoriainversion', opts)
+        .get<
+          CatalogoResponse<CatalogoItem>
+        >('/sime/catcategoriainversion', opts)
         .then(normalizeResponse),
       api
         .get<CatalogoResponse<CatalogoItem>>('/sime/cattiposerviciofijo', opts)
         .then(normalizeResponse),
       api
-        .get<CatalogoResponse<CatalogoEstadoModelo>>('/sime/catestadomodelo', opts)
+        .get<
+          CatalogoResponse<CatalogoEstadoModelo>
+        >('/sime/catestadomodelo', opts)
         .then(normalizeResponse),
     ])
 
@@ -74,63 +84,71 @@ export const catalogService = {
         unidadMedida,
         categoriaInversion,
         tipoServicioFijo,
-        estadoModelo
+        estadoModelo,
       },
     }
   },
   getGrupoSeccion: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItemConCodigoOrden>>(
       '/sime/catgruposeccion',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
 
   getBloqueCanvas: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItemConCodigoOrden>>(
       '/sime/catbloquecanvas',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
 
   getCuadranteFoda: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItemConCodigoOrden>>(
       '/sime/catcuadrantefoda',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
 
   getCategoriaInsumo: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
       '/sime/catcategoriainsumo',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
- 
+
   getUnidadMedida: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
       '/sime/catunidadmedida',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
- 
+
   getCategoriaInversion: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
       '/sime/catcategoriainversion',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
- 
+
   getTipoServicioFijo: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoItem>>(
       '/sime/cattiposerviciofijo',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
- 
+
   getEstadoModelo: async (token?: string) => {
     const res = await api.get<CatalogoResponse<CatalogoEstadoModelo>>(
       '/sime/catestadomodelo',
-      { headers: authHeader(token) })
+      { headers: authHeader(token) }
+    )
     return normalizeResponse(res)
   },
 }

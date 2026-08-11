@@ -49,7 +49,9 @@ export const entrepeneurFormService = {
 
   updateReferenciaGeneral: (
     id: number,
-    payload: Partial<Pick<FormularioReferenciaGeneral, 'id_estado_emprendedor'>>,
+    payload: Partial<
+      Pick<FormularioReferenciaGeneral, 'id_estado_emprendedor'>
+    >,
     token?: string
   ) =>
     api.put<{ ok: boolean; msg: string }>(
@@ -119,11 +121,7 @@ export const entrepeneurFormService = {
       { body: payload, token }
     ),
 
-  getAllAsistenciaTecnica: (
-    page = 1,
-    limit = 15,
-    token?: string
-  ) => {
+  getAllAsistenciaTecnica: (page = 1, limit = 15, token?: string) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),

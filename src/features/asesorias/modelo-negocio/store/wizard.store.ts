@@ -169,7 +169,9 @@ export const useModeloNegocioWizardStore =
           const result = await createModeloAction(
             formData.ficha.numeroTramite || 'SIN TRAMITE',
             contexto.fechaIngreso || new Date().toISOString().split('T')[0],
-            contexto.nombreEmprendimiento || contexto.nombreEmprendedor || 'Sin nombre',
+            contexto.nombreEmprendimiento ||
+              contexto.nombreEmprendedor ||
+              'Sin nombre',
             contexto.idSector ?? 1,
             formData.ficha.productoLinea || 'Sin producto',
             formData.ficha.analista || 'Sin analista',

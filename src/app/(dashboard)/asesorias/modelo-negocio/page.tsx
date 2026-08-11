@@ -48,15 +48,20 @@ export default async function ModeloNegocioPage({
       // Since modelo_negocio doesn't have id_emprendedor, we try to find it
       // by matching nombre_emprendimiento against the user's emprendimientos
       try {
-        const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
-          Promise.all([
-            entrepreneurService.getAll(1, LIMIT_EMPRENDIMIENTOS, session.token),
-            entrepeneurFormService.getAllReferenciaGeneral(
-              1,
-              LIMIT_EMPRENDIMIENTOS,
-              session.token
-            ),
-          ])
+        const [entrepreneursRes, formulariosRes] = await withSessionRedirect(
+          () =>
+            Promise.all([
+              entrepreneurService.getAll(
+                1,
+                LIMIT_EMPRENDIMIENTOS,
+                session.token
+              ),
+              entrepeneurFormService.getAllReferenciaGeneral(
+                1,
+                LIMIT_EMPRENDIMIENTOS,
+                session.token
+              ),
+            ])
         )
 
         const entrepreneursById = new Map(
@@ -67,12 +72,13 @@ export default async function ModeloNegocioPage({
         )
 
         // Find the matching emprendimiento by nombre
-        const matchingFormulario = formulariosRes.formularios_referencia_general.find(
-          (formulario) =>
-            formulario.tiene_emprendimiento &&
-            formulario.nombre_emprendimiento ===
-              modeloRes.modelo.nombre_emprendimiento
-        )
+        const matchingFormulario =
+          formulariosRes.formularios_referencia_general.find(
+            (formulario) =>
+              formulario.tiene_emprendimiento &&
+              formulario.nombre_emprendimiento ===
+                modeloRes.modelo.nombre_emprendimiento
+          )
 
         if (matchingFormulario) {
           emprendedorId = matchingFormulario.id_emprendedor
@@ -85,7 +91,8 @@ export default async function ModeloNegocioPage({
               contacto: emprendedor.celular,
               correo: emprendedor.email,
               fechaIngreso:
-                matchingFormulario.fecha_formulario ?? emprendedor.fecha_registro,
+                matchingFormulario.fecha_formulario ??
+                emprendedor.fecha_registro,
               nombreEmprendimiento:
                 matchingFormulario.nombre_emprendimiento ?? null,
               idSector: null,

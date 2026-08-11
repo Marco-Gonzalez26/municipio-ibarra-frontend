@@ -6,7 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { FormularioReferenciaGeneral, FormularioAsistenciaTecnica } from '@/types/form.type'
+import type {
+  FormularioReferenciaGeneral,
+  FormularioAsistenciaTecnica,
+} from '@/types/form.type'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 
 const ESTADO_MAP: Record<number, string> = {
@@ -59,14 +62,19 @@ export function FormularioDetailDialog({
             <div>
               <p className="text-muted-foreground">Fecha</p>
               <p className="font-medium">
-                {new Date(formulario.fecha_formulario).toLocaleDateString('es-EC')}
+                {new Date(formulario.fecha_formulario).toLocaleDateString(
+                  'es-EC'
+                )}
               </p>
             </div>
             <div>
               <p className="text-muted-foreground">Estado</p>
               <p className="font-medium">
                 {tipo === 'referencia'
-                  ? ESTADO_MAP[(formulario as FormularioReferenciaGeneral).id_estado_emprendedor] ?? 'DESCONOCIDO'
+                  ? (ESTADO_MAP[
+                      (formulario as FormularioReferenciaGeneral)
+                        .id_estado_emprendedor
+                    ] ?? 'DESCONOCIDO')
                   : '-'}
               </p>
             </div>
@@ -78,15 +86,20 @@ export function FormularioDetailDialog({
                 <div>
                   <p className="text-muted-foreground">Tiene emprendimiento</p>
                   <p className="font-medium">
-                    {(formulario as FormularioReferenciaGeneral).tiene_emprendimiento ? 'Sí' : 'No'}
+                    {(formulario as FormularioReferenciaGeneral)
+                      .tiene_emprendimiento
+                      ? 'Sí'
+                      : 'No'}
                   </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Intención emprender</p>
                   <p className="font-medium">
-                    {(formulario as FormularioReferenciaGeneral).intencion_emprender === null
+                    {(formulario as FormularioReferenciaGeneral)
+                      .intencion_emprender === null
                       ? 'Sin especificar'
-                      : (formulario as FormularioReferenciaGeneral).intencion_emprender
+                      : (formulario as FormularioReferenciaGeneral)
+                            .intencion_emprender
                         ? 'Sí'
                         : 'No'}
                   </p>
@@ -94,20 +107,28 @@ export function FormularioDetailDialog({
                 <div>
                   <p className="text-muted-foreground">Nombre emprendimiento</p>
                   <p className="font-medium">
-                    {(formulario as FormularioReferenciaGeneral).nombre_emprendimiento ?? '-'}
+                    {(formulario as FormularioReferenciaGeneral)
+                      .nombre_emprendimiento ?? '-'}
                   </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Código pago</p>
                   <p className="font-medium">
-                    {(formulario as FormularioReferenciaGeneral).codigo_pago ?? '-'}
+                    {(formulario as FormularioReferenciaGeneral).codigo_pago ??
+                      '-'}
                   </p>
                 </div>
               </div>
-              {(formulario as FormularioReferenciaGeneral).notas_adicionales && (
+              {(formulario as FormularioReferenciaGeneral)
+                .notas_adicionales && (
                 <div>
                   <p className="text-muted-foreground">Notas</p>
-                  <p>{(formulario as FormularioReferenciaGeneral).notas_adicionales}</p>
+                  <p>
+                    {
+                      (formulario as FormularioReferenciaGeneral)
+                        .notas_adicionales
+                    }
+                  </p>
                 </div>
               )}
             </>
@@ -119,13 +140,16 @@ export function FormularioDetailDialog({
                 <div>
                   <p className="text-muted-foreground">Emprendimiento</p>
                   <p className="font-medium">
-                    {(formulario as FormularioAsistenciaTecnica).nombre_emprendimiento ?? '-'}
+                    {(formulario as FormularioAsistenciaTecnica)
+                      .nombre_emprendimiento ?? '-'}
                   </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Tasa cancelada</p>
                   <p className="font-medium">
-                    {(formulario as FormularioAsistenciaTecnica).tasa_cancelada ? 'Sí' : 'No'}
+                    {(formulario as FormularioAsistenciaTecnica).tasa_cancelada
+                      ? 'Sí'
+                      : 'No'}
                   </p>
                 </div>
               </div>
