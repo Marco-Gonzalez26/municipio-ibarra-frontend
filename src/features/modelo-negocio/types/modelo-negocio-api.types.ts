@@ -87,9 +87,8 @@ export interface PortafolioProductoDTO {
   id: number
   id_fuente_ingreso: number
   codigo_producto: string | null
-  nombre_producto: string
+  orden: number
   precio: number
-  descripcion: string | null
   peso: number | null
 }
 
@@ -107,10 +106,10 @@ export interface RecursosActividadesDTO {
 export interface CostoVariableDTO {
   id: number
   id_modelo: number
-  categoria: string
+  id_categoria: number
   descripcion: string
   cantidad: number
-  unidad: string
+  id_unidad: number | null
   costo_unitario: number
 }
 
@@ -124,7 +123,7 @@ export interface CostoFijoDTO {
 export interface InversionInicialDTO {
   id: number
   id_modelo: number
-  categoria: string
+  id_categoria: number
   descripcion: string
   costo: number
 }

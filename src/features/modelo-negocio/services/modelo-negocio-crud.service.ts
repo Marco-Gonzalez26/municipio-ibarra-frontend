@@ -216,9 +216,9 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createCostoVariable: (data: Omit<CostoVariableDTO, 'id'>, token?: string) =>
+  createCostoVariable: (idModelo: number, data: Omit<CostoVariableDTO, 'id' | 'id_modelo'>, token?: string) =>
     api.post<{ msg: string; costo_variable: CostoVariableDTO }>(
-      '/sime/mncostovariable',
+      `/sime/mncostovariable/modelo/${idModelo}`,
       { body: data, token }
     ),
 
@@ -231,9 +231,9 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createCostoFijo: (data: Omit<CostoFijoDTO, 'id'>, token?: string) =>
+  createCostoFijo: (idModelo: number, data: Omit<CostoFijoDTO, 'id' | 'id_modelo'>, token?: string) =>
     api.post<{ msg: string; costo_fijo: CostoFijoDTO }>(
-      '/sime/mncostofijo',
+      `/sime/mncostofijo/modelo/${idModelo}`,
       { body: data, token }
     ),
 
@@ -246,9 +246,9 @@ export const modeloNegocioService = {
       { token }
     ),
 
-  createInversionInicial: (data: Omit<InversionInicialDTO, 'id'>, token?: string) =>
+  createInversionInicial: (idModelo: number, data: Omit<InversionInicialDTO, 'id' | 'id_modelo'>, token?: string) =>
     api.post<{ msg: string; inversion_inicial: InversionInicialDTO }>(
-      '/sime/mninversioninicial',
+      `/sime/mninversioninicial/modelo/${idModelo}`,
       { body: data, token }
     ),
 

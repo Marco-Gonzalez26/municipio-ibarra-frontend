@@ -17,6 +17,7 @@ import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
 import { EntrepreneurDetailDialog } from './entrepreneur-detail-dialog'
 import { DeleteEntrepreneurDialog } from './delete-entrepeneur-dialog'
+import { ChangeEstadoDialog } from './change-estado-dialog'
 
 const ESTADO_MAP: Record<
   number,
@@ -49,6 +50,11 @@ export function EntrepreneursTable({
   const [selectedForDelete, setSelectedForDelete] = useState<{
     id: number
     name: string
+  } | null>(null)
+  const [changeEstadoDialogOpen, setChangeEstadoDialogOpen] = useState(false)
+  const [changeEstadoTarget, setChangeEstadoTarget] = useState<{
+    formularioId: number
+    tipo: 'aprobar' | 'rechazar'
   } | null>(null)
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
@@ -111,7 +117,9 @@ export function EntrepreneursTable({
           <TableBody>
             {filteredEntrepeneurs.map((entrepreneur) => {
               const formulario = getFormulario(entrepreneur.id)
-              const estado = ESTADO_MAP[formulario?.id_estado_emprendedor ?? 1]
+              const estadoId = formulario?.id_estado_emprendedor ?? 1
+              const estado = ESTADO_MAP[estadoId]
+              const isTerminal = estadoId === 3 || estadoId === 4
               const fecha = formulario
                 ? new Date(formulario.fecha_formulario).toLocaleDateString(
                     'es-EC'
@@ -152,10 +160,34 @@ export function EntrepreneursTable({
                       >
                         <Pencil className="size-4 text-yellow-500" />
                       </Button>
-                      <Button size="icon" variant="ghost">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        disabled={!formulario || isTerminal}
+                        onClick={() => {
+                          if (!formulario) return
+                          setChangeEstadoTarget({
+                            formularioId: formulario.id,
+                            tipo: 'aprobar',
+                          })
+                          setChangeEstadoDialogOpen(true)
+                        }}
+                      >
                         <Check className="size-4 text-green-500" />
                       </Button>
-                      <Button size="icon" variant="ghost">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        disabled={!formulario || isTerminal}
+                        onClick={() => {
+                          if (!formulario) return
+                          setChangeEstadoTarget({
+                            formularioId: formulario.id,
+                            tipo: 'rechazar',
+                          })
+                          setChangeEstadoDialogOpen(true)
+                        }}
+                      >
                         <X className="size-4 text-orange-500" />
                       </Button>
                       <Button
@@ -192,6 +224,13 @@ export function EntrepreneursTable({
         onOpenChange={setDialogOpen}
         entrepreneur={selectedEntrepreneur}
         formulario={selectedFormulario}
+      />
+
+      <ChangeEstadoDialog
+        tipo={changeEstadoTarget?.tipo ?? 'aprobar'}
+        formularioId={changeEstadoTarget?.formularioId ?? 0}
+        open={changeEstadoDialogOpen}
+        onOpenChange={setChangeEstadoDialogOpen}
       />
     </>
   )

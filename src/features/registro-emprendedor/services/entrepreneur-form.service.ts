@@ -1,6 +1,7 @@
 import { api, authHeader } from '@/lib/https'
 
 import type {
+  FormularioReferenciaGeneral,
   FormularioReferenciaGeneralCreateDTO,
   FormularioRefSector,
   FormularioRefSectorCreateDTO,
@@ -12,6 +13,7 @@ import type {
   FormularioAsistRequerimientoCreateDTO,
   FormularioReferenciaGeneralResponse,
   FormularioAsistenciaTecnicaResponse,
+  FormularioAsistenciaTecnicaListResponse,
   FormularioReferenciaGeneralCreateResponse,
   FormularioReferenciaGeneralListResponse,
 } from '@/types/form.type'
@@ -42,6 +44,16 @@ export const entrepeneurFormService = {
   ) =>
     api.post<FormularioReferenciaGeneralCreateResponse>(
       '/formulariosreferenciageneral',
+      { body: payload, token }
+    ),
+
+  updateReferenciaGeneral: (
+    id: number,
+    payload: Partial<Pick<FormularioReferenciaGeneral, 'id_estado_emprendedor'>>,
+    token?: string
+  ) =>
+    api.put<{ ok: boolean; msg: string }>(
+      `/formulariosreferenciageneral/${id}`,
       { body: payload, token }
     ),
 
@@ -106,6 +118,22 @@ export const entrepeneurFormService = {
       '/formularioasistenciatecnica',
       { body: payload, token }
     ),
+
+  getAllAsistenciaTecnica: (
+    page = 1,
+    limit = 15,
+    token?: string
+  ) => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    })
+
+    return api.get<FormularioAsistenciaTecnicaListResponse>(
+      `/formularioasistenciatecnica?${params.toString()}`,
+      { token }
+    )
+  },
 
   createAsistRequerimiento: (
     payload: FormularioAsistRequerimientoCreateDTO,

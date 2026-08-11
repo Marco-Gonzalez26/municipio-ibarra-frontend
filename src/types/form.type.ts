@@ -123,6 +123,12 @@ export interface FormularioAsistenciaTecnicaResponse {
   data: FormularioAsistenciaTecnica
 }
 
+export interface FormularioAsistenciaTecnicaListResponse {
+  ok: boolean
+  total: number
+  data: FormularioAsistenciaTecnica[]
+}
+
 export interface FormularioReferenciaGeneralListResponse {
   ok: boolean
   total: number

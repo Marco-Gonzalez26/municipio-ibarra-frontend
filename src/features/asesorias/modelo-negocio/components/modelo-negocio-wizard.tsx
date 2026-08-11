@@ -46,6 +46,13 @@ function mapServerSectionsToFormData(
   const conc = sections.conclusiones as { conclusiones: string } | null
   const foda = sections.foda as Array<{ id_cuadrante: number; contenido: string }> | null
 
+  const costosVar = sections.costosVariables as Array<{ id_categoria: number; descripcion: string; cantidad: number; id_unidad: number | null; costo_unitario: number }> | null
+  const costosFij = sections.costosFijos as Array<{ detalle: string; valor: number }> | null
+  const inversion = sections.inversionInicial as Array<{ id_categoria: number; descripcion: string; costo: number }> | null
+  const proj = sections.proyeccionSupuestos as { precio: number; costos_fijos: number; crecimiento: number; start_units: number; var_ratio: number; margen: number } | null
+  const fuentes = sections.fuentesIngreso as Array<{ fuente_ingreso: string; monto_estimado: number | null }> | null
+  const portafolio = sections.portafolioProductos as Array<{ codigo_producto: string | null; orden: number; precio: number; peso: number | null }> | null
+
   const fodaMap: Record<number, string> = {}
   if (foda) {
     for (const item of foda) {
@@ -92,8 +99,14 @@ function mapServerSectionsToFormData(
       relacion: cc?.relacion ?? '',
     },
     ingresos: {
-      ingresosTexto: '',
-      productos: [],
+      ingresosTexto: fuentes?.[0]?.fuente_ingreso ?? '',
+      productos: portafolio
+        ?.sort((a, b) => a.orden - b.orden)
+        .map((p) => ({
+          producto: p.codigo_producto ?? '',
+          descripcion: '',
+          precio: p.precio,
+        })) ?? [],
     },
     recursos: {
       recursosFinancieros: ra?.recursos_financieros ?? '',
@@ -108,16 +121,30 @@ function mapServerSectionsToFormData(
       socios: ra?.socios ?? '',
     },
     costos: {
-      insumos: [],
-      fijos: [],
-      inversion: [],
+      insumos: costosVar?.map((c) => ({
+        categoriaId: c.id_categoria,
+        descripcion: c.descripcion,
+        cantidad: c.cantidad,
+        unidadId: c.id_unidad,
+        costoUnit: c.costo_unitario,
+      })) ?? [],
+      fijos: costosFij?.map((f) => ({
+        detalle: f.detalle,
+        valor: f.valor,
+      })) ?? [],
+      inversion: inversion?.map((i) => ({
+        categoriaId: i.id_categoria,
+        descripcion: i.descripcion,
+        costo: i.costo,
+      })) ?? [],
       proyeccion: {
-        precio: 0,
-        costosFijos: 0,
-        growth: 0,
-        startUnits: 0,
-        varRatio: 0,
-        margen: 0,
+        precio: proj?.precio ?? 0,
+        costosFijos: proj?.costos_fijos ?? 0,
+        growth: proj?.crecimiento ?? 0,
+        startUnits: proj?.start_units ?? 0,
+        costoVariableUnitario: proj?.var_ratio ?? 0,
+        margen: proj?.margen ?? 0,
+        annualFixedCostIncrease: 0,
       },
     },
     conclusiones: {

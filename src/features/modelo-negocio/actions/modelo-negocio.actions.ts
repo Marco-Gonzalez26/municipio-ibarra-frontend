@@ -11,6 +11,7 @@ import type {
   CostoVariableDTO,
   CostoFijoDTO,
   InversionInicialDTO,
+  ProyeccionSupuestosDTO,
   FodaDTO,
 } from '../types/modelo-negocio-api.types'
 import type { ModeloNegocioState } from '@/features/asesorias/modelo-negocio/types/wizard-form.type'
@@ -258,16 +259,16 @@ async function saveIngresos(
   }
 
   // Create portafolio products
-  for (const prod of formData.ingresos.productos) {
+  for (let i = 0; i < formData.ingresos.productos.length; i++) {
+    const prod = formData.ingresos.productos[i]
     if (prod.producto.trim() && idFuente) {
       await modeloNegocioService.createPortafolioProducto(
         idFuente,
         {
-          codigo_producto: null,
-          nombre_producto: prod.producto,
-          descripcion: prod.descripcion || null,
+          codigo_producto: prod.producto,
+          orden: i + 1,
           precio: prod.precio,
-          peso: null,
+          peso: 0,
         },
         token
       )
@@ -315,14 +316,14 @@ async function saveCostos(
       .catch(() => {})
   }
   for (const ins of formData.costos.insumos) {
-    if (ins.categoria.trim() && ins.cantidad > 0 && ins.costoUnit > 0) {
+    if (ins.categoriaId && ins.cantidad > 0 && ins.costoUnit > 0) {
       await modeloNegocioService.createCostoVariable(
+        modeloId,
         {
-          id_modelo: modeloId,
-          categoria: ins.categoria,
+          id_categoria: ins.categoriaId,
           descripcion: ins.descripcion,
           cantidad: ins.cantidad,
-          unidad: ins.unidad,
+          id_unidad: ins.unidadId,
           costo_unitario: ins.costoUnit,
         },
         token
@@ -340,7 +341,8 @@ async function saveCostos(
   for (const fijo of formData.costos.fijos) {
     if (fijo.detalle.trim() && fijo.valor > 0) {
       await modeloNegocioService.createCostoFijo(
-        { id_modelo: modeloId, detalle: fijo.detalle, valor: fijo.valor },
+        modeloId,
+        { detalle: fijo.detalle, valor: fijo.valor },
         token
       )
     }
@@ -356,11 +358,11 @@ async function saveCostos(
       .catch(() => {})
   }
   for (const inv of formData.costos.inversion) {
-    if (inv.categoria.trim() && inv.costo > 0) {
+    if (inv.categoriaId && inv.costo > 0) {
       await modeloNegocioService.createInversionInicial(
+        modeloId,
         {
-          id_modelo: modeloId,
-          categoria: inv.categoria,
+          id_categoria: inv.categoriaId,
           descripcion: inv.descripcion,
           costo: inv.costo,
         },
@@ -378,7 +380,7 @@ async function saveCostos(
       costos_fijos: proj.costosFijos,
       crecimiento: proj.growth,
       start_units: proj.startUnits,
-      var_ratio: proj.varRatio,
+      var_ratio: proj.costoVariableUnitario,
       margen: proj.margen,
     },
     token
@@ -535,7 +537,7 @@ export async function loadModeloAction(modeloId: number) {
 
   const modelo = modeloRes.modelo
 
-  // Load all sections in parallel (except propuestaProductos which needs idPropuesta)
+  // Load all sections in parallel (except propuestaProductos and portafolioProductos which need foreign keys)
   const [
     introduccion,
     contexto,
@@ -545,6 +547,11 @@ export async function loadModeloAction(modeloId: number) {
     recursosActividades,
     conclusiones,
     foda,
+    costosVariables,
+    costosFijos,
+    inversionInicial,
+    proyeccionSupuestos,
+    fuentesIngreso,
   ] = await Promise.all([
     modeloNegocioService
       .getIntroduccion(modeloId, session.token)
@@ -566,6 +573,21 @@ export async function loadModeloAction(modeloId: number) {
       .getConclusiones(modeloId, session.token)
       .catch(() => null),
     modeloNegocioService.getFoda(modeloId, session.token).catch(() => null),
+    modeloNegocioService
+      .getCostosVariables(modeloId, session.token)
+      .catch(() => null),
+    modeloNegocioService
+      .getCostosFijos(modeloId, session.token)
+      .catch(() => null),
+    modeloNegocioService
+      .getInversionInicial(modeloId, session.token)
+      .catch(() => null),
+    modeloNegocioService
+      .getProyeccionSupuestos(modeloId, session.token)
+      .catch(() => null),
+    modeloNegocioService
+      .getFuentesIngreso(modeloId, session.token)
+      .catch(() => null),
   ])
 
   // Fetch propuestaProductos using idPropuesta (can't run in parallel)
@@ -575,15 +597,18 @@ export async function loadModeloAction(modeloId: number) {
         .getPropuestaProductos(idPropuesta, session.token)
         .catch(() => null)
     : null
-  console.log({
-    introduccion,
-    contexto,
-    propuestaValor,
-    clientesCanales,
-    recursosActividades,
-    conclusiones,
-    foda,
-  })
+
+  // Fetch portafolioProductos for each fuente de ingreso
+  const fuentes = fuentesIngreso?.data ?? []
+  const portafolioByFuente = await Promise.all(
+    fuentes.map((f) =>
+      modeloNegocioService
+        .getPortafolioProductos(f.id, session.token)
+        .catch(() => ({ ok: false, data: [] as PortafolioProductoDTO[] }))
+    )
+  )
+  const allPortafolioProductos = portafolioByFuente.flatMap((r) => r?.data ?? [])
+
   // Find first incomplete step
   const pasos = progreso.data ?? []
   const sortedPasos = [...pasos].sort((a, b) => a.paso_numero - b.paso_numero)
@@ -605,6 +630,12 @@ export async function loadModeloAction(modeloId: number) {
       recursosActividades: recursosActividades?.data ?? null,
       conclusiones: conclusiones?.data ?? null,
       foda: foda?.data ?? null,
+      costosVariables: costosVariables?.data ?? null,
+      costosFijos: costosFijos?.data ?? null,
+      inversionInicial: inversionInicial?.data ?? null,
+      proyeccionSupuestos: proyeccionSupuestos?.data ?? null,
+      fuentesIngreso: fuentesIngreso?.data ?? null,
+      portafolioProductos: allPortafolioProductos,
     },
   }
 }

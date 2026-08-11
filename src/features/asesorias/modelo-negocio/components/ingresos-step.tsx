@@ -2,6 +2,7 @@
 
 import { forwardRef, useImperativeHandle } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
+
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -40,8 +41,13 @@ export const IngresosStep = forwardRef<StepHandle, IngresosStepProps>(
       (state) => state.updateIngresos
     )
 
+    const ingresos = useModeloNegocioWizardStore(
+      (state) => state.formData.ingresos
+    )
+    console.log({ ingresos })
     const { control, handleSubmit, getValues } = useForm<IngresosForm>({
-      defaultValues: useModeloNegocioWizardStore.getState().formData.ingresos,
+      defaultValues: ingresos,
+      values: ingresos,
     })
     const { fields, append, remove } = useFieldArray({
       control,
@@ -91,8 +97,7 @@ export const IngresosStep = forwardRef<StepHandle, IngresosStepProps>(
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-1/4">Producto</TableHead>
-                <TableHead>Descripción</TableHead>
+                <TableHead className="w-1/2">Producto</TableHead>
                 <TableHead className="w-32">Precio</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
@@ -103,13 +108,6 @@ export const IngresosStep = forwardRef<StepHandle, IngresosStepProps>(
                   <TableCell>
                     <Controller
                       name={`productos.${index}.producto`}
-                      control={control}
-                      render={({ field }) => <Input {...field} />}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Controller
-                      name={`productos.${index}.descripcion`}
                       control={control}
                       render={({ field }) => <Input {...field} />}
                     />

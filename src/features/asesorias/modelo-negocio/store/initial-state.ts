@@ -68,8 +68,9 @@ export const initialState: WizardStoreState = {
       costosFijos: 0,
       growth: 0,
       startUnits: 0,
-      varRatio: 0,
+      costoVariableUnitario: 0,
       margen: 0,
+      annualFixedCostIncrease: 0,
     },
   },
   conclusiones: {

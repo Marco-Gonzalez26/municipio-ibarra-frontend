@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowDown, ArrowUp, ArrowUpDown, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Send, Check, X, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -33,7 +34,7 @@ import {
 import type { ModeloNegocioDTO } from '@/features/modelo-negocio/types/modelo-negocio-api.types'
 import type { EmprendimientoOpcion } from '../types/ficha.type'
 import { SeleccionarEmprendimientoDialog } from './seleccionar-emprendimiento-dialog'
-import { deleteModeloAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import { deleteModeloAction, changeEstadoAction } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 
 const ESTADO_MAP: Record<
   number,
@@ -85,6 +86,10 @@ export function ModeloNegocioListado({
   const [dialogoAbierto, setDialogoAbierto] = useState(false)
   const [modeloAEliminar, setModeloAEliminar] =
     useState<ModeloNegocioDTO | null>(null)
+  const [modeloACambiarEstado, setModeloACambiarEstado] =
+    useState<ModeloNegocioDTO | null>(null)
+  const [nuevoEstadoId, setNuevoEstadoId] = useState<number>(0)
+  const [motivo, setMotivo] = useState('')
 
   const modelosFiltrados = useMemo(() => {
     const termino = busqueda.trim().toLowerCase()
@@ -150,6 +155,35 @@ export function ModeloNegocioListado({
       }
     }
     setModeloAEliminar(null)
+  }
+
+  function abrirCambioEstado(modelo: ModeloNegocioDTO, nuevoId: number) {
+    setModeloACambiarEstado(modelo)
+    setNuevoEstadoId(nuevoId)
+    setMotivo('')
+  }
+
+  async function confirmarCambioEstado() {
+    if (!modeloACambiarEstado) return
+    try {
+      await changeEstadoAction(
+        modeloACambiarEstado.id,
+        nuevoEstadoId,
+        motivo || undefined
+      )
+      setModelos((prev) =>
+        prev.map((m) =>
+          m.id === modeloACambiarEstado.id
+            ? { ...m, id_estado: nuevoEstadoId }
+            : m
+        )
+      )
+    } catch (error) {
+      console.error('Error changing state:', error)
+    }
+    setModeloACambiarEstado(null)
+    setNuevoEstadoId(0)
+    setMotivo('')
   }
 
   return (
@@ -245,6 +279,7 @@ export function ModeloNegocioListado({
             {modelosFiltrados.map((modelo) => {
               const estadoInfo = ESTADO_MAP[modelo.id_estado] ?? ESTADO_MAP[1]
               const esBorrador = modelo.id_estado === 1
+              const enRevision = modelo.id_estado === 2
               return (
                 <TableRow key={modelo.id} className="text-center">
                   <TableCell className="font-medium">
@@ -270,15 +305,48 @@ export function ModeloNegocioListado({
                         </Link>
                       </Button>
                       {esBorrador && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label="Eliminar borrador"
-                          onClick={() => setModeloAEliminar(modelo)}
-                        >
-                          <Trash2 className="size-4 text-destructive" />
-                        </Button>
+                        <>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => abrirCambioEstado(modelo, 2)}
+                          >
+                            <Send className="mr-1 size-3.5" />
+                            Enviar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Eliminar borrador"
+                            onClick={() => setModeloAEliminar(modelo)}
+                          >
+                            <Trash2 className="size-4 text-destructive" />
+                          </Button>
+                        </>
+                      )}
+                      {enRevision && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => abrirCambioEstado(modelo, 3)}
+                          >
+                            <Check className="mr-1 size-3.5 text-green-600" />
+                            Aprobar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => abrirCambioEstado(modelo, 4)}
+                          >
+                            <X className="mr-1 size-3.5 text-destructive" />
+                            Rechazar
+                          </Button>
+                        </>
                       )}
                     </div>
                   </TableCell>
@@ -312,6 +380,15 @@ export function ModeloNegocioListado({
         modelo={modeloAEliminar}
         onClose={() => setModeloAEliminar(null)}
         onConfirm={confirmarEliminar}
+      />
+
+      <CambiarEstadoDialog
+        modelo={modeloACambiarEstado}
+        nuevoEstadoId={nuevoEstadoId}
+        motivo={motivo}
+        onMotivoChange={setMotivo}
+        onClose={() => setModeloACambiarEstado(null)}
+        onConfirm={confirmarCambioEstado}
       />
     </div>
   )
@@ -392,6 +469,74 @@ function EliminarBorradorDialog({
           </Button>
           <Button type="button" variant="destructive" onClick={onConfirm}>
             Eliminar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CambiarEstadoDialog({
+  modelo,
+  nuevoEstadoId,
+  motivo,
+  onMotivoChange,
+  onClose,
+  onConfirm,
+}: {
+  modelo: ModeloNegocioDTO | null
+  nuevoEstadoId: number
+  motivo: string
+  onMotivoChange: (value: string) => void
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  const estadoDestino = ESTADO_MAP[nuevoEstadoId]
+  const esRechazo = nuevoEstadoId === 4
+
+  return (
+    <Dialog open={Boolean(modelo)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {esRechazo ? (
+              <X className="size-5 text-destructive" />
+            ) : (
+              <Check className="size-5 text-green-600" />
+            )}
+            {esRechazo ? 'Rechazar modelo' : 'Cambiar estado'}
+          </DialogTitle>
+          <DialogDescription>
+            Se cambiará el estado de{' '}
+            <span className="font-semibold text-foreground">
+              {modelo?.nombre_emprendimiento ?? 'este emprendimiento'}
+            </span>{' '}
+            a <Badge variant={estadoDestino?.variant}>{estadoDestino?.label}</Badge>.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label htmlFor="motivo-cambio">
+            Motivo {esRechazo ? '(obligatorio)' : '(opcional)'}
+          </Label>
+          <Textarea
+            id="motivo-cambio"
+            value={motivo}
+            onChange={(e) => onMotivoChange(e.target.value)}
+            placeholder={esRechazo ? 'Ingrese el motivo del rechazo...' : 'Motivo del cambio (opcional)...'}
+            rows={3}
+          />
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            variant={esRechazo ? 'destructive' : 'default'}
+            onClick={onConfirm}
+            disabled={esRechazo && !motivo.trim()}
+          >
+            {esRechazo ? 'Rechazar' : 'Confirmar'}
           </Button>
         </DialogFooter>
       </DialogContent>

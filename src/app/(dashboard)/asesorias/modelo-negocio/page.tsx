@@ -142,7 +142,11 @@ export default async function ModeloNegocioPage({
       )
 
       emprendimientos = (formulariosRes.formularios_referencia_general ?? [])
-        .filter((formulario) => formulario.tiene_emprendimiento)
+        .filter(
+          (formulario) =>
+            formulario.tiene_emprendimiento &&
+            formulario.id_estado_emprendedor === 3
+        )
         .map((formulario) => {
           const emprendedor = entrepreneursById.get(formulario.id_emprendedor)
           return {
