@@ -11,7 +11,6 @@ import type {
   CostoVariableDTO,
   CostoFijoDTO,
   InversionInicialDTO,
-  ProyeccionSupuestosDTO,
   FodaDTO,
 } from '../types/modelo-negocio-api.types'
 import type { ModeloNegocioState } from '@/features/asesorias/modelo-negocio/types/wizard-form.type'
@@ -173,8 +172,7 @@ async function savePortafolio(
   modeloId: number,
   formData: ModeloNegocioState,
   token: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stepResult: any
+  stepResult: StepResult | null
 ) {
   // Get propuesta valor ID: try stepResult first, then GET fallback
   let idPropuesta = stepResult?.propuesta_valor?.id ?? 0
@@ -391,12 +389,16 @@ async function saveCostos(
 
 // ── Special step save handlers ──────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface StepResult {
+  propuesta_valor?: { id?: number }
+  [key: string]: unknown
+}
+
 type CollectionHandler = (
   modeloId: number,
   formData: ModeloNegocioState,
   token: string,
-  stepResult: any
+  stepResult: StepResult | null
 ) => Promise<void>
 
 const COLLECTION_STEP_HANDLERS: Record<string, CollectionHandler> = {
@@ -473,12 +475,15 @@ export async function saveStepAction(
 
   // Simple upsert steps (1:1 tables) — run first so collection handlers can use the result
   const stepConfig = SIMPLE_STEP_API_MAP[stepKey]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let stepResult: any = null
+  let stepResult: StepResult | null = null
   if (stepConfig) {
     const dataToSave = stepConfig.extractKey(formData)
     if (dataToSave !== null) {
-      stepResult = await stepConfig.save(modeloId, dataToSave, token)
+      stepResult = (await stepConfig.save(
+        modeloId,
+        dataToSave,
+        token
+      )) as StepResult
     }
   }
 

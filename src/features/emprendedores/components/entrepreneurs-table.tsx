@@ -74,13 +74,6 @@ export function EntrepreneursTable({
     setSelectedFormulario(getFormulario(entrepreneur.id))
     setDialogOpen(true)
   }
-  function handleDelete(entrepreneur: Emprendedor) {
-    setSelectedForDelete({
-      id: entrepreneur.id,
-      name: entrepreneur.nombres_apellidos,
-    })
-    setDeleteDialogOpen(true)
-  }
   return (
     <>
       <input

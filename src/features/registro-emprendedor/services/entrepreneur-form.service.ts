@@ -1,4 +1,4 @@
-import { api, authHeader } from '@/lib/https'
+import { api } from '@/lib/https'
 
 import type {
   FormularioReferenciaGeneral,
@@ -11,7 +11,6 @@ import type {
   FormularioAsistenciaTecnicaCreateDTO,
   FormularioAsistRequerimiento,
   FormularioAsistRequerimientoCreateDTO,
-  FormularioReferenciaGeneralResponse,
   FormularioAsistenciaTecnicaResponse,
   FormularioAsistenciaTecnicaListResponse,
   FormularioReferenciaGeneralCreateResponse,
