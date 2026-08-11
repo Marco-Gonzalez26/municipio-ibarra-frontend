@@ -51,8 +51,8 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
     const updateAnexos = useModeloNegocioWizardStore(
       (state) => state.updateAnexos
     )
-    const registrarProgreso = useModeloNegocioWizardStore(
-      (state) => state.registrarProgreso
+    const saveCurrentStep = useModeloNegocioWizardStore(
+      (state) => state.saveCurrentStep
     )
     const formData = useModeloNegocioWizardStore((state) => state.formData)
     const canvas = deriveCanvas(formData)
@@ -65,7 +65,7 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
       saveDraft: () => updateAnexos(getValues()),
     }))
 
-    function onSubmit(data: AnexosForm) {
+    async function onSubmit(data: AnexosForm) {
       const pendientes = getIncompleteSteps({
         ...formData,
         anexos: data,
@@ -83,7 +83,7 @@ export const AnexosStep = forwardRef<StepHandle, AnexosStepProps>(
       }
 
       updateAnexos(data)
-      registrarProgreso('completado')
+      await saveCurrentStep()
       toast.success('Modelo de negocio guardado')
       router.push('/asesorias/modelo-negocio')
     }

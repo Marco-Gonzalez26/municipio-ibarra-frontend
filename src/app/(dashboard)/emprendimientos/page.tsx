@@ -12,6 +12,7 @@ import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
 
 const LIMIT = 15
+const LIMIT_FORMULARIOS = 500
 
 interface EmprendimientosPageProps {
   searchParams: Promise<{ page?: string }>
@@ -32,10 +33,10 @@ export default async function EmprendimientosPage({
     // Se usa referencia general porque el front aún no tiene servicio propio.
     const [entrepreneursRes, formulariosRes] = await withSessionRedirect(() =>
       Promise.all([
-        entrepreneurService.getAll(page, LIMIT, session.token),
+        entrepreneurService.getAll(1, LIMIT_FORMULARIOS, session.token),
         entrepeneurFormService.getAllReferenciaGeneral(
-          page,
-          LIMIT,
+          1,
+          LIMIT_FORMULARIOS,
           session.token
         ),
       ])

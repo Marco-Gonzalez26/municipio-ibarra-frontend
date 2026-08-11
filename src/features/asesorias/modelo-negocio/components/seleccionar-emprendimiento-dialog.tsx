@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -12,20 +11,17 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import type { EmprendimientoOpcion } from '../types/ficha.type'
-import type { ModeloNegocioRegistro } from '../types/wizard-form.type'
 
 interface SeleccionarEmprendimientoDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   emprendimientos: EmprendimientoOpcion[]
-  modelosGuardados: Record<number, ModeloNegocioRegistro>
 }
 
 export function SeleccionarEmprendimientoDialog({
   open,
   onOpenChange,
   emprendimientos,
-  modelosGuardados,
 }: SeleccionarEmprendimientoDialogProps) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
@@ -66,33 +62,23 @@ export function SeleccionarEmprendimientoDialog({
         />
 
         <div className="max-h-96 space-y-2 overflow-y-auto">
-          {filtrados.map((opcion) => {
-            const modeloExistente = modelosGuardados[opcion.idEmprendedor]
-            return (
-              <button
-                key={opcion.idEmprendedor}
-                type="button"
-                onClick={() => seleccionar(opcion.idEmprendedor)}
-                className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {opcion.nombreEmprendimiento}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {opcion.nombreEmprendedor} · CI {opcion.cedula}
-                  </p>
-                </div>
-                {modeloExistente && (
-                  <Badge variant="secondary" className="shrink-0">
-                    {modeloExistente.estado === 'completado'
-                      ? 'Completado'
-                      : 'Ya tiene borrador'}
-                  </Badge>
-                )}
-              </button>
-            )
-          })}
+          {filtrados.map((opcion) => (
+            <button
+              key={opcion.idEmprendedor}
+              type="button"
+              onClick={() => seleccionar(opcion.idEmprendedor)}
+              className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">
+                  {opcion.nombreEmprendimiento}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {opcion.nombreEmprendedor} · CI {opcion.cedula}
+                </p>
+              </div>
+            </button>
+          ))}
 
           {filtrados.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">

@@ -1,4 +1,3 @@
-
 import type { CatalogoItem } from '@/types/catalog.type'
 
 export interface CatalogoItemConCodigoOrden extends CatalogoItem {
@@ -7,5 +6,5 @@ export interface CatalogoItemConCodigoOrden extends CatalogoItem {
 }
 
 export interface CatalogoEstadoModelo extends CatalogoItemConCodigoOrden {
-   es_terminal: boolean | number
+  es_terminal: boolean | number
 }
