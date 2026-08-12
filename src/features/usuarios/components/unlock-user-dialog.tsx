@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Trash2 } from 'lucide-react'
+import { Loader2, Unlock } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,38 +14,26 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
-import { deactivateUserAction } from '../actions/deactivate-user.action'
+import { unlockUserAction } from '../actions/unlock-user.action'
 import type { UsuarioConRol } from '../utils/merge-users-with-roles'
 
-interface DeactivateUserDialogProps {
+interface UnlockUserDialogProps {
   user: UsuarioConRol | null
   onClose: () => void
 }
 
-export function DeactivateUserDialog({
-  user,
-  onClose,
-}: DeactivateUserDialogProps) {
+export function UnlockUserDialog({ user, onClose }: UnlockUserDialogProps) {
   const router = useRouter()
-
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState('')
 
   function handleConfirm() {
-    if (!user) {
-      return
-    }
+    if (!user) return
 
     setError('')
 
     startTransition(async () => {
-      const result = await deactivateUserAction({
-        userId: user.id,
-        assignmentId: user.asignacionRol?.id ?? null,
-        idRol: user.asignacionRol?.id_rol ?? user.rol?.id ?? null,
-        fechaAsignacion: user.asignacionRol?.fecha_asignacion ?? null,
-        fechaExpiracion: user.asignacionRol?.fecha_expiracion ?? null,
-      })
+      const result = await unlockUserAction(user.id)
 
       if (!result.success) {
         setError(result.message)
@@ -70,21 +58,25 @@ export function DeactivateUserDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Trash2 className="size-5 text-destructive" />
-            Desactivar usuario
+            <Unlock className="size-5 text-green-600" />
+            Desbloquear usuario
           </DialogTitle>
 
           <DialogDescription>
-            ¿Deseas desactivar al usuario{' '}
+            Se reiniciarán los intentos fallidos del usuario{' '}
             <span className="font-semibold text-foreground">
               {user ? `${user.nombres} ${user.apellidos}` : 'seleccionado'}
             </span>
-            ?
+            .
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
-          El usuario quedará desactivado y no podrá utilizar el sistema.
+        <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
+          Intentos fallidos actuales:{' '}
+          <span className="font-semibold">{user?.intentos_fallidos ?? 0}</span>.
+          Este usuario reseteará sus intentos fallidos a{' '}
+          <span className="font-semibold">0</span> y podrá iniciar sesión
+          nuevamente.
         </div>
 
         {error ? (
@@ -106,19 +98,17 @@ export function DeactivateUserDialog({
             Cancelar
           </Button>
 
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isPending}
-          >
+          <Button type="button" onClick={handleConfirm} disabled={isPending}>
             {isPending ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Desactivando
+                Desbloqueando
               </>
             ) : (
-              'Desactivar usuario'
+              <>
+                <Unlock className="mr-2 size-4" />
+                Desbloquear
+              </>
             )}
           </Button>
         </DialogFooter>

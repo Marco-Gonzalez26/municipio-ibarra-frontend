@@ -36,7 +36,10 @@ function summarizePropuesta(
 function summarizeIngresos(ingresos: ModeloNegocioState['ingresos']): string {
   const productos = ingresos.productos
     .filter((producto) => producto.producto)
-    .map((producto) => `${producto.producto} ($${producto.precio.toFixed(2)})`)
+    .map(
+      (producto) =>
+        `${producto.producto} ($${Number(producto.precio).toFixed(2)})`
+    )
     .join(', ')
   return joinOrEmpty([
     ingresos.ingresosTexto,
@@ -56,12 +59,16 @@ function summarizeRecursos(recursos: ModeloNegocioState['recursos']): string {
 
 function summarizeCostos(costos: ModeloNegocioState['costos']): string {
   const totalInsumos = costos.insumos.reduce(
-    (total, insumo) => total + insumo.cantidad * insumo.costoUnit,
+    (total, insumo) =>
+      total + Number(insumo.cantidad) * Number(insumo.costoUnit),
     0
   )
-  const totalFijos = costos.fijos.reduce((total, fijo) => total + fijo.valor, 0)
+  const totalFijos = costos.fijos.reduce(
+    (total, fijo) => total + Number(fijo.valor),
+    0
+  )
   const totalInversion = costos.inversion.reduce(
-    (total, item) => total + item.costo,
+    (total, item) => total + Number(item.costo),
     0
   )
 

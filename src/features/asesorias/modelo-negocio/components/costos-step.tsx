@@ -1,12 +1,19 @@
 'use client'
 
-import { forwardRef, useEffect, useImperativeHandle } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -20,7 +27,14 @@ import { useModeloNegocioWizardStore } from '../store/wizard.store'
 import type { CostosForm } from '../types/canvas.type'
 import { calculateFinancialProjection } from '../utils/financial-projection'
 import { NumberInput } from '@/components/ui/number-input'
+import { Separator } from '@/components/ui/separator'
 import { StepFooter, StepHeader, type StepHandle } from './step-shell'
+import {
+  getCategoriasInsumo,
+  getUnidadesMedida,
+  getCategoriasInversion,
+} from '../actions/catalogs.actions'
+import type { CatalogoItem } from '@/types/catalog.type'
 
 interface CostosStepProps {
   onNext: () => void
@@ -36,7 +50,7 @@ function limpiarCostos(data: CostosForm): CostosForm {
     ...data,
     insumos: data.insumos.filter(
       (item) =>
-        item.categoria.trim() !== '' &&
+        item.categoriaId !== null &&
         Number(item.cantidad) > 0 &&
         Number(item.costoUnit) > 0
     ),
@@ -44,7 +58,7 @@ function limpiarCostos(data: CostosForm): CostosForm {
       (item) => item.detalle.trim() !== '' && Number(item.valor) > 0
     ),
     inversion: data.inversion.filter(
-      (item) => item.categoria.trim() !== '' && Number(item.costo) > 0
+      (item) => item.categoriaId !== null && Number(item.costo) > 0
     ),
   }
 }
@@ -55,8 +69,11 @@ export const CostosStep = forwardRef<StepHandle, CostosStepProps>(
       (state) => state.updateCostos
     )
 
+    const costos = useModeloNegocioWizardStore((state) => state.formData.costos)
+
     const { control, handleSubmit, getValues, setValue } = useForm<CostosForm>({
-      defaultValues: useModeloNegocioWizardStore.getState().formData.costos,
+      defaultValues: costos,
+      values: costos,
     })
 
     useImperativeHandle(ref, () => ({
@@ -91,12 +108,30 @@ export const CostosStep = forwardRef<StepHandle, CostosStepProps>(
   }
 )
 
+function useCatalogs() {
+  const [categoriasInsumo, setCategoriasInsumo] = useState<CatalogoItem[]>([])
+  const [unidadesMedida, setUnidadesMedida] = useState<CatalogoItem[]>([])
+  const [categoriasInversion, setCategoriasInversion] = useState<
+    CatalogoItem[]
+  >([])
+
+  useEffect(() => {
+    getCategoriasInsumo().then(setCategoriasInsumo)
+    getUnidadesMedida().then(setUnidadesMedida)
+    getCategoriasInversion().then(setCategoriasInversion)
+  }, [])
+
+  return { categoriasInsumo, unidadesMedida, categoriasInversion }
+}
+
 function InsumosTable({ control }: { control: Control<CostosForm> }) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'insumos',
   })
   const rows = useWatch({ control, name: 'insumos' }) ?? []
+  const { categoriasInsumo, unidadesMedida } = useCatalogs()
+
   const total = rows.reduce(
     (sum, row) =>
       sum + (Number(row?.cantidad) || 0) * (Number(row?.costoUnit) || 0),
@@ -127,9 +162,25 @@ function InsumosTable({ control }: { control: Control<CostosForm> }) {
               <TableRow key={item.id}>
                 <TableCell>
                   <Controller
-                    name={`insumos.${index}.categoria`}
+                    name={`insumos.${index}.categoriaId`}
                     control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value?.toString() ?? ''}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categoriasInsumo.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id.toString()}>
+                              {cat.descripcion}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                 </TableCell>
                 <TableCell>
@@ -154,9 +205,25 @@ function InsumosTable({ control }: { control: Control<CostosForm> }) {
                 </TableCell>
                 <TableCell>
                   <Controller
-                    name={`insumos.${index}.unidad`}
+                    name={`insumos.${index}.unidadId`}
                     control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value?.toString() ?? ''}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {unidadesMedida.map((u) => (
+                            <SelectItem key={u.id} value={u.id.toString()}>
+                              {u.descripcion}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                 </TableCell>
                 <TableCell>
@@ -203,10 +270,10 @@ function InsumosTable({ control }: { control: Control<CostosForm> }) {
         variant="outline"
         onClick={() =>
           append({
-            categoria: '',
+            categoriaId: null,
             descripcion: '',
             cantidad: 0,
-            unidad: '',
+            unidadId: null,
             costoUnit: 0,
           })
         }
@@ -295,6 +362,7 @@ function InversionTable({ control }: { control: Control<CostosForm> }) {
     name: 'inversion',
   })
   const rows = useWatch({ control, name: 'inversion' }) ?? []
+  const { categoriasInversion } = useCatalogs()
   const total = rows.reduce((sum, row) => sum + (Number(row?.costo) || 0), 0)
 
   return (
@@ -314,9 +382,25 @@ function InversionTable({ control }: { control: Control<CostosForm> }) {
             <TableRow key={item.id}>
               <TableCell>
                 <Controller
-                  name={`inversion.${index}.categoria`}
+                  name={`inversion.${index}.categoriaId`}
                   control={control}
-                  render={({ field }) => <Input {...field} />}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value?.toString() ?? ''}
+                      onValueChange={(v) => field.onChange(Number(v))}
+                    >
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoriasInversion.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id.toString()}>
+                            {cat.descripcion}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </TableCell>
               <TableCell>
@@ -364,26 +448,13 @@ function InversionTable({ control }: { control: Control<CostosForm> }) {
       <Button
         type="button"
         variant="outline"
-        onClick={() => append({ categoria: '', descripcion: '', costo: 0 })}
+        onClick={() => append({ categoriaId: null, descripcion: '', costo: 0 })}
       >
         + Agregar ítem de inversión
       </Button>
     </Field>
   )
 }
-
-const SUPUESTOS: {
-  id: keyof Omit<CostosForm['proyeccion'], 'costosFijos'>
-  label: string
-  prefix?: string
-  suffix?: string
-}[] = [
-  { id: 'precio', label: 'Precio de venta', prefix: '$' },
-  { id: 'growth', label: 'Crecimiento / trim.', suffix: '%' },
-  { id: 'startUnits', label: 'Unidades T1' },
-  { id: 'varRatio', label: 'Costos variables', suffix: '% ing.' },
-  { id: 'margen', label: 'Margen de ganancia', suffix: '%' },
-]
 
 function ProyeccionSection({
   control,
@@ -392,101 +463,195 @@ function ProyeccionSection({
   control: Control<CostosForm>
   setValue: UseFormSetValue<CostosForm>
 }) {
-  const supuestos = useWatch({ control, name: 'proyeccion' })
+  const precio = useWatch({ control, name: 'proyeccion.precio' }) ?? 0
+  const startUnits = useWatch({ control, name: 'proyeccion.startUnits' }) ?? 0
+  const growth = useWatch({ control, name: 'proyeccion.growth' }) ?? 0
+  const annualFixedCostIncrease =
+    useWatch({ control, name: 'proyeccion.annualFixedCostIncrease' }) ?? 0
+  const margen = useWatch({ control, name: 'proyeccion.margen' }) ?? 0
+
   const fijos = useWatch({ control, name: 'fijos' }) ?? []
+  const insumos = useWatch({ control, name: 'insumos' }) ?? []
   const productos = useModeloNegocioWizardStore(
     (state) => state.formData.ingresos.productos
   )
 
-  const costosFijosTrimestral =
-    fijos.reduce((sum, row) => sum + (Number(row?.valor) || 0), 0) * 3
+  const costosFijosMensual = fijos.reduce(
+    (sum, row) => sum + (Number(row?.valor) || 0),
+    0
+  )
+  const costosFijosTrimestral = costosFijosMensual * 3
 
-  const preciosValidos = productos
-    .map((producto) => Number(producto.precio) || 0)
-    .filter((precio) => precio > 0)
-  const precioSugerido = preciosValidos.length
-    ? Number(
-        (
-          preciosValidos.reduce((sum, precio) => sum + precio, 0) /
-          preciosValidos.length
-        ).toFixed(2)
-      )
-    : 0
+  const costoVariableUnitario = insumos.reduce(
+    (sum, row) => sum + (Number(row?.costoUnit) || 0),
+    0
+  )
 
   useEffect(() => {
     setValue('proyeccion.costosFijos', Number(costosFijosTrimestral.toFixed(2)))
   }, [costosFijosTrimestral, setValue])
 
   useEffect(() => {
-    if ((supuestos.precio ?? 0) === 0 && precioSugerido > 0) {
+    setValue(
+      'proyeccion.costoVariableUnitario',
+      Number(costoVariableUnitario.toFixed(2))
+    )
+  }, [costoVariableUnitario, setValue])
+
+  const preciosValidos = productos
+    .map((producto) => Number(producto.precio) || 0)
+    .filter((p) => p > 0)
+  const precioSugerido = preciosValidos.length
+    ? Number(
+        (
+          preciosValidos.reduce((sum, p) => sum + p, 0) / preciosValidos.length
+        ).toFixed(2)
+      )
+    : 0
+
+  useEffect(() => {
+    if (Number(precio) === 0 && precioSugerido > 0) {
       setValue('proyeccion.precio', precioSugerido)
     }
-    // Solo se autocompleta mientras el analista no haya escrito un precio propio.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [precioSugerido])
 
   const { filas, ingresosPorAnio } = calculateFinancialProjection({
-    ...supuestos,
+    precio: Number(precio) || 0,
+    startUnits: Number(startUnits) || 0,
+    growth: Number(growth) || 0,
+    annualFixedCostIncrease: Number(annualFixedCostIncrease) || 0,
     costosFijos: costosFijosTrimestral,
+    costoVariableUnitario,
+    margen: Number(margen) || 0,
   })
 
   return (
-    <Field>
-      <FieldLabel>Proyección financiera (5 años · 20 trimestres)</FieldLabel>
-      <p className="text-xs text-muted-foreground">
-        Los valores se calculan automáticamente a partir de los supuestos.
-        &quot;Costos fijos (trim.)&quot; se toma de la tabla de costos fijos
-        mensuales de arriba y &quot;Precio de venta&quot; se sugiere a partir
-        del precio promedio de tus productos.
-      </p>
+    <div className="space-y-6">
+      <div>
+        <FieldLabel>Supuestos de proyección</FieldLabel>
+        <p className="text-xs text-muted-foreground">
+          Ingrese los valores para generar la proyección financiera a 5 años.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-        <div className="rounded-lg border bg-muted/40 p-2.5">
-          <p className="mb-1 text-[11px] text-muted-foreground">
-            Costos fijos (trim.)
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <Controller
+          name="proyeccion.precio"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>
+                Precio de venta unitario
+              </FieldLabel>
+              <NumberInput
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="proyeccion.startUnits"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>
+                Unidades iniciales / trimestre
+              </FieldLabel>
+              <NumberInput
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                allowDecimals={false}
+              />
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="proyeccion.growth"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>
+                Crecimiento trimestral (%)
+              </FieldLabel>
+              <NumberInput
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="proyeccion.annualFixedCostIncrease"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>
+                Aumento anual C. fijos (%)
+              </FieldLabel>
+              <NumberInput
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="proyeccion.margen"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>Margen objetivo (%)</FieldLabel>
+              <NumberInput
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </Field>
+          )}
+        />
+      </div>
+
+      <Separator />
+
+      <div>
+        <FieldLabel>Resultados calculados</FieldLabel>
+        <p className="text-xs text-muted-foreground">
+          Los costos fijos y variables se calculan automáticamente de las tablas
+          anteriores.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="rounded-lg border bg-muted/40 p-3">
+          <p className="text-xs text-muted-foreground">Costos fijos (trim.)</p>
+          <p className="mt-1 text-sm font-semibold">
+            ${costosFijosTrimestral.toFixed(2)}
           </p>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold text-muted-foreground">
-              $
-            </span>
-            <span className="text-sm font-semibold text-foreground">
-              {costosFijosTrimestral.toFixed(2)}
-            </span>
-          </div>
         </div>
 
-        {SUPUESTOS.map((supuesto) => (
-          <Controller
-            key={supuesto.id}
-            name={`proyeccion.${supuesto.id}`}
-            control={control}
-            render={({ field }) => (
-              <div className="rounded-lg border bg-muted/40 p-2.5">
-                <p className="mb-1 text-[11px] text-muted-foreground">
-                  {supuesto.label}
-                </p>
-                <div className="flex items-center gap-1">
-                  {supuesto.prefix && (
-                    <span className="text-sm font-semibold text-muted-foreground">
-                      {supuesto.prefix}
-                    </span>
-                  )}
-                  <NumberInput
-                    value={field.value}
-                    onChange={field.onChange}
-                    className="h-auto rounded-none border-0 bg-transparent p-0 text-sm font-semibold text-foreground shadow-none outline-none focus-visible:border-transparent focus-visible:ring-0"
-                  />
-                  {supuesto.suffix && (
-                    <span className="text-[11px] whitespace-nowrap text-muted-foreground">
-                      {supuesto.suffix}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          />
-        ))}
+        <div className="rounded-lg border bg-muted/40 p-3">
+          <p className="text-xs text-muted-foreground">
+            Costo variable unitario
+          </p>
+          <p className="mt-1 text-sm font-semibold">
+            ${costoVariableUnitario.toFixed(2)}
+          </p>
+        </div>
       </div>
+
+      <Separator />
+
+      <FieldLabel>Proyección a 5 años (20 trimestres)</FieldLabel>
 
       <div className="max-h-80 overflow-y-auto rounded-lg border">
         <Table>
@@ -510,7 +675,10 @@ function ProyeccionSection({
                 Utilidad neta
               </TableHead>
               <TableHead className="sticky top-0 bg-muted text-right">
-                Beneficio mensual
+                Margen %
+              </TableHead>
+              <TableHead className="sticky top-0 bg-muted text-right">
+                Ing. mensual
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -540,8 +708,17 @@ function ProyeccionSection({
                 >
                   {money(fila.utilidadNeta)}
                 </TableCell>
+                <TableCell
+                  className={
+                    fila.margen < 0
+                      ? 'text-right text-destructive'
+                      : 'text-right'
+                  }
+                >
+                  {fila.margen.toFixed(1)}%
+                </TableCell>
                 <TableCell className="text-right font-semibold text-primary">
-                  {money(fila.beneficioMensual)}
+                  {money(fila.ingresoMensualPromedio)}
                 </TableCell>
               </TableRow>
             ))}
@@ -559,6 +736,6 @@ function ProyeccionSection({
           </div>
         ))}
       </div>
-    </Field>
+    </div>
   )
 }

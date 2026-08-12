@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
 
 export interface StepHandle {
-  saveDraft: () => void
+  saveDraft: () => void | Promise<void>
 }
 
 interface StepHeaderProps {
@@ -32,29 +32,42 @@ export function StepFooter({
   onSaveDraft,
   submitLabel = 'Siguiente',
 }: StepFooterProps) {
-  const registrarProgreso = useModeloNegocioWizardStore(
-    (state) => state.registrarProgreso
+  const saveCurrentStep = useModeloNegocioWizardStore(
+    (state) => state.saveCurrentStep
   )
+  const isSaving = useModeloNegocioWizardStore((state) => state.isSaving)
 
-  function handleSaveDraft() {
+  async function handleSaveDraft() {
     onSaveDraft()
-    registrarProgreso('borrador')
+    await saveCurrentStep()
   }
 
   return (
     <div className="flex justify-between gap-3 border-t pt-6">
       {onPrevious ? (
-        <Button type="button" variant="outline" onClick={onPrevious}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPrevious}
+          disabled={isSaving}
+        >
           Anterior
         </Button>
       ) : (
         <span />
       )}
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={handleSaveDraft}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleSaveDraft}
+          disabled={isSaving}
+        >
           Guardar Borrador
         </Button>
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" disabled={isSaving}>
+          {submitLabel}
+        </Button>
       </div>
     </div>
   )

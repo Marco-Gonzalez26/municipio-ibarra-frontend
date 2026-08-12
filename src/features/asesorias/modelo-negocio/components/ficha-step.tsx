@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useEffect, useImperativeHandle } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -13,18 +13,25 @@ import { StepFooter, StepHeader, type StepHandle } from './step-shell'
 
 interface FichaStepProps {
   contexto: FichaContexto
+  analistaNombre?: string
   onNext: () => void
 }
 
 export const FichaStep = forwardRef<StepHandle, FichaStepProps>(
-  function FichaStep({ contexto, onNext }, ref) {
+  function FichaStep({ contexto, analistaNombre, onNext }, ref) {
     const updateFicha = useModeloNegocioWizardStore(
       (state) => state.updateFicha
     )
 
-    const { control, handleSubmit, getValues } = useForm<FichaForm>({
+    const { control, handleSubmit, getValues, setValue } = useForm<FichaForm>({
       defaultValues: useModeloNegocioWizardStore.getState().formData.ficha,
     })
+
+    useEffect(() => {
+      if (analistaNombre && !getValues('analista')) {
+        setValue('analista', analistaNombre)
+      }
+    }, [analistaNombre, setValue, getValues])
 
     useImperativeHandle(ref, () => ({
       saveDraft: () => updateFicha(getValues()),

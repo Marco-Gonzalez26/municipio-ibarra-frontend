@@ -139,7 +139,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
       <SidebarFooter>
         {user && (
           <SidebarMenu>
-            <SidebarMenuItem className="px-2 text-xs text-muted-foreground">
+            <SidebarMenuItem
+              className="px-2 text-xs text-muted-foreground truncate"
+              title={`Sesión: ${user.nombres}`}
+            >
               Sesión: {user.nombres}
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -152,7 +155,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
             </SidebarMenuItem>
           </SidebarMenu>
         )}
-        <div className="p-2 text-xs text-muted-foreground">
+
+        <div className="px-2 py-1 text-[10px] text-muted-foreground/70 leading-tight truncate">
           © 2026 Municipalidad de Ibarra
         </div>
       </SidebarFooter>

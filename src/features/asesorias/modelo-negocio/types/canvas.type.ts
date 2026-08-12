@@ -42,10 +42,10 @@ export interface SociosForm {
 }
 
 export interface InsumoCosto {
-  categoria: string
+  categoriaId: number | null
   descripcion: string
   cantidad: number
-  unidad: string
+  unidadId: number | null
   costoUnit: number
 }
 
@@ -55,7 +55,7 @@ export interface CostoFijo {
 }
 
 export interface InversionItem {
-  categoria: string
+  categoriaId: number | null
   descripcion: string
   costo: number
 }
@@ -65,8 +65,9 @@ export interface SupuestosProyeccion {
   costosFijos: number
   growth: number
   startUnits: number
-  varRatio: number
+  costoVariableUnitario: number
   margen: number
+  annualFixedCostIncrease: number
 }
 
 export interface CostosForm {

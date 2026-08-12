@@ -6,6 +6,7 @@ export interface FichaContexto {
   correo: string
   fechaIngreso: string
   nombreEmprendimiento: string | null
+  idSector: number | null
   sector: string | null
   direccion: string | null
 }

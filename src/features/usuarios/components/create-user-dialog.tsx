@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState, useTransition } from 'react'
+import { FormEvent, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
@@ -67,16 +67,12 @@ export function CreateUserDialog({
   const [values, setValues] = useState<UserFormValues>(createInitialValues)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-
+  function resetForm() {
+    setValues(createInitialValues())
+    setError('')
+    setShowPassword(false)
+  }
   const activeRoles = roles.filter((role) => role.activo)
-
-  useEffect(() => {
-    if (!open) {
-      setValues(createInitialValues())
-      setError('')
-      setShowPassword(false)
-    }
-  }, [open])
 
   function updateValue<K extends keyof UserFormValues>(
     field: K,
@@ -192,7 +188,7 @@ export function CreateUserDialog({
         setError(result.message)
         return
       }
-
+      resetForm()
       onOpenChange(false)
       router.refresh()
     })
@@ -202,9 +198,15 @@ export function CreateUserDialog({
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!isPending) {
-          onOpenChange(nextOpen)
+        if (isPending) {
+          return
         }
+
+        if (!nextOpen) {
+          resetForm()
+        }
+
+        onOpenChange(nextOpen)
       }}
     >
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -389,7 +391,10 @@ export function CreateUserDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                resetForm()
+                onOpenChange(false)
+              }}
               disabled={isPending}
             >
               Cancelar
