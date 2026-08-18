@@ -75,6 +75,7 @@ function formatFecha(value: string) {
   return date.toLocaleString('es-EC', {
     dateStyle: 'medium',
     timeStyle: 'short',
+    timeZone: 'America/Guayaquil',
   })
 }
 
