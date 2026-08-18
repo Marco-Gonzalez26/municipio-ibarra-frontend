@@ -509,12 +509,22 @@ function ProyeccionSection({
       )
     : 0
 
+  const margenObjetivo = Number(margen) || 0
+  const precioPorMargen =
+    margenObjetivo > 0 && margenObjetivo < 100 && costoVariableUnitario > 0
+      ? Number((costoVariableUnitario / (1 - margenObjetivo / 100)).toFixed(2))
+      : 0
+
   useEffect(() => {
-    if (Number(precio) === 0 && precioSugerido > 0) {
-      setValue('proyeccion.precio', precioSugerido)
+    if (Number(precio) === 0) {
+      if (precioPorMargen > 0) {
+        setValue('proyeccion.precio', precioPorMargen)
+      } else if (precioSugerido > 0) {
+        setValue('proyeccion.precio', precioSugerido)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [precioSugerido])
+  }, [precioPorMargen, precioSugerido])
 
   const { filas, ingresosPorAnio } = calculateFinancialProjection({
     precio: Number(precio) || 0,
@@ -616,6 +626,11 @@ function ProyeccionSection({
                 value={field.value}
                 onChange={field.onChange}
               />
+              <p className="text-xs text-muted-foreground">
+                Si el precio está en 0, se sugiere un precio que cubre los
+                costos variables y este margen. El margen neto final también
+                descuenta los costos fijos.
+              </p>
             </Field>
           )}
         />
