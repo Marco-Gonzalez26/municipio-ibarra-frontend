@@ -114,6 +114,7 @@ function mapServerSectionsToFormData(
     start_units: number
     var_ratio: number
     margen: number
+    aumento_anual_cfijos?: number
   } | null
   const fuentes = sections.fuentesIngreso as Array<{
     fuente_ingreso: string
@@ -219,7 +220,7 @@ function mapServerSectionsToFormData(
         startUnits: proj?.start_units ?? 0,
         costoVariableUnitario: proj?.var_ratio ?? 0,
         margen: proj?.margen ?? 0,
-        annualFixedCostIncrease: 0,
+        annualFixedCostIncrease: proj?.aumento_anual_cfijos ?? 0,
       },
     },
     conclusiones: {

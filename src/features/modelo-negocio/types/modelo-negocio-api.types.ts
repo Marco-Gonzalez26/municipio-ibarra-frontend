@@ -137,6 +137,7 @@ export interface ProyeccionSupuestosDTO {
   start_units: number
   var_ratio: number
   margen: number
+  aumento_anual_cfijos: number
 }
 
 export interface ConclusionesDTO {

@@ -382,6 +382,7 @@ async function saveCostos(
       start_units: proj.startUnits,
       var_ratio: proj.costoVariableUnitario,
       margen: proj.margen,
+      aumento_anual_cfijos: proj.annualFixedCostIncrease,
     },
     token
   )
