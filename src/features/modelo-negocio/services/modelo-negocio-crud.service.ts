@@ -43,6 +43,7 @@ export const modeloNegocioService = {
       `/sime/modelonegocio/${id}`,
       {
         token,
+        silent: true,
       }
     ),
 
