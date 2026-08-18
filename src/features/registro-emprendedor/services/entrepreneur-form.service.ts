@@ -1,8 +1,8 @@
 import { api } from '@/lib/https'
 
 import type {
-  FormularioReferenciaGeneral,
   FormularioReferenciaGeneralCreateDTO,
+  FormularioReferenciaGeneralUpdateDTO,
   FormularioRefSector,
   FormularioRefSectorCreateDTO,
   FormularioRefSectorListResponse,
@@ -48,14 +48,18 @@ export const entrepeneurFormService = {
 
   updateReferenciaGeneral: (
     id: number,
-    payload: Partial<
-      Pick<FormularioReferenciaGeneral, 'id_estado_emprendedor'>
-    >,
+    payload: FormularioReferenciaGeneralUpdateDTO,
     token?: string
   ) =>
     api.put<{ ok: boolean; msg: string }>(
       `/formulariosreferenciageneral/${id}`,
       { body: payload, token }
+    ),
+
+  deleteReferenciaGeneral: (id: number, token?: string) =>
+    api.delete<{ ok: boolean; msg: string }>(
+      `/formulariosreferenciageneral/${id}`,
+      { token }
     ),
 
   createRefSector: (payload: FormularioRefSectorCreateDTO, token?: string) =>
@@ -69,6 +73,11 @@ export const entrepeneurFormService = {
       `/formulariorefsector?id_formulario_ref=${idFormularioRef}`,
       { token }
     ),
+
+  deleteRefSector: (id: number, token?: string) =>
+    api.delete<{ ok: boolean; msg: string }>(`/formulariorefsector/${id}`, {
+      token,
+    }),
 
   createRefSectores: (
     idFormulario: number,
@@ -92,6 +101,24 @@ export const entrepeneurFormService = {
       body: payload,
       token,
     }),
+
+  getRefInfraestructuraByFormulario: (
+    idFormularioRef: number,
+    token?: string
+  ) =>
+    api.get<{
+      ok: boolean
+      total: number
+      formularios_ref_infraestructura: FormularioRefInfraestructura[]
+    }>(`/formulariorefinfraestructura?id_formulario_ref=${idFormularioRef}`, {
+      token,
+    }),
+
+  deleteRefInfraestructura: (id: number, token?: string) =>
+    api.delete<{ ok: boolean; msg: string }>(
+      `/formulariorefinfraestructura/${id}`,
+      { token }
+    ),
 
   createRefInfraestructuras: (
     idFormulario: number,

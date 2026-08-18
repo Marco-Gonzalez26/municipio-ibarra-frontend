@@ -1,7 +1,10 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useMemo, useState, useTransition } from 'react'
 import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { updateEmprendimientoAction } from '../actions/update-emprendimiento.action'
+import { deleteEmprendimientoAction } from '../actions/delete-emprendimiento.action'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -70,9 +73,7 @@ export function EmprendimientosTable({
   formularios,
 }: EmprendimientosTableProps) {
   const [searchTerm, setSearchTerm] = useState('')
-
-  // Edición visual hasta conectar endpoints de emprendimientos.
-  const [rows, setRows] = useState<FormularioReferenciaGeneral[]>(formularios)
+  const [, startTransition] = useTransition()
   const [selectedFormulario, setSelectedFormulario] =
     useState<FormularioReferenciaGeneral | null>(null)
   const [editingFormulario, setEditingFormulario] =
@@ -88,7 +89,7 @@ export function EmprendimientosTable({
     [entrepreneurs]
   )
 
-  const filteredRows = rows.filter((row) => {
+  const filteredRows = formularios.filter((row) => {
     const searchString = `${row.nombre_emprendimiento}`.toLowerCase()
     return searchString.includes(searchTerm.toLowerCase())
   })
@@ -98,28 +99,34 @@ export function EmprendimientosTable({
   }
 
   function handleUpdate(id: number, values: EmprendimientoFormValues) {
-    setRows((current) =>
-      current.map((row) =>
-        row.id === id
-          ? {
-              ...row,
-              id_emprendedor: values.id_emprendedor,
-              nombre_emprendimiento: values.nombre_emprendimiento,
-              id_tipo_oferta: values.id_tipo_oferta,
-              id_estado_emprendedor: values.id_estado_emprendedor,
-              codigo_pago: values.codigo_pago,
-              valor_pago_inicial: values.valor_pago_inicial,
-              notas_adicionales: values.notas_adicionales || null,
-            }
-          : row
-      )
-    )
-    setEditingFormulario(null)
+    startTransition(async () => {
+      try {
+        await updateEmprendimientoAction(id, values)
+        toast.success('Emprendimiento actualizado correctamente.')
+        setEditingFormulario(null)
+      } catch (error) {
+        toast.error('No se pudo actualizar el emprendimiento', {
+          description:
+            error instanceof Error ? error.message : 'Intente nuevamente.',
+        })
+      }
+    })
   }
 
   function handleDelete(id: number) {
-    setRows((current) => current.filter((row) => row.id !== id))
-    setDeleteFormulario(null)
+    startTransition(async () => {
+      try {
+        await deleteEmprendimientoAction(id)
+        toast.success('Emprendimiento eliminado correctamente.')
+      } catch (error) {
+        toast.error('No se pudo eliminar el emprendimiento', {
+          description:
+            error instanceof Error ? error.message : 'Intente nuevamente.',
+        })
+      } finally {
+        setDeleteFormulario(null)
+      }
+    })
   }
 
   return (
@@ -220,7 +227,7 @@ export function EmprendimientosTable({
               )
             })}
 
-            {rows.length === 0 ? (
+            {formularios.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={8}
@@ -553,11 +560,11 @@ function DeleteEmprendimientoDialog({
             Eliminar emprendimiento
           </DialogTitle>
           <DialogDescription>
-            ¿Deseas retirar de la vista el emprendimiento{' '}
+            ¿Deseas eliminar el emprendimiento{' '}
             <span className="font-semibold text-foreground">
               {formulario?.nombre_emprendimiento ?? 'seleccionado'}
             </span>
-            ? Esta acción es visual dentro del prototipo local.
+            ? Esta acción no se puede deshacer.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
