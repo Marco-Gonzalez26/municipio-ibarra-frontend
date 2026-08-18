@@ -19,6 +19,7 @@ interface RequestOptions {
   cache?: RequestCache
   tags?: string[]
   token?: string
+  silent?: boolean
 }
 
 const httpClient = async <T>(
@@ -32,6 +33,7 @@ const httpClient = async <T>(
     cache = 'default',
     tags = [],
     token,
+    silent = false,
   } = options
 
   const isFormatData = body instanceof FormData
@@ -56,10 +58,12 @@ const httpClient = async <T>(
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null)
     const message = errorBody?.msg || errorBody?.message || res.statusText
-    console.error(
-      `[API ${method}] ${endpoint} → ${res.status}`,
-      JSON.stringify(errorBody)
-    )
+    if (!silent) {
+      console.error(
+        `[API ${method}] ${endpoint} → ${res.status}`,
+        JSON.stringify(errorBody)
+      )
+    }
     throw new ApiError(message, res.status)
   }
 

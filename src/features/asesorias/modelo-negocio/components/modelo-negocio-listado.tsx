@@ -46,17 +46,23 @@ import {
   deleteModeloAction,
   changeEstadoAction,
 } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
+import { ExportModeloNegocioButton } from './export-modelo-negocio-button'
 
 const ESTADO_MAP: Record<
   number,
   {
     label: string
     variant: 'secondary' | 'default' | 'destructive' | 'outline'
+    className?: string
   }
 > = {
   1: { label: 'BORRADOR', variant: 'secondary' },
   2: { label: 'EN REVISIÓN', variant: 'outline' },
-  3: { label: 'APROBADO', variant: 'default' },
+  3: {
+    label: 'APROBADO',
+    variant: 'default',
+    className: 'bg-green-600 text-white hover:bg-green-600/80',
+  },
   4: { label: 'RECHAZADO', variant: 'destructive' },
 }
 
@@ -69,6 +75,7 @@ function formatFecha(value: string) {
   return date.toLocaleString('es-EC', {
     dateStyle: 'medium',
     timeStyle: 'short',
+    timeZone: 'America/Guayaquil',
   })
 }
 
@@ -256,7 +263,7 @@ export function ModeloNegocioListado({
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-        <Table>
+        <Table className="min-w-[52rem]">
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary *:text-center">
               <TableHead className="text-primary-foreground">
@@ -292,6 +299,7 @@ export function ModeloNegocioListado({
               const estadoInfo = ESTADO_MAP[modelo.id_estado] ?? ESTADO_MAP[1]
               const esBorrador = modelo.id_estado === 1
               const enRevision = modelo.id_estado === 2
+              const esAprobado = modelo.id_estado === 3
               return (
                 <TableRow key={modelo.id} className="text-center">
                   <TableCell className="font-medium">
@@ -302,7 +310,10 @@ export function ModeloNegocioListado({
                   </TableCell>
                   <TableCell>{modelo.analista}</TableCell>
                   <TableCell>
-                    <Badge variant={estadoInfo.variant}>
+                    <Badge
+                      variant={estadoInfo.variant}
+                      className={estadoInfo.className}
+                    >
                       {estadoInfo.label}
                     </Badge>
                   </TableCell>
@@ -361,6 +372,9 @@ export function ModeloNegocioListado({
                             Rechazar
                           </Button>
                         </>
+                      )}
+                      {esAprobado && (
+                        <ExportModeloNegocioButton modeloId={modelo.id} />
                       )}
                     </div>
                   </TableCell>
@@ -526,7 +540,10 @@ function CambiarEstadoDialog({
               {modelo?.nombre_emprendimiento ?? 'este emprendimiento'}
             </span>{' '}
             a{' '}
-            <Badge variant={estadoDestino?.variant}>
+            <Badge
+              variant={estadoDestino?.variant}
+              className={estadoDestino?.className}
+            >
               {estadoDestino?.label}
             </Badge>
             .
