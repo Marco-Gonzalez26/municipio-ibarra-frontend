@@ -263,7 +263,7 @@ export function ModeloNegocioListado({
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-        <Table>
+        <Table className="min-w-[52rem]">
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary *:text-center">
               <TableHead className="text-primary-foreground">
