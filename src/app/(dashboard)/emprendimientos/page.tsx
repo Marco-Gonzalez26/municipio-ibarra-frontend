@@ -52,10 +52,11 @@ export default async function EmprendimientosPage({
       ? formulariosRes.formularios_referencia_general
       : []
 
-    formularios = formulariosBase.filter(
+    const emprendimientos = formulariosBase.filter(
       (formulario) => formulario.tiene_emprendimiento
     )
-    total = formulariosRes.total ?? formularios.length
+    total = emprendimientos.length
+    formularios = emprendimientos.slice((page - 1) * LIMIT, page * LIMIT)
   } catch (error) {
     unstable_rethrow(error)
     console.error('No se pudieron cargar los emprendimientos', error)

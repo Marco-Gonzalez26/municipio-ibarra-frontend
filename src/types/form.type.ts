@@ -32,6 +32,19 @@ export type FormularioReferenciaGeneralCreateDTO = Omit<
   | 'fecha_registro'
 >
 
+export type FormularioReferenciaGeneralUpdateDTO = Partial<
+  Pick<
+    FormularioReferenciaGeneral,
+    | 'id_emprendedor'
+    | 'nombre_emprendimiento'
+    | 'id_tipo_oferta'
+    | 'id_estado_emprendedor'
+    | 'codigo_pago'
+    | 'valor_pago_inicial'
+    | 'notas_adicionales'
+  >
+>
+
 // Formulario Ref Sector
 
 export interface FormularioRefSector {
