@@ -22,10 +22,10 @@ export const fichaContextoService = {
     ])
 
     const formulario = idFormularioRef
-      ? formulariosRes.formularios_referencia_general.find(
+      ? (formulariosRes.formularios_referencia_general.find(
           (item) => item.id === idFormularioRef
-        ) ?? null
-      : formulariosRes.formularios_referencia_general[0] ?? null
+        ) ?? null)
+      : (formulariosRes.formularios_referencia_general[0] ?? null)
 
     let sector: string | null = null
     let idSector: number | null = null

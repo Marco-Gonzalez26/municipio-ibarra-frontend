@@ -30,11 +30,7 @@ export async function createEmprendimientoAction(
         : []
 
   await Promise.all([
-    entrepeneurFormService.createRefSectores(
-      idFormularioRef,
-      sectores,
-      token
-    ),
+    entrepeneurFormService.createRefSectores(idFormularioRef, sectores, token),
     entrepeneurFormService.createRefInfraestructuras(
       idFormularioRef,
       state.emprendimiento.recursos_disponibles,

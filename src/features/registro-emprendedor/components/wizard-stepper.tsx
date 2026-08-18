@@ -1,16 +1,16 @@
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import {
-  WIZARD_STEPS,
-  type WizardStep,
-} from '../types/wizard-form.type'
+import { WIZARD_STEPS, type WizardStep } from '../types/wizard-form.type'
 
 interface WizardStepperProps {
   currentStep: WizardStep
   steps?: { key: WizardStep; label: string }[]
 }
 
-export function WizardStepper({ currentStep, steps = WIZARD_STEPS }: WizardStepperProps) {
+export function WizardStepper({
+  currentStep,
+  steps = WIZARD_STEPS,
+}: WizardStepperProps) {
   const currentIndex = steps.findIndex((s) => s.key === currentStep)
 
   return (

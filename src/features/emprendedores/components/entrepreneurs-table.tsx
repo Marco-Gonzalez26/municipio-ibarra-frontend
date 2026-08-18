@@ -135,8 +135,7 @@ export function EntrepreneursTable({
                     {formulariosDelEmprendedor.length > 0
                       ? formulariosDelEmprendedor
                           .map(
-                            (item) =>
-                              item.nombre_emprendimiento ?? 'Sin nombre'
+                            (item) => item.nombre_emprendimiento ?? 'Sin nombre'
                           )
                           .join(', ')
                       : 'No especificado'}
