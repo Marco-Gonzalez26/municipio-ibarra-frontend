@@ -1,6 +1,7 @@
 'use client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { WizardStepper } from './wizard-stepper'
 import { useWizardStore } from '../store/wizard.store'
 import { PersonalDataStep } from './personal-data-step'
@@ -8,12 +9,6 @@ import { CurrentSituationStep } from './current-situation-step'
 import { IntentionsStep } from './intentions-step'
 import { EnterpriseStep } from './enterprise-step'
 import { TechnicalAssistanceStep } from './technical-assistance-step'
-import { entrepreneurService } from '../services/entrepreneur.service'
-import {
-  mapWizardToEntrepreneurDTO,
-  mapWizardToFormularioAsistenciaDTO,
-  mapWizardToFormularioReferenciaDTO,
-} from '../utils/wizard-form-mapper'
 import type {
   CurrentSituationCatalogs,
   EnterpriseCatalogs,
@@ -22,7 +17,6 @@ import type {
   TechnicalAssistanceCatalogs,
 } from '../types/props.type'
 import { PaymentStep } from './payment-step'
-import { entrepeneurFormService } from '../services/entrepreneur-form.service'
 import { createEntrepreneurAction } from '../actions/create-entrepeneur-and-enterprise-action'
 
 interface RegisterWizardProps {
@@ -41,10 +35,16 @@ export function RegisterWizard({
   intentionsCatalogs,
   enterpriseCatalogs,
 }: RegisterWizardProps) {
+  const resetForMode = useWizardStore((state) => state.resetForMode)
   const currentStep = useWizardStore((state) => state.currentStep)
   const goToNextStep = useWizardStore((state) => state.goToNextStep)
   const goToPreviousStep = useWizardStore((state) => state.goToPreviousStep)
   const router = useRouter()
+
+  useEffect(() => {
+    resetForMode('registro')
+  }, [resetForMode])
+
   async function onFinish() {
     const state = useWizardStore.getState().formData
 

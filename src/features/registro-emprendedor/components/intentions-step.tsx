@@ -147,9 +147,6 @@ export function IntentionsStep({
           Anterior
         </Button>
         <div className="flex gap-3">
-          <Button type="button" variant="outline">
-            Guardar Borrador
-          </Button>
           <Button type="submit">Siguiente</Button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 export interface FichaContexto {
   idEmprendedor: number
+  idFormularioRef: number | null
   nombreEmprendedor: string
   cedula: string
   contacto: string
@@ -19,6 +20,7 @@ export interface FichaForm {
 }
 
 export interface EmprendimientoOpcion {
+  idFormularioRef: number
   idEmprendedor: number
   nombreEmprendedor: string
   cedula: string
