@@ -621,9 +621,6 @@ export function PersonalDataStep({
           Anterior
         </Button>
         <div className="flex justify-end gap-3 border-t pt-6">
-          <Button type="button" variant="outline">
-            Guardar Borrador
-          </Button>
           <Button type="submit">Siguiente</Button>
         </div>
       </div>

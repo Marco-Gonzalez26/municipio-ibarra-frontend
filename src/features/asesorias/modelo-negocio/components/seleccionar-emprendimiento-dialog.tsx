@@ -38,9 +38,11 @@ export function SeleccionarEmprendimientoDialog({
     )
   }, [emprendimientos, busqueda])
 
-  function seleccionar(idEmprendedor: number) {
+  function seleccionar(idEmprendedor: number, idFormularioRef: number) {
     onOpenChange(false)
-    router.push(`/asesorias/modelo-negocio?id=${idEmprendedor}`)
+    router.push(
+      `/asesorias/modelo-negocio?id=${idEmprendedor}&formularioRef=${idFormularioRef}`
+    )
   }
 
   return (
@@ -64,9 +66,11 @@ export function SeleccionarEmprendimientoDialog({
         <div className="max-h-96 space-y-2 overflow-y-auto">
           {filtrados.map((opcion) => (
             <button
-              key={opcion.idEmprendedor}
+              key={opcion.idFormularioRef}
               type="button"
-              onClick={() => seleccionar(opcion.idEmprendedor)}
+              onClick={() =>
+                seleccionar(opcion.idEmprendedor, opcion.idFormularioRef)
+              }
               className="flex w-full items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
             >
               <div className="min-w-0">

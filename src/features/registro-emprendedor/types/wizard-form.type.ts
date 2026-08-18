@@ -84,12 +84,24 @@ export type WizardStep =
   | 'emprendimiento'
   | 'asistencia-tecnica'
 
+export type WizardMode = 'registro' | 'emprendimiento-existente'
+
 export const WIZARD_STEPS: { key: WizardStep; label: string }[] = [
   { key: 'pago', label: 'Pago' },
 
   { key: 'datos-personales', label: 'Datos Personales' },
   { key: 'situacion-actual', label: 'Situación Actual' },
   { key: 'intenciones', label: 'Intenciones' },
+  { key: 'emprendimiento', label: 'Emprendimiento' },
+  { key: 'asistencia-tecnica', label: 'Asistencia Técnica' },
+]
+
+export const EXISTING_ENTREPRENEUR_STEPS: {
+  key: WizardStep
+  label: string
+}[] = [
+  { key: 'pago', label: 'Pago' },
+  { key: 'intenciones', label: 'Sectores' },
   { key: 'emprendimiento', label: 'Emprendimiento' },
   { key: 'asistencia-tecnica', label: 'Asistencia Técnica' },
 ]

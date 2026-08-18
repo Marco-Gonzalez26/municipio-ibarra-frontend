@@ -168,9 +168,6 @@ export function TechnicalAssistanceStep({
           Anterior
         </Button>
         <div className="flex gap-3">
-          <Button type="button" variant="outline">
-            Guardar Borrador
-          </Button>
           <Button type="submit" disabled={isSubmitting}>
             <Send className="size-4" />
             {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
