@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Building2 } from 'lucide-react'
+import { Users, TrendingUp } from 'lucide-react'
 
 const features = [
   {
@@ -12,12 +12,6 @@ const features = [
     title: 'Asesoría Técnica',
     description:
       'Accede a asesoramiento en gestión de negocios, marketing, producción y más para impulsar tu emprendimiento.',
-  },
-  {
-    icon: Building2,
-    title: 'Seguimiento',
-    description:
-      'Monitorea el estado de tu solicitud y mantente informado sobre las oportunidades disponibles.',
   },
 ]
 

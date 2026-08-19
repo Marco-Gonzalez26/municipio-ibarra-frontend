@@ -6,20 +6,26 @@ import type { FichaContexto } from '../types/ficha.type'
 export const fichaContextoService = {
   getByEmprendedorId: async (
     idEmprendedor: number,
-    token: string
+    token: string,
+    idFormularioRef?: number
   ): Promise<FichaContexto> => {
+    const formularioLimit = idFormularioRef ? 500 : 1
     const [emprendedor, formulariosRes, sectoresCatalogo] = await Promise.all([
       entrepreneurService.getById(idEmprendedor, token),
       entrepeneurFormService.getAllReferenciaGeneral(
         1,
-        1,
+        formularioLimit,
         token,
         idEmprendedor
       ),
       catalogService.getEnterpriseSector(token),
     ])
 
-    const formulario = formulariosRes.formularios_referencia_general[0] ?? null
+    const formulario = idFormularioRef
+      ? (formulariosRes.formularios_referencia_general.find(
+          (item) => item.id === idFormularioRef
+        ) ?? null)
+      : (formulariosRes.formularios_referencia_general[0] ?? null)
 
     let sector: string | null = null
     let idSector: number | null = null
@@ -42,6 +48,7 @@ export const fichaContextoService = {
 
     return {
       idEmprendedor: emprendedor.id,
+      idFormularioRef: formulario?.id ?? null,
       nombreEmprendedor: emprendedor.nombres_apellidos,
       cedula: emprendedor.cedula,
       contacto: emprendedor.celular,
