@@ -19,7 +19,6 @@ export const Footer = () => {
             <li>Inicio</li>
             <li>Registro Simple</li>
             <li>Asesoría Técnica</li>
-            <li>Consultar Solicitud</li>
           </ul>
         </div>
 

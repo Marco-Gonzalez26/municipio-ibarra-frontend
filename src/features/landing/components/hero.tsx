@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Session } from '@/features/auth/types/auth.type'
-import { LayoutDashboard, LogIn, Search, UserPlus } from 'lucide-react'
+import { LayoutDashboard, LogIn, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 
 interface HeroProps {
@@ -52,23 +52,6 @@ export function Hero({ session }: HeroProps) {
               </Button>
             </Link>
           )}
-        </div>
-
-        <div className="mx-auto mt-12 max-w-md rounded-xl border bg-card p-6 text-left shadow-sm">
-          <h3 className="font-semibold text-card-foreground">
-            ¿Ya tienes una solicitud?
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Consulta el estado de tu solicitud de registro o asesoría.
-          </p>
-          <Button
-            variant="secondary"
-            className="mt-4 w-full hover:cursor-pointer"
-            size="lg"
-          >
-            <Search className="size-4" />
-            Consultar Estado de Solicitud
-          </Button>
         </div>
       </div>
     </section>
