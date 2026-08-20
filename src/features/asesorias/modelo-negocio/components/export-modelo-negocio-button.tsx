@@ -84,9 +84,10 @@ export function ExportModeloNegocioButton({
             <title>${fileName}</title>
             <style>
               body { margin: 0; padding: 0; }
-              @page { size: A4; margin: 0; }
+              @page { size: A4; margin: 1mm; }
               @media print {
-                body { margin: 0; }
+                body, .docx-wrapper { background: white !important; }
+                .docx-wrapper > section.docx { box-shadow: none !important; margin-bottom: 0 !important; }
                 .docx-wrapper > section.docx > article { transform: scale(0.97); transform-origin: top center; }
               }
               .docx-wrapper > section.docx { page-break-after: always; break-after: page; }
