@@ -86,6 +86,8 @@ export function ExportModeloNegocioButton({
               body { margin: 0; padding: 0; }
               @page { size: A4; margin: 0; }
               @media print { body { margin: 0; } }
+              .docx-wrapper > section.docx { page-break-after: always; break-after: page; }
+              .docx-wrapper > section.docx:last-child { page-break-after: auto; break-after: auto; }
             </style>
           </head>
           <body>
@@ -103,6 +105,7 @@ export function ExportModeloNegocioButton({
             renderAsync(blob, container, undefined, {
               breakPages: true,
               inWrapper: true,
+              hideWrapperOnPrint: true,
             }).then(() => {
               setTimeout(() => {
                 printWindow.print()
