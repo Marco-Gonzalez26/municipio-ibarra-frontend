@@ -84,7 +84,7 @@ export function ExportModeloNegocioButton({
             <title>${fileName}</title>
             <style>
               body { margin: 0; padding: 0; }
-              @page { size: A4; margin: 1mm; }
+              @page { size: A4; margin: 0; }
               @media print {
                 body, .docx-wrapper { background: white !important; }
                 .docx-wrapper > section.docx { box-shadow: none !important; margin-bottom: 0 !important; }

@@ -23,10 +23,10 @@ const NAVY = '2E4057'
 const ALT_ROW = 'F0F4F8'
 const RED = 'CC0000'
 
-const PAGE_TOP = convertInchesToTwip(0.8)
-const PAGE_BOTTOM = convertInchesToTwip(0.8)
-const PAGE_LEFT = convertInchesToTwip(1.2)
-const PAGE_RIGHT = convertInchesToTwip(0.8)
+const PAGE_TOP = convertInchesToTwip(1)
+const PAGE_BOTTOM = convertInchesToTwip(1)
+const PAGE_LEFT = convertInchesToTwip(1)
+const PAGE_RIGHT = convertInchesToTwip(1)
 
 const NOTA =
   'Nota: Elaboración propia con información proporcionada por el emprendedor'
