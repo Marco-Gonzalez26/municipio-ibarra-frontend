@@ -4,6 +4,8 @@ import type { LucideIcon } from 'lucide-react'
 export interface ReportFilters {
   desde?: string
   hasta?: string
+  emprendedorId?: string
+  formularioId?: string
 }
 
 export interface ReportSummaryItem {
@@ -21,6 +23,13 @@ export interface ReportColumn {
   accessor: (row: unknown) => string
 }
 
+export interface ReportEntitySelector {
+  paramName: string
+  label: string
+  placeholder: string
+  fetchOptions: (token: string) => Promise<{ value: string; label: string }[]>
+}
+
 export interface ReportDefinition {
   slug: string
   title: string
@@ -33,6 +42,9 @@ export interface ReportDefinition {
   breakdowns?: (rows: unknown[], token: string) => Promise<ReportBreakdown[]>
   // Columnas de la tabla detallada. Si no se define, el PDF omite esa sección.
   columns?: ReportColumn[]
+  // Selector de entidad (ej. emprendedor específico). Si existe, la página
+  // de filtros muestra un Select con las opciones.
+  entitySelector?: ReportEntitySelector
 }
 
 export interface ReportDetail {
