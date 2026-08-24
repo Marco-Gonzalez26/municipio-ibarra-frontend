@@ -127,7 +127,12 @@ export function UsersTable({ users, roles }: UsersTableProps) {
                     {isBlocked ? (
                       <Badge variant="destructive">BLOQUEADO</Badge>
                     ) : isActive ? (
-                      <Badge variant="default">ACTIVO</Badge>
+                      <Badge
+                        variant="default"
+                        className="bg-green-600 text-white hover:bg-green-600/80"
+                      >
+                        ACTIVO
+                      </Badge>
                     ) : (
                       <Badge variant="secondary">INACTIVO</Badge>
                     )}

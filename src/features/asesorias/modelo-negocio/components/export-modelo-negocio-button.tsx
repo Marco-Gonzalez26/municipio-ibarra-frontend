@@ -145,6 +145,7 @@ export function ExportModeloNegocioButton({
       <Button
         type="button"
         size="sm"
+        className="bg-blue-600 text-white hover:bg-blue-600/90"
         onClick={handleExportPdf}
         disabled={disabled || isPdfGenerating}
       >
