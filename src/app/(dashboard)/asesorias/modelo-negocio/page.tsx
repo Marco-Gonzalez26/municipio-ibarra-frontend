@@ -20,21 +20,22 @@ const LIMIT_EMPRENDIMIENTOS = 200
 const LIMIT_MODELOS = 200
 
 interface ModeloNegocioPageProps {
-  searchParams: Promise<{ id?: string }>
+  searchParams: Promise<{ id?: string; formularioRef?: string }>
 }
 
 export default async function ModeloNegocioPage({
   searchParams,
 }: ModeloNegocioPageProps) {
-  const { id } = await searchParams
+  const { id, formularioRef } = await searchParams
   const session = await requireSession()
 
   // If id is provided, try to load the modelo and its context
   let modeloNegocioId: number | null = null
   let contexto: FichaContexto | null = null
   let emprendedorId: number | null = null
+  const parsedFormularioRef = formularioRef ? Number(formularioRef) : null
 
-  if (id) {
+  if (id && !parsedFormularioRef) {
     const parsedId = Number(id)
 
     // First, try to fetch as a modelo_negocio ID
@@ -86,6 +87,7 @@ export default async function ModeloNegocioPage({
           if (emprendedor) {
             contexto = {
               idEmprendedor: emprendedor.id,
+              idFormularioRef: matchingFormulario.id,
               nombreEmprendedor: emprendedor.nombres_apellidos,
               cedula: emprendedor.cedula,
               contacto: emprendedor.celular,
@@ -115,6 +117,22 @@ export default async function ModeloNegocioPage({
         unstable_rethrow(error)
         console.error('No se pudo cargar la ficha del emprendedor', error)
       }
+    }
+  }
+
+  if (id && parsedFormularioRef) {
+    emprendedorId = Number(id)
+    try {
+      contexto = await withSessionRedirect(() =>
+        fichaContextoService.getByEmprendedorId(
+          emprendedorId!,
+          session.token,
+          parsedFormularioRef
+        )
+      )
+    } catch (error) {
+      unstable_rethrow(error)
+      console.error('No se pudo cargar el formulario seleccionado', error)
     }
   }
 
@@ -157,6 +175,7 @@ export default async function ModeloNegocioPage({
         .map((formulario) => {
           const emprendedor = entrepreneursById.get(formulario.id_emprendedor)
           return {
+            idFormularioRef: formulario.id,
             idEmprendedor: formulario.id_emprendedor,
             nombreEmprendedor: emprendedor?.nombres_apellidos ?? 'Sin nombre',
             cedula: emprendedor?.cedula ?? '-',

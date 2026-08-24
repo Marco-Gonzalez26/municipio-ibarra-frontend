@@ -4,14 +4,18 @@ import { WIZARD_STEPS, type WizardStep } from '../types/wizard-form.type'
 
 interface WizardStepperProps {
   currentStep: WizardStep
+  steps?: { key: WizardStep; label: string }[]
 }
 
-export function WizardStepper({ currentStep }: WizardStepperProps) {
-  const currentIndex = WIZARD_STEPS.findIndex((s) => s.key === currentStep)
+export function WizardStepper({
+  currentStep,
+  steps = WIZARD_STEPS,
+}: WizardStepperProps) {
+  const currentIndex = steps.findIndex((s) => s.key === currentStep)
 
   return (
     <div className="flex items-center justify-between">
-      {WIZARD_STEPS.map((step, index) => {
+      {steps.map((step, index) => {
         const isCompleted = index < currentIndex
         const isActive = index === currentIndex
         const isLast = index === WIZARD_STEPS.length - 1

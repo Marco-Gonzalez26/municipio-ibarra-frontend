@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, Pencil, Check, X, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Check, X, Trash2, Building2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -70,8 +70,12 @@ export function EntrepreneursTable({
     return searchString.includes(searchTerm.toLowerCase())
   })
 
+  function getFormularios(idEmprendedor: number) {
+    return formularios.filter((f) => f.id_emprendedor === idEmprendedor)
+  }
+
   function getFormulario(idEmprendedor: number) {
-    return formularios.find((f) => f.id_emprendedor === idEmprendedor) ?? null
+    return getFormularios(idEmprendedor)[0] ?? null
   }
 
   function handleView(entrepreneur: Emprendedor) {
@@ -115,6 +119,7 @@ export function EntrepreneursTable({
           <TableBody>
             {filteredEntrepeneurs.map((entrepreneur) => {
               const formulario = getFormulario(entrepreneur.id)
+              const formulariosDelEmprendedor = getFormularios(entrepreneur.id)
               const estadoId = formulario?.id_estado_emprendedor ?? 1
               const estado = ESTADO_MAP[estadoId]
               const isTerminal = estadoId === 3 || estadoId === 4
@@ -132,7 +137,13 @@ export function EntrepreneursTable({
                   <TableCell>{entrepreneur.nombres_apellidos}</TableCell>
                   <TableCell>{entrepreneur.cedula}</TableCell>
                   <TableCell>
-                    {formulario?.nombre_emprendimiento ?? 'No especificado'}
+                    {formulariosDelEmprendedor.length > 0
+                      ? formulariosDelEmprendedor
+                          .map(
+                            (item) => item.nombre_emprendimiento ?? 'Sin nombre'
+                          )
+                          .join(', ')
+                      : 'No especificado'}
                   </TableCell>
                   <TableCell>
                     <Badge variant={estado.variant} className={estado.className}>
@@ -142,6 +153,19 @@ export function EntrepreneursTable({
                   <TableCell>{fecha}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Añadir emprendimiento"
+                        aria-label={`Añadir emprendimiento a ${entrepreneur.nombres_apellidos}`}
+                        onClick={() =>
+                          router.push(
+                            `/emprendedores/${entrepreneur.id}/emprendimiento/nuevo`
+                          )
+                        }
+                      >
+                        <Building2 className="size-4 text-primary" />
+                      </Button>
                       <Button
                         size="icon"
                         variant="ghost"
