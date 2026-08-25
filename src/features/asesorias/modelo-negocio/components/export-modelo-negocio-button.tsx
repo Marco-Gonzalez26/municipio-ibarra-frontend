@@ -85,7 +85,13 @@ export function ExportModeloNegocioButton({
             <style>
               body { margin: 0; padding: 0; }
               @page { size: A4; margin: 0; }
-              @media print { body { margin: 0; } }
+              @media print {
+                body, .docx-wrapper { background: white !important; }
+                .docx-wrapper > section.docx { box-shadow: none !important; margin-bottom: 0 !important; }
+                .docx-wrapper > section.docx > article { transform: scale(0.97); transform-origin: top center; }
+              }
+              .docx-wrapper > section.docx { page-break-after: always; break-after: page; }
+              .docx-wrapper > section.docx:last-child { page-break-after: auto; break-after: auto; }
             </style>
           </head>
           <body>
@@ -103,6 +109,7 @@ export function ExportModeloNegocioButton({
             renderAsync(blob, container, undefined, {
               breakPages: true,
               inWrapper: true,
+              hideWrapperOnPrint: true,
             }).then(() => {
               setTimeout(() => {
                 printWindow.print()
@@ -138,6 +145,7 @@ export function ExportModeloNegocioButton({
       <Button
         type="button"
         size="sm"
+        className="bg-blue-600 text-white hover:bg-blue-600/90"
         onClick={handleExportPdf}
         disabled={disabled || isPdfGenerating}
       >

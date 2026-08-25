@@ -35,11 +35,16 @@ const ESTADO_MAP: Record<
   {
     label: string
     variant: 'default' | 'secondary' | 'destructive' | 'outline'
+    className?: string
   }
 > = {
   1: { label: 'INGRESADO', variant: 'secondary' },
   2: { label: 'PENDIENTE', variant: 'outline' },
-  3: { label: 'APROBADO', variant: 'default' },
+  3: {
+    label: 'APROBADO',
+    variant: 'default',
+    className: 'bg-green-600 text-white hover:bg-green-600/80',
+  },
   4: { label: 'RECHAZADO', variant: 'destructive' },
 }
 
@@ -188,7 +193,9 @@ export function EmprendimientosTable({
                     {getTipoOferta(formulario.id_tipo_oferta)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={estado.variant}>{estado.label}</Badge>
+                    <Badge variant={estado.variant} className={estado.className}>
+                      {estado.label}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     {formatDate(formulario.fecha_formulario)}
