@@ -29,6 +29,8 @@ export async function GET(request: Request, { params }: RouteParams) {
   const filters = {
     desde: parseDateParam(searchParams.get('desde')),
     hasta: parseDateParam(searchParams.get('hasta')),
+    emprendedorId: searchParams.get('emprendedorId') ?? undefined,
+    formularioId: searchParams.get('formularioId') ?? undefined,
   }
 
   let payload

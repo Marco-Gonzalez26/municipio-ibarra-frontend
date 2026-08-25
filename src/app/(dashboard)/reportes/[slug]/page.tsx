@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { requireSession } from '@/features/auth/services/session.service'
+import { getSession, requireSession } from '@/features/auth/services/session.service'
 import { getReportDefinition } from '@/features/reportes/config/reports.config'
 import { ReportFiltersForm } from '@/features/reportes/components/report-filters-form'
 
@@ -17,6 +17,27 @@ export default async function ReportPage({ params }: ReportPageProps) {
   const report = getReportDefinition(slug)
   if (!report) {
     notFound()
+  }
+
+  let entityOptions: { value: string; label: string }[] | undefined
+  let entitySelector:
+    | { paramName: string; label: string; placeholder: string }
+    | undefined
+
+  if (report.entitySelector) {
+    const session = await getSession()
+    if (session) {
+      try {
+        entityOptions = await report.entitySelector.fetchOptions(session.token)
+      } catch {
+        entityOptions = []
+      }
+    }
+    entitySelector = {
+      paramName: report.entitySelector.paramName,
+      label: report.entitySelector.label,
+      placeholder: report.entitySelector.placeholder,
+    }
   }
 
   return (
@@ -36,7 +57,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
         <p className="text-sm text-muted-foreground">{report.description}</p>
 
-        <ReportFiltersForm slug={report.slug} />
+        <ReportFiltersForm
+          slug={report.slug}
+          entitySelector={entitySelector}
+          entityOptions={entityOptions}
+        />
       </div>
     </>
   )

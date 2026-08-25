@@ -1,4 +1,4 @@
-import { Store, Users } from 'lucide-react'
+import { FileText, Store, User, Users } from 'lucide-react'
 import { api } from '@/lib/https'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
@@ -162,6 +162,215 @@ export const REPORTS: ReportDefinition[] = [
         header: 'Fecha de registro',
         accessor: (row) =>
           toLocalDate((row as FormularioEmprendimiento).fecha_registro),
+      },
+    ],
+  },
+  {
+    slug: 'emprendedor-detalle',
+    title: 'Reporte por Emprendedor',
+    description: 'Ficha completa del emprendedor y sus emprendimientos.',
+    icon: User,
+    entitySelector: {
+      paramName: 'emprendedorId',
+      label: 'Emprendedor',
+      placeholder: 'Seleccionar emprendedor',
+      fetchOptions: async (token) => {
+        const emprendedores = await fetchAllEmprendedores(token)
+        return emprendedores.map((e) => ({
+          value: String(e.id),
+          label: `${e.nombres_apellidos} — ${e.cedula}`,
+        }))
+      },
+    },
+    fetchRows: async (filters, token) => {
+      const emprendedorId = Number(filters.emprendedorId)
+      if (!emprendedorId) return []
+
+      const [emprendedor, formulariosRaw] = await Promise.all([
+        entrepreneurService.getById(emprendedorId, token),
+        fetchAllPages<FormularioReferenciaGeneral>((page, limit) =>
+          entrepeneurFormService
+            .getAllReferenciaGeneral(page, limit, token, emprendedorId)
+            .then((res) => ({
+              total: res.total,
+              items: res.formularios_referencia_general,
+            }))
+        ),
+      ])
+
+      const formularios = formulariosRaw.filter((f) =>
+        isWithinDateRange(f.fecha_registro, filters.desde, filters.hasta)
+      )
+
+      const emprendimientos = formularios.filter((f) => f.tiene_emprendimiento)
+
+      // One row per emprendimiento; if none, one row with just emprendedor data
+      if (emprendimientos.length === 0) {
+        return [
+          {
+            emprendedor,
+            nombre_emprendimiento: 'Sin emprendimientos',
+            tiene_emprendimiento: false,
+            fecha_registro: emprendedor.fecha_registro,
+            emprendedorId,
+          },
+        ]
+      }
+
+      return emprendimientos.map((f) => ({
+        ...f,
+        emprendedor,
+        emprendedorId,
+      }))
+    },
+    summarize: (rows) => {
+      const emprendimientos = (rows as { tiene_emprendimiento: boolean }[]).filter(
+        (r) => r.tiene_emprendimiento
+      ).length
+      return [
+        { label: 'Total de emprendimientos', value: emprendimientos },
+        { label: 'Total de formularios', value: rows.length },
+      ]
+    },
+    columns: [
+      {
+        header: 'Emprendedor',
+        accessor: (row) => (row as { emprendedor: Emprendedor }).emprendedor?.nombres_apellidos ?? '—',
+      },
+      { header: 'Cédula', accessor: (row) => (row as { emprendedor: Emprendedor }).emprendedor?.cedula ?? '—' },
+      {
+        header: 'Emprendimiento',
+        accessor: (row) => (row as FormularioReferenciaGeneral).nombre_emprendimiento ?? 'Sin nombre',
+      },
+      {
+        header: 'Estado',
+        accessor: (row) => {
+          const estadoMap: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
+          return estadoMap[(row as FormularioReferenciaGeneral).id_estado_emprendedor] ?? '—'
+        },
+      },
+      {
+        header: 'Fecha de registro',
+        accessor: (row) => toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
+      },
+    ],
+  },
+  {
+    slug: 'emprendimiento-detalle',
+    title: 'Reporte por Emprendimiento',
+    description: 'Contexto, estado, fecha y formularios del emprendimiento.',
+    icon: FileText,
+    entitySelector: {
+      paramName: 'formularioId',
+      label: 'Emprendimiento',
+      placeholder: 'Seleccionar emprendimiento',
+      fetchOptions: async (token) => {
+        const [formularios, emprendedores] = await Promise.all([
+          fetchAllPages<FormularioReferenciaGeneral>((page, limit) =>
+            entrepeneurFormService
+              .getAllReferenciaGeneral(page, limit, token)
+              .then((res) => ({
+                total: res.total,
+                items: res.formularios_referencia_general,
+              }))
+          ),
+          fetchAllEmprendedores(token),
+        ])
+
+        const nombreMap = new Map(emprendedores.map((e) => [e.id, e.nombres_apellidos]))
+
+        return formularios
+          .filter((f) => f.tiene_emprendimiento)
+          .map((f) => ({
+            value: String(f.id),
+            label: `${f.nombre_emprendimiento ?? 'Sin nombre'} — ${nombreMap.get(f.id_emprendedor) ?? 'Sin emprendedor'}`,
+          }))
+      },
+    },
+    fetchRows: async (filters, token) => {
+      const formularioId = Number(filters.formularioId)
+      if (!formularioId) return []
+
+      const [formularios, emprendedores] = await Promise.all([
+        fetchAllPages<FormularioReferenciaGeneral>((page, limit) =>
+          entrepeneurFormService
+            .getAllReferenciaGeneral(page, limit, token)
+            .then((res) => ({
+              total: res.total,
+              items: res.formularios_referencia_general,
+            }))
+        ),
+        fetchAllEmprendedores(token),
+      ])
+
+      const nombreMap = new Map(emprendedores.map((e) => [e.id, e.nombres_apellidos]))
+
+      const formulario = formularios.find((f) => f.id === formularioId)
+      if (!formulario) return []
+
+      if (!isWithinDateRange(formulario.fecha_registro, filters.desde, filters.hasta)) {
+        return []
+      }
+
+      // Enrich with emprendedor name and sector context
+      const sectorForms = await fetchAllFormularioSectores(token)
+      const sectoresDelFormulario = sectorForms.filter(
+        (sf) => sf.id_formulario_ref === formularioId
+      )
+
+      let sectorLabel = 'Sin sector'
+      if (sectoresDelFormulario.length > 0) {
+        try {
+          const sectoresRes = await api.get<CatalogoResponse>('/catsectoremprendimiento', { token })
+          const sectorNames = sectoresDelFormulario
+            .map((sf) => sectoresRes.data.find((c) => c.id === sf.id_sector)?.descripcion)
+            .filter(Boolean)
+          if (sectorNames.length > 0) sectorLabel = sectorNames.join(', ')
+        } catch {
+          // keep default
+        }
+      }
+
+      return [
+        {
+          ...formulario,
+          nombre_emprendedor: nombreMap.get(formulario.id_emprendedor) ?? 'Sin especificar',
+          sector: sectorLabel,
+        },
+      ]
+    },
+    summarize: (rows) => {
+      if (rows.length === 0) return [{ label: 'Registros encontrados', value: 0 }]
+      const row = rows[0] as FormularioReferenciaGeneral & { sector: string }
+      const estadoMap: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
+      return [
+        { label: `Estado: ${estadoMap[row.id_estado_emprendedor] ?? '—'}`, value: 1 },
+        { label: `Sector: ${row.sector}`, value: 1 },
+      ]
+    },
+    columns: [
+      {
+        header: 'Emprendimiento',
+        accessor: (row) => (row as FormularioReferenciaGeneral).nombre_emprendimiento ?? 'Sin nombre',
+      },
+      {
+        header: 'Emprendedor',
+        accessor: (row) => (row as { nombre_emprendedor: string }).nombre_emprendedor,
+      },
+      {
+        header: 'Contexto (sector)',
+        accessor: (row) => (row as { sector: string }).sector,
+      },
+      {
+        header: 'Estado',
+        accessor: (row) => {
+          const m: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
+          return m[(row as FormularioReferenciaGeneral).id_estado_emprendedor] ?? '—'
+        },
+      },
+      {
+        header: 'Fecha de registro',
+        accessor: (row) => toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
       },
     ],
   },
