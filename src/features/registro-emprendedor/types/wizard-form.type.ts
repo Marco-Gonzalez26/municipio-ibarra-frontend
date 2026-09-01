@@ -65,6 +65,7 @@ export interface EmprendimientoForm {
 export interface AsistenciaTecnicaForm {
   areas_asistencia: number[]
   observaciones: string
+  tasa_cancelada: boolean | null
 }
 
 export interface RegistroEmprendedorState {
