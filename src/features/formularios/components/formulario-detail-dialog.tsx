@@ -147,7 +147,7 @@ export function FormularioDetailDialog({
                 <div>
                   <p className="text-muted-foreground">Tasa cancelada</p>
                   <p className="font-medium">
-                    {(formulario as FormularioAsistenciaTecnica).tasa_cancelada
+                    {Boolean((formulario as FormularioAsistenciaTecnica).tasa_cancelada)
                       ? 'Sí'
                       : 'No'}
                   </p>
