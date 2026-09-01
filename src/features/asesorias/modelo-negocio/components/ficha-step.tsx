@@ -121,13 +121,21 @@ export const FichaStep = forwardRef<StepHandle, FichaStepProps>(
           <Controller
             name="analista"
             control={control}
-            rules={{ required: 'El analista responsable es obligatorio' }}
+            rules={{
+              required: 'El analista responsable es obligatorio',
+              validate: (v) =>
+                v.trim().includes(' ') || 'Debe incluir nombre y apellido',
+            }}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>
                   Analista responsable *
                 </FieldLabel>
-                <Input {...field} id={field.name} />
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder="Nombre y apellido"
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

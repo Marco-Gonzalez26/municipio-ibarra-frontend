@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Toaster } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const interSans = Inter({
@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" className={`${interSans.className}  h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         {children}
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="top-right" theme="light" />
       </body>
     </html>
   )

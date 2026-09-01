@@ -10,6 +10,7 @@ import { ModeloNegocioListado } from '@/features/asesorias/modelo-negocio/compon
 import { ModeloNegocioWizard } from '@/features/asesorias/modelo-negocio/components/modelo-negocio-wizard'
 import { fichaContextoService } from '@/features/asesorias/modelo-negocio/services/ficha-contexto.service'
 import { modeloNegocioService } from '@/features/modelo-negocio/services/modelo-negocio-crud.service'
+import { userService } from '@/features/usuarios/services/user.service'
 import type {
   FichaContexto,
   EmprendimientoOpcion,
@@ -189,6 +190,17 @@ export default async function ModeloNegocioPage({
     }
   }
 
+  let analistaNombre = session.usuario.nombres
+  try {
+    const usuario = await withSessionRedirect(() =>
+      userService.getById(session.usuario.id, session.token)
+    )
+    const fullName = `${usuario.nombres} ${usuario.apellidos}`.trim()
+    if (fullName) analistaNombre = fullName
+  } catch {
+    // fallback to session nombres if user fetch fails
+  }
+
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -202,7 +214,7 @@ export default async function ModeloNegocioPage({
             idEmprendedor={emprendedorId}
             contexto={contexto}
             modeloNegocioId={modeloNegocioId}
-            analistaNombre={session.usuario.nombres}
+            analistaNombre={analistaNombre}
           />
         ) : (
           <ModeloNegocioListado
