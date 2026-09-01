@@ -33,9 +33,15 @@ export const Login = ({ redirect_url }: LoginProps) => {
       const redirectUrl = redirect_url ?? '/inicio'
       router.push(redirectUrl)
     } catch (error) {
+      const isAuthError =
+        error instanceof Error &&
+        'status' in error &&
+        ((error as { status: number }).status === 401 ||
+          (error as { status: number }).status === 403)
       toast.error('No se pudo iniciar sesión', {
-        description:
-          error instanceof Error
+        description: isAuthError
+          ? 'Credenciales inválidas, verifique su usuario y contraseña.'
+          : error instanceof Error
             ? error.message
             : 'Intente nuevamente más tarde.',
       })

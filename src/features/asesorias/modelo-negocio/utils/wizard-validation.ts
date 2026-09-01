@@ -12,7 +12,8 @@ const STEP_VALIDATORS: Record<
   ficha: ({ ficha }) =>
     hasText(ficha.numeroTramite) &&
     hasText(ficha.productoLinea) &&
-    hasText(ficha.analista),
+    hasText(ficha.analista) &&
+    ficha.analista.trim().includes(' '),
   introduccion: ({ introduccion }) =>
     hasText(introduccion.introduccion) && hasText(introduccion.importancia),
   antecedentes: ({ antecedentes }) => hasText(antecedentes.antecedentes),
