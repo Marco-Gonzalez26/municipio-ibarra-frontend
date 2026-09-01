@@ -51,9 +51,7 @@ Si necesitas cruzar datos de otro endpoint (join), hazlo aquí mismo y devuelve 
 Recibe las filas que devolvió `fetchRows` (tipadas como `unknown[]`, hay que castear) y retorna una lista de `{ label, value }`. Puede tener más de un ítem si quieres mostrar varios totales.
 
 ```ts
-summarize: (rows) => [
-  { label: 'Total de registros', value: rows.length },
-]
+summarize: (rows) => [{ label: 'Total de registros', value: rows.length }]
 ```
 
 ## `breakdowns` (opcional): desglose por categoría
@@ -80,7 +78,10 @@ Arreglo de `{ header: string; accessor: (row: unknown) => string }`. Cada `acces
 ```ts
 columns: [
   { header: 'Nombre', accessor: (row) => (row as MiTipo).nombre },
-  { header: 'Fecha', accessor: (row) => toLocalDate((row as MiTipo).fecha_registro) },
+  {
+    header: 'Fecha',
+    accessor: (row) => toLocalDate((row as MiTipo).fecha_registro),
+  },
 ]
 ```
 

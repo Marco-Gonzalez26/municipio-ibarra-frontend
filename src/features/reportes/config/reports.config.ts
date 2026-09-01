@@ -55,7 +55,11 @@ export const REPORTS: ReportDefinition[] = [
       const rows = await fetchAllEmprendedores(token)
 
       return rows.filter((emprendedor) =>
-        isWithinDateRange(emprendedor.fecha_registro, filters.desde, filters.hasta)
+        isWithinDateRange(
+          emprendedor.fecha_registro,
+          filters.desde,
+          filters.hasta
+        )
       )
     },
     summarize: (rows) => [
@@ -63,10 +67,15 @@ export const REPORTS: ReportDefinition[] = [
     ],
     breakdowns: async (rows, token) => {
       const emprendedores = rows as Emprendedor[]
-      const generosRes = await api.get<CatalogoResponse>('/catgenero', { token })
+      const generosRes = await api.get<CatalogoResponse>('/catgenero', {
+        token,
+      })
 
       return [
-        { title: 'Por género', items: buildGenderChart(emprendedores, generosRes.data) },
+        {
+          title: 'Por género',
+          items: buildGenderChart(emprendedores, generosRes.data),
+        },
         { title: 'Por rango de edad', items: buildAgeChart(emprendedores) },
         { title: 'Por parroquia', items: buildParishChart(emprendedores) },
       ]
@@ -90,7 +99,8 @@ export const REPORTS: ReportDefinition[] = [
   {
     slug: 'emprendimientos',
     title: 'Reporte de Emprendimientos',
-    description: 'Cantidad de emprendimientos registrados en un rango de fechas.',
+    description:
+      'Cantidad de emprendimientos registrados en un rango de fechas.',
     icon: Store,
     fetchRows: async (filters, token) => {
       const [formularios, emprendedores] = await Promise.all([
@@ -133,7 +143,9 @@ export const REPORTS: ReportDefinition[] = [
     ],
     breakdowns: async (rows, token) => {
       const formularios = rows as FormularioEmprendimiento[]
-      const formularioIds = new Set(formularios.map((formulario) => formulario.id))
+      const formularioIds = new Set(
+        formularios.map((formulario) => formulario.id)
+      )
 
       const [sectorFormsRaw, sectoresRes] = await Promise.all([
         fetchAllFormularioSectores(token),
@@ -145,14 +157,18 @@ export const REPORTS: ReportDefinition[] = [
       )
 
       return [
-        { title: 'Por sector', items: buildSectorChart(sectorForms, sectoresRes.data) },
+        {
+          title: 'Por sector',
+          items: buildSectorChart(sectorForms, sectoresRes.data),
+        },
       ]
     },
     columns: [
       {
         header: 'Nombre del emprendimiento',
         accessor: (row) =>
-          (row as FormularioEmprendimiento).nombre_emprendimiento || 'Sin nombre',
+          (row as FormularioEmprendimiento).nombre_emprendimiento ||
+          'Sin nombre',
       },
       {
         header: 'Emprendedor',
@@ -224,9 +240,9 @@ export const REPORTS: ReportDefinition[] = [
       }))
     },
     summarize: (rows) => {
-      const emprendimientos = (rows as { tiene_emprendimiento: boolean }[]).filter(
-        (r) => r.tiene_emprendimiento
-      ).length
+      const emprendimientos = (
+        rows as { tiene_emprendimiento: boolean }[]
+      ).filter((r) => r.tiene_emprendimiento).length
       return [
         { label: 'Total de emprendimientos', value: emprendimientos },
         { label: 'Total de formularios', value: rows.length },
@@ -235,23 +251,41 @@ export const REPORTS: ReportDefinition[] = [
     columns: [
       {
         header: 'Emprendedor',
-        accessor: (row) => (row as { emprendedor: Emprendedor }).emprendedor?.nombres_apellidos ?? '—',
+        accessor: (row) =>
+          (row as { emprendedor: Emprendedor }).emprendedor
+            ?.nombres_apellidos ?? '—',
       },
-      { header: 'Cédula', accessor: (row) => (row as { emprendedor: Emprendedor }).emprendedor?.cedula ?? '—' },
+      {
+        header: 'Cédula',
+        accessor: (row) =>
+          (row as { emprendedor: Emprendedor }).emprendedor?.cedula ?? '—',
+      },
       {
         header: 'Emprendimiento',
-        accessor: (row) => (row as FormularioReferenciaGeneral).nombre_emprendimiento ?? 'Sin nombre',
+        accessor: (row) =>
+          (row as FormularioReferenciaGeneral).nombre_emprendimiento ??
+          'Sin nombre',
       },
       {
         header: 'Estado',
         accessor: (row) => {
-          const estadoMap: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
-          return estadoMap[(row as FormularioReferenciaGeneral).id_estado_emprendedor] ?? '—'
+          const estadoMap: Record<number, string> = {
+            1: 'Ingresado',
+            2: 'Pendiente',
+            3: 'Aprobado',
+            4: 'Rechazado',
+          }
+          return (
+            estadoMap[
+              (row as FormularioReferenciaGeneral).id_estado_emprendedor
+            ] ?? '—'
+          )
         },
       },
       {
         header: 'Fecha de registro',
-        accessor: (row) => toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
+        accessor: (row) =>
+          toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
       },
     ],
   },
@@ -277,7 +311,9 @@ export const REPORTS: ReportDefinition[] = [
           fetchAllEmprendedores(token),
         ])
 
-        const nombreMap = new Map(emprendedores.map((e) => [e.id, e.nombres_apellidos]))
+        const nombreMap = new Map(
+          emprendedores.map((e) => [e.id, e.nombres_apellidos])
+        )
 
         return formularios
           .filter((f) => f.tiene_emprendimiento)
@@ -303,12 +339,20 @@ export const REPORTS: ReportDefinition[] = [
         fetchAllEmprendedores(token),
       ])
 
-      const nombreMap = new Map(emprendedores.map((e) => [e.id, e.nombres_apellidos]))
+      const nombreMap = new Map(
+        emprendedores.map((e) => [e.id, e.nombres_apellidos])
+      )
 
       const formulario = formularios.find((f) => f.id === formularioId)
       if (!formulario) return []
 
-      if (!isWithinDateRange(formulario.fecha_registro, filters.desde, filters.hasta)) {
+      if (
+        !isWithinDateRange(
+          formulario.fecha_registro,
+          filters.desde,
+          filters.hasta
+        )
+      ) {
         return []
       }
 
@@ -321,9 +365,15 @@ export const REPORTS: ReportDefinition[] = [
       let sectorLabel = 'Sin sector'
       if (sectoresDelFormulario.length > 0) {
         try {
-          const sectoresRes = await api.get<CatalogoResponse>('/catsectoremprendimiento', { token })
+          const sectoresRes = await api.get<CatalogoResponse>(
+            '/catsectoremprendimiento',
+            { token }
+          )
           const sectorNames = sectoresDelFormulario
-            .map((sf) => sectoresRes.data.find((c) => c.id === sf.id_sector)?.descripcion)
+            .map(
+              (sf) =>
+                sectoresRes.data.find((c) => c.id === sf.id_sector)?.descripcion
+            )
             .filter(Boolean)
           if (sectorNames.length > 0) sectorLabel = sectorNames.join(', ')
         } catch {
@@ -334,28 +384,41 @@ export const REPORTS: ReportDefinition[] = [
       return [
         {
           ...formulario,
-          nombre_emprendedor: nombreMap.get(formulario.id_emprendedor) ?? 'Sin especificar',
+          nombre_emprendedor:
+            nombreMap.get(formulario.id_emprendedor) ?? 'Sin especificar',
           sector: sectorLabel,
         },
       ]
     },
     summarize: (rows) => {
-      if (rows.length === 0) return [{ label: 'Registros encontrados', value: 0 }]
+      if (rows.length === 0)
+        return [{ label: 'Registros encontrados', value: 0 }]
       const row = rows[0] as FormularioReferenciaGeneral & { sector: string }
-      const estadoMap: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
+      const estadoMap: Record<number, string> = {
+        1: 'Ingresado',
+        2: 'Pendiente',
+        3: 'Aprobado',
+        4: 'Rechazado',
+      }
       return [
-        { label: `Estado: ${estadoMap[row.id_estado_emprendedor] ?? '—'}`, value: 1 },
+        {
+          label: `Estado: ${estadoMap[row.id_estado_emprendedor] ?? '—'}`,
+          value: 1,
+        },
         { label: `Sector: ${row.sector}`, value: 1 },
       ]
     },
     columns: [
       {
         header: 'Emprendimiento',
-        accessor: (row) => (row as FormularioReferenciaGeneral).nombre_emprendimiento ?? 'Sin nombre',
+        accessor: (row) =>
+          (row as FormularioReferenciaGeneral).nombre_emprendimiento ??
+          'Sin nombre',
       },
       {
         header: 'Emprendedor',
-        accessor: (row) => (row as { nombre_emprendedor: string }).nombre_emprendedor,
+        accessor: (row) =>
+          (row as { nombre_emprendedor: string }).nombre_emprendedor,
       },
       {
         header: 'Contexto (sector)',
@@ -364,13 +427,21 @@ export const REPORTS: ReportDefinition[] = [
       {
         header: 'Estado',
         accessor: (row) => {
-          const m: Record<number, string> = { 1: 'Ingresado', 2: 'Pendiente', 3: 'Aprobado', 4: 'Rechazado' }
-          return m[(row as FormularioReferenciaGeneral).id_estado_emprendedor] ?? '—'
+          const m: Record<number, string> = {
+            1: 'Ingresado',
+            2: 'Pendiente',
+            3: 'Aprobado',
+            4: 'Rechazado',
+          }
+          return (
+            m[(row as FormularioReferenciaGeneral).id_estado_emprendedor] ?? '—'
+          )
         },
       },
       {
         header: 'Fecha de registro',
-        accessor: (row) => toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
+        accessor: (row) =>
+          toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
       },
     ],
   },

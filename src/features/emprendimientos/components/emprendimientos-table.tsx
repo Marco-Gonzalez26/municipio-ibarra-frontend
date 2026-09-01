@@ -193,7 +193,10 @@ export function EmprendimientosTable({
                     {getTipoOferta(formulario.id_tipo_oferta)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={estado.variant} className={estado.className}>
+                    <Badge
+                      variant={estado.variant}
+                      className={estado.className}
+                    >
                       {estado.label}
                     </Badge>
                   </TableCell>

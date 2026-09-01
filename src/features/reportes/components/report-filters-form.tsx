@@ -38,7 +38,8 @@ export function ReportFiltersForm({
     const params = new URLSearchParams()
     if (desde) params.set('desde', desde)
     if (hasta) params.set('hasta', hasta)
-    if (entitySelector && entityValue) params.set(entitySelector.paramName, entityValue)
+    if (entitySelector && entityValue)
+      params.set(entitySelector.paramName, entityValue)
 
     window.location.href = `/api/reportes/${slug}/pdf?${params.toString()}`
   }
@@ -94,10 +95,7 @@ export function ReportFiltersForm({
         </Field>
       </div>
 
-      <Button
-        type="submit"
-        disabled={Boolean(entitySelector && !entityValue)}
-      >
+      <Button type="submit" disabled={Boolean(entitySelector && !entityValue)}>
         <FileDown className="mr-2 size-4" />
         Generar PDF
       </Button>

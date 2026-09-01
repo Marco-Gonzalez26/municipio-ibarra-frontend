@@ -2,7 +2,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { getSession, requireSession } from '@/features/auth/services/session.service'
+import {
+  getSession,
+  requireSession,
+} from '@/features/auth/services/session.service'
 import { getReportDefinition } from '@/features/reportes/config/reports.config'
 import { ReportFiltersForm } from '@/features/reportes/components/report-filters-form'
 

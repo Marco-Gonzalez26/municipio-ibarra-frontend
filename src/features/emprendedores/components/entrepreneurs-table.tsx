@@ -146,7 +146,10 @@ export function EntrepreneursTable({
                       : 'No especificado'}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={estado.variant} className={estado.className}>
+                    <Badge
+                      variant={estado.variant}
+                      className={estado.className}
+                    >
                       {estado.label}
                     </Badge>
                   </TableCell>
