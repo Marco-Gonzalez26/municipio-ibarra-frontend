@@ -88,7 +88,8 @@ export function AsistenciaTable({
         setEditingFormulario(null)
       } catch (error) {
         toast.error('No se pudo actualizar', {
-          description: error instanceof Error ? error.message : 'Intente nuevamente',
+          description:
+            error instanceof Error ? error.message : 'Intente nuevamente',
         })
       }
     })
@@ -142,7 +143,9 @@ export function AsistenciaTable({
                     <TableCell>{f.nombre_emprendimiento ?? '-'}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={Boolean(f.tasa_cancelada) ? 'default' : 'secondary'}
+                        variant={
+                          Boolean(f.tasa_cancelada) ? 'default' : 'secondary'
+                        }
                       >
                         {Boolean(f.tasa_cancelada) ? 'Sí' : 'No'}
                       </Badge>
@@ -229,7 +232,9 @@ function EditAsistenciaDialog({
   isPending: boolean
 }) {
   const [nombre, setNombre] = useState(formulario?.nombre_emprendimiento ?? '')
-  const [tasa, setTasa] = useState(String(Boolean(formulario?.tasa_cancelada ?? '')))
+  const [tasa, setTasa] = useState(
+    String(Boolean(formulario?.tasa_cancelada ?? ''))
+  )
   const [notas, setNotas] = useState(formulario?.notas ?? '')
 
   return (
@@ -237,7 +242,9 @@ function EditAsistenciaDialog({
       <DialogContent key={formulario?.id ?? 'empty'} className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Editar asistencia FAT-{formulario?.id}</DialogTitle>
-          <DialogDescription>Modifique los datos del formulario</DialogDescription>
+          <DialogDescription>
+            Modifique los datos del formulario
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -264,7 +271,11 @@ function EditAsistenciaDialog({
           </Field>
           <Field>
             <FieldLabel>Tasa cancelada *</FieldLabel>
-            <RadioGroup value={tasa} onValueChange={setTasa} className="flex gap-4">
+            <RadioGroup
+              value={tasa}
+              onValueChange={setTasa}
+              className="flex gap-4"
+            >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="true" id="edit-tasa-si" />
                 <Label htmlFor="edit-tasa-si">Sí</Label>
@@ -285,7 +296,11 @@ function EditAsistenciaDialog({
             />
           </Field>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isPending}>

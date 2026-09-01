@@ -152,7 +152,9 @@ export function TechnicalAssistanceStep({
       <Controller
         name="tasa_cancelada"
         control={control}
-        rules={{ validate: (v) => v !== null || 'Indique si la tasa fue cancelada' }}
+        rules={{
+          validate: (v) => v !== null || 'Indique si la tasa fue cancelada',
+        }}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Tasa cancelada *</FieldLabel>

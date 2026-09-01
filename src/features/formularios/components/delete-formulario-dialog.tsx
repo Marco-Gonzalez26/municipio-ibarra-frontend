@@ -34,7 +34,8 @@ export function DeleteFormularioDialog({
     setLoading(true)
     try {
       if (tipo === 'asistencia') {
-        const { deleteAsistenciaAction } = await import('../actions/delete-asistencia.action')
+        const { deleteAsistenciaAction } =
+          await import('../actions/delete-asistencia.action')
         await deleteAsistenciaAction(formularioId)
       }
       toast.success(`Formulario ${label}-${formularioId} eliminado`)
