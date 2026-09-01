@@ -298,7 +298,7 @@ function EmprendimientoDetailDialog({
       open={Boolean(formulario)}
       onOpenChange={(open) => !open && onClose()}
     >
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl min-w-3xl w-full" showCloseButton>
         <DialogHeader>
           <DialogTitle>Detalles del emprendimiento</DialogTitle>
           <DialogDescription>

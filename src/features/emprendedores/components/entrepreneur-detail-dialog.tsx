@@ -28,7 +28,7 @@ export function EntrepreneurDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl min-w-xl w-full" showCloseButton>
+      <DialogContent className="max-w-4xl min-w-3xl w-full" showCloseButton>
         <DialogHeader>
           <DialogTitle>Detalles del Emprendedor</DialogTitle>
           <DialogDescription>
@@ -97,7 +97,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm font-medium">{value}</p>
+      <p className="text-sm font-medium text-wrap w-64">{value}</p>
     </div>
   )
 }
