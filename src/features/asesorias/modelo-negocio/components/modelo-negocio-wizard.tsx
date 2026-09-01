@@ -473,7 +473,7 @@ export function ModeloNegocioWizard({
           />
         ) : null}
 
-        {modeloNegocioId && (
+        {modeloNegocioId && currentStep === 'anexos' && (
           <div className="mt-4 flex items-center justify-end gap-2 border-t pt-4">
             <ExportModeloNegocioButton
               data={mapStoreToFullData(formData, contexto, catalogs)}
