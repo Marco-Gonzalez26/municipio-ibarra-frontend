@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { deleteEntrepreneurAction } from '../actions/delete-entrepeneur.action'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 
 interface DeleteEntrepreneurDialogProps {
   open: boolean
@@ -39,7 +40,7 @@ export function DeleteEntrepreneurDialog({
       onOpenChange(false)
     } catch (error) {
       toast.error('No se pudo desactivar el emprendedor', {
-        description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
+        description: getApiErrorMessage(error),
       })
     } finally {
       setIsDeleting(false)

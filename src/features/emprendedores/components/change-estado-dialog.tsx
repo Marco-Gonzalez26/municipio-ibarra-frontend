@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { changeFormularioEstadoAction } from '../actions/change-formulario-estado.action'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 
 interface ChangeEstadoDialogProps {
   tipo: 'aprobar' | 'rechazar'
@@ -48,7 +49,7 @@ export function ChangeEstadoDialog({
           ? 'No se pudo aprobar el formulario'
           : 'No se pudo rechazar el formulario',
         {
-          description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
+          description: getApiErrorMessage(error),
         }
       )
     } finally {

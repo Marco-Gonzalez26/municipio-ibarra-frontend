@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 import type {
   FormularioReferenciaGeneral,
   FormularioAsistenciaTecnica,
@@ -146,13 +147,30 @@ export function FormularioDetailDialog({
                 </div>
                 <div>
                   <p className="text-muted-foreground">Tasa cancelada</p>
-                  <p className="font-medium">
+                  <Badge
+                    variant={
+                      Boolean(
+                        (formulario as FormularioAsistenciaTecnica)
+                          .tasa_cancelada
+                      )
+                        ? 'default'
+                        : 'destructive'
+                    }
+                    className={
+                      Boolean(
+                        (formulario as FormularioAsistenciaTecnica)
+                          .tasa_cancelada
+                      )
+                        ? 'bg-green-600 text-white hover:bg-green-600/80'
+                        : 'bg-red-600 text-white hover:bg-red-600/80'
+                    }
+                  >
                     {Boolean(
                       (formulario as FormularioAsistenciaTecnica).tasa_cancelada
                     )
                       ? 'Sí'
                       : 'No'}
-                  </p>
+                  </Badge>
                 </div>
               </div>
               {(formulario as FormularioAsistenciaTecnica).notas && (

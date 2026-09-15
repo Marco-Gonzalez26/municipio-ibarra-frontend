@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Eye, EyeOff } from 'lucide-react'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -33,17 +34,8 @@ export const Login = ({ redirect_url }: LoginProps) => {
       const redirectUrl = redirect_url ?? '/inicio'
       router.push(redirectUrl)
     } catch (error) {
-      const isAuthError =
-        error instanceof Error &&
-        'status' in error &&
-        ((error as { status: number }).status === 401 ||
-          (error as { status: number }).status === 403)
       toast.error('No se pudo iniciar sesión', {
-        description: isAuthError
-          ? 'Credenciales inválidas, verifique su usuario y contraseña.'
-          : error instanceof Error
-            ? error.message
-            : 'Intente nuevamente más tarde.',
+        description: getApiErrorMessage(error, 'Intente nuevamente más tarde.'),
       })
     }
   }

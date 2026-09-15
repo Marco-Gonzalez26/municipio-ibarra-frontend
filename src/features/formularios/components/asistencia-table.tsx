@@ -144,7 +144,12 @@ export function AsistenciaTable({
                     <TableCell>
                       <Badge
                         variant={
-                          Boolean(f.tasa_cancelada) ? 'default' : 'secondary'
+                          Boolean(f.tasa_cancelada) ? 'default' : 'destructive'
+                        }
+                        className={
+                          Boolean(f.tasa_cancelada)
+                            ? 'bg-green-600 text-white hover:bg-green-600/80'
+                            : 'bg-red-600 text-white hover:bg-red-600/80'
                         }
                       >
                         {Boolean(f.tasa_cancelada) ? 'Sí' : 'No'}

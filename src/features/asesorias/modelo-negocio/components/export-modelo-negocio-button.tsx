@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { FileDown, Printer, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 import { generateModeloNegocioDocx } from '../lib/generate-modelo-negocio-docx'
 import { getModeloNegocioFullDataAction } from '../actions/get-modelo-negocio-full-data.action'
 import type { ModeloNegocioFullData } from '@/types/modelo-negocio-full.type'
@@ -29,7 +30,9 @@ export function ExportModeloNegocioButton({
       return await getModeloNegocioFullDataAction(modeloId)
     } catch (error) {
       console.error('Error fetching modelo data:', error)
-      toast.error('Error al cargar los datos del modelo')
+      toast.error('Error al cargar los datos del modelo', {
+        description: getApiErrorMessage(error),
+      })
       return null
     }
   }
@@ -54,7 +57,9 @@ export function ExportModeloNegocioButton({
       toast.success('DOCX descargado correctamente')
     } catch (error) {
       console.error('Error generating DOCX:', error)
-      toast.error('Error al generar el documento')
+      toast.error('Error al generar el documento', {
+        description: getApiErrorMessage(error),
+      })
     } finally {
       setIsDocxGenerating(false)
     }
@@ -121,7 +126,9 @@ export function ExportModeloNegocioButton({
       }, 300)
     } catch (error) {
       console.error('Error generating PDF:', error)
-      toast.error('Error al exportar a PDF')
+      toast.error('Error al exportar a PDF', {
+        description: getApiErrorMessage(error),
+      })
       setIsPdfGenerating(false)
     }
   }

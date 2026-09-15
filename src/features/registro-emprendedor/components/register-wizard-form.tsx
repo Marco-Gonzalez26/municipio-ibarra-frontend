@@ -18,6 +18,7 @@ import type {
 } from '../types/props.type'
 import { PaymentStep } from './payment-step'
 import { createEntrepreneurAction } from '../actions/create-entrepeneur-and-enterprise-action'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 
 interface RegisterWizardProps {
   personalDataCatalogs: PersonalDataCatalogs
@@ -57,7 +58,7 @@ export function RegisterWizard({
       router.push('/inicio')
     } catch (error) {
       toast.error('No se pudo enviar la solicitud', {
-        description: (error as { msg?: string }).msg ?? 'Intente nuevamente.',
+        description: getApiErrorMessage(error),
       })
     }
   }

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/get-api-error-message'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -93,7 +94,7 @@ export function EditEntrepreneurForm({
     } catch (error) {
       console.error(error)
       toast.error('No se pudo actualizar el emprendedor', {
-        description: 'Intente nuevamente más tarde.',
+        description: getApiErrorMessage(error, 'Intente nuevamente más tarde.'),
       })
     }
   }
