@@ -193,12 +193,12 @@ export default async function ModeloNegocioPage({
   let analistaNombre = session.usuario.nombres
   try {
     const usuario = await withSessionRedirect(() =>
-      userService.getById(session.usuario.id, session.token)
+      userService.getById(session.usuario.id, session.token, { silent: true })
     )
     const fullName = `${usuario.nombres} ${usuario.apellidos}`.trim()
     if (fullName) analistaNombre = fullName
   } catch {
-    // fallback to session nombres if user fetch fails
+    // fallback to session nombres if user fetch fails (e.g. stale session 404)
   }
 
   return (

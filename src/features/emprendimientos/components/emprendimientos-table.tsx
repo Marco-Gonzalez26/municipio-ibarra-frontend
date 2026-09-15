@@ -29,6 +29,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
+import { formatDate } from '@/lib/date'
 
 const ESTADO_MAP: Record<
   number,
@@ -623,11 +624,4 @@ function getTipoOferta(id: number | null) {
   }
 
   return id ? (map[id] ?? `Tipo ${id}`) : 'No especificado'
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return '-'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleDateString('es-EC')
 }

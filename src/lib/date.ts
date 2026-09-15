@@ -1,3 +1,17 @@
+// Formato de visualización DD/MM/YYYY en hora de Ecuador.
+// No usa dateStyle/timeStyle para evitar "14 sept 2026, 5:05 p. m."
+export function formatDate(value?: string | null): string {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
+  return new Intl.DateTimeFormat('es-EC', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'America/Guayaquil',
+  }).format(date)
+}
+
 // Convierte un timestamp ISO del backend a YYYY-MM-DD en hora local,
 // para poder compararlo contra un <input type="date">.
 export function toLocalDate(value: string): string {

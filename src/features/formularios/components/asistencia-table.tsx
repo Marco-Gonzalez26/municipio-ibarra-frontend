@@ -31,6 +31,7 @@ import type { Emprendedor } from '@/types/entrepreneur.type'
 import { FormularioDetailDialog } from './formulario-detail-dialog'
 import { DeleteFormularioDialog } from './delete-formulario-dialog'
 import { updateAsistenciaAction } from '../actions/update-asistencia.action'
+import { formatDate } from '@/lib/date'
 
 interface AsistenciaTableProps {
   formularios: FormularioAsistenciaTecnica[]
@@ -137,9 +138,7 @@ export function AsistenciaTable({
                     <TableCell>
                       {emprendedor?.nombres_apellidos ?? 'No encontrado'}
                     </TableCell>
-                    <TableCell>
-                      {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
-                    </TableCell>
+                    <TableCell>{formatDate(f.fecha_formulario)}</TableCell>
                     <TableCell>{f.nombre_emprendimiento ?? '-'}</TableCell>
                     <TableCell>
                       <Badge

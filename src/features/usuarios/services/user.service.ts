@@ -44,9 +44,10 @@ export const userService = {
     }
   },
 
-  getById: (id: number, token: string) =>
+  getById: (id: number, token: string, opts?: { silent?: boolean }) =>
     api.get<Usuario>(`/usuarios/${id}`, {
       headers: authHeader(token),
+      silent: opts?.silent,
     }),
 
   create: (payload: UsuarioCreateDTO, token: string) =>

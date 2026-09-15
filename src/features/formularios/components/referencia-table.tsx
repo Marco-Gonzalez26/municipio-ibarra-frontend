@@ -33,6 +33,7 @@ import type { Emprendedor } from '@/types/entrepreneur.type'
 import { FormularioDetailDialog } from './formulario-detail-dialog'
 import { DeleteFormularioDialog } from './delete-formulario-dialog'
 import { updateReferenciaAction } from '../actions/update-referencia.action'
+import { formatDate } from '@/lib/date'
 
 const ESTADO_MAP: Record<
   number,
@@ -160,9 +161,7 @@ export function ReferenciaTable({
                     <TableCell>
                       {emprendedor?.nombres_apellidos ?? 'No encontrado'}
                     </TableCell>
-                    <TableCell>
-                      {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
-                    </TableCell>
+                    <TableCell>{formatDate(f.fecha_formulario)}</TableCell>
                     <TableCell>
                       <Badge
                         variant={estado.variant}

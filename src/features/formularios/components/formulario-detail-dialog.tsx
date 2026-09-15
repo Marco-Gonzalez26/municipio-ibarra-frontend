@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/lib/date'
 import type {
   FormularioReferenciaGeneral,
   FormularioAsistenciaTecnica,
@@ -63,9 +64,7 @@ export function FormularioDetailDialog({
             <div>
               <p className="text-muted-foreground">Fecha</p>
               <p className="font-medium">
-                {new Date(formulario.fecha_formulario).toLocaleDateString(
-                  'es-EC'
-                )}
+                {formatDate(formulario.fecha_formulario)}
               </p>
             </div>
             <div>

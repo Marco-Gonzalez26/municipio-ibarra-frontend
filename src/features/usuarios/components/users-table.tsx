@@ -27,6 +27,7 @@ import { UnlockUserDialog } from './unlock-user-dialog'
 
 import type { Role } from '../types/user-role.type'
 import type { UsuarioConRol } from '../utils/merge-users-with-roles'
+import { formatDate } from '@/lib/date'
 
 interface UsersTableProps {
   users: UsuarioConRol[]
@@ -330,12 +331,12 @@ function UserDetailDialog({
 
             <InfoItem
               label="Fecha de registro"
-              value={formatDateTime(user.fecha_registro)}
+              value={formatDate(user.fecha_registro)}
             />
 
             <InfoItem
               label="Último acceso"
-              value={formatDateTime(user.fecha_ultimo_acceso)}
+              value={formatDate(user.fecha_ultimo_acceso)}
             />
 
             <InfoItem label="Roles disponibles" value={String(roles.length)} />
@@ -368,35 +369,4 @@ function InfoItem({ label, value }: { label: string; value: string }) {
       <p className="mt-1 break-words text-sm font-medium">{value}</p>
     </div>
   )
-}
-
-function formatDate(value?: string | null) {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleDateString('es-EC')
-}
-
-function formatDateTime(value?: string | null) {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleString('es-EC', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
 }
