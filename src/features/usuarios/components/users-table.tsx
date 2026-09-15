@@ -278,6 +278,7 @@ function UserDetailDialog({
 
   return (
     <Dialog
+
       open={Boolean(user)}
       onOpenChange={(open) => {
         if (!open) {
@@ -285,7 +286,7 @@ function UserDetailDialog({
         }
       }}
     >
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto min-w-4xl w-full">
         <DialogHeader>
           <DialogTitle>Detalle del usuario</DialogTitle>
 
