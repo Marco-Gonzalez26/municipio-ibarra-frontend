@@ -6,14 +6,6 @@ import type { FichaContexto } from '../types/ficha.type'
 import type { WizardStep } from '../types/wizard-form.type'
 import { WizardStepper } from './wizard-stepper'
 import type { StepHandle } from './step-shell'
-import { ExportModeloNegocioButton } from './export-modelo-negocio-button'
-import { mapStoreToFullData } from '../lib/map-store-to-full-data'
-import {
-  getCategoriasInsumo,
-  getUnidadesMedida,
-  getCategoriasInversion,
-} from '../actions/catalogs.actions'
-import type { CatalogoItem } from '@/types/catalog.type'
 import { FichaStep } from './ficha-step'
 import { IntroduccionStep } from './introduccion-step'
 import { AntecedentesStep } from './antecedentes-step'
@@ -310,30 +302,6 @@ export function ModeloNegocioWizard({
 
   const stepRef = useRef<StepHandle>(null)
   const isSaving = useModeloNegocioWizardStore((state) => state.isSaving)
-  const formData = useModeloNegocioWizardStore((state) => state.formData)
-  const modeloNegocioId = useModeloNegocioWizardStore(
-    (state) => state.modeloNegocioId
-  )
-
-  const [catalogs, setCatalogs] = useState<{
-    categoriasInsumo: CatalogoItem[]
-    unidadesMedida: CatalogoItem[]
-    categoriasInversion: CatalogoItem[]
-  }>({ categoriasInsumo: [], unidadesMedida: [], categoriasInversion: [] })
-
-  useEffect(() => {
-    Promise.all([
-      getCategoriasInsumo(),
-      getUnidadesMedida(),
-      getCategoriasInversion(),
-    ]).then(([cat, uni, inv]) =>
-      setCatalogs({
-        categoriasInsumo: cat,
-        unidadesMedida: uni,
-        categoriasInversion: inv,
-      })
-    )
-  }, [])
 
   async function handleStepClick(step: WizardStep) {
     if (step === currentStep || isSaving) return
@@ -472,14 +440,6 @@ export function ModeloNegocioWizard({
             onGoToStep={setCurrentStep}
           />
         ) : null}
-
-        {modeloNegocioId && currentStep === 'anexos' && (
-          <div className="mt-4 flex items-center justify-end gap-2 border-t pt-4">
-            <ExportModeloNegocioButton
-              data={mapStoreToFullData(formData, contexto, catalogs)}
-            />
-          </div>
-        )}
       </div>
     </div>
   )
