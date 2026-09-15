@@ -13,19 +13,21 @@ import {
 import type { Role } from '@/features/usuarios/types/user-role.type'
 import type { UsuarioConRol } from '@/features/usuarios/utils/merge-users-with-roles'
 
-const LIMIT = 15
+const LIMIT = 30
 
 interface UsuariosPageProps {
   searchParams: Promise<{
     page?: string
+    q?: string
   }>
 }
 
 export default async function UsuariosPage({
   searchParams,
 }: UsuariosPageProps) {
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, q } = await searchParams
   const page = Number(pageParam ?? 1)
+  const search = q ?? ''
 
   const session = await requireAdmin()
 
@@ -37,7 +39,7 @@ export default async function UsuariosPage({
     const [usersRes, rolesRes, assignmentsRes, perfilesRes] =
       await withSessionRedirect(() =>
         Promise.all([
-          userService.getAll(page, LIMIT, session.token),
+          userService.getAll(page, LIMIT, session.token, search),
           userRoleService.getRoles(session.token),
           userRoleService.getAllAssignments(session.token),
           perfilService.getAll(1, 200, session.token),
@@ -74,7 +76,7 @@ export default async function UsuariosPage({
       </header>
 
       <main className="flex flex-1 flex-col gap-4 p-4 pb-6">
-        <UsersTable users={users} roles={roles} />
+        <UsersTable users={users} roles={roles} initialSearch={search} />
 
         <TablePagination
           currentPage={page}

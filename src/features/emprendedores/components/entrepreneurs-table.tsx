@@ -2,7 +2,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, Pencil, Check, X, Trash2, Building2 } from 'lucide-react'
+import {
+  Eye,
+  Pencil,
+  Check,
+  X,
+  Trash2,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -62,13 +71,25 @@ export function EntrepreneursTable({
     tipo: 'aprobar' | 'rechazar'
   } | null>(null)
   const router = useRouter()
+  const ITEMS_PER_PAGE = 15
   const [searchTerm, setSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
 
   const filteredEntrepeneurs = entrepreneurs.filter((entrepeneur) => {
     const searchString =
       `${entrepeneur.nombres_apellidos} ${entrepeneur.cedula}`.toLowerCase()
     return searchString.includes(searchTerm.toLowerCase())
   })
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredEntrepeneurs.length / ITEMS_PER_PAGE)
+  )
+  const currentPage = Math.min(page, totalPages)
+  const paginatedEntrepeneurs = filteredEntrepeneurs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   function getFormularios(idEmprendedor: number) {
     return formularios.filter((f) => f.id_emprendedor === idEmprendedor)
@@ -89,7 +110,10 @@ export function EntrepreneursTable({
         type="text"
         placeholder="Buscar por nombre, cédula..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => {
+          setSearchTerm(e.target.value)
+          setPage(1)
+        }}
         style={{
           padding: '8px',
           marginBottom: '20px',
@@ -117,7 +141,7 @@ export function EntrepreneursTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredEntrepeneurs.map((entrepreneur) => {
+            {paginatedEntrepeneurs.map((entrepreneur) => {
               const formulario = getFormulario(entrepreneur.id)
               const formulariosDelEmprendedor = getFormularios(entrepreneur.id)
               const estadoId = formulario?.id_estado_emprendedor ?? 1
@@ -237,6 +261,32 @@ export function EntrepreneursTable({
             })}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="mt-2 flex justify-end rounded-xl border bg-background px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+
+          <span className="text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <DeleteEntrepreneurDialog

@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useMemo, useState, useTransition } from 'react'
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { updateEmprendimientoAction } from '../actions/update-emprendimiento.action'
 import { deleteEmprendimientoAction } from '../actions/delete-emprendimiento.action'
@@ -77,7 +77,9 @@ export function EmprendimientosTable({
   entrepreneurs,
   formularios,
 }: EmprendimientosTableProps) {
+  const ITEMS_PER_PAGE = 15
   const [searchTerm, setSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
   const [, startTransition] = useTransition()
   const [selectedFormulario, setSelectedFormulario] =
     useState<FormularioReferenciaGeneral | null>(null)
@@ -98,6 +100,16 @@ export function EmprendimientosTable({
     const searchString = `${row.nombre_emprendimiento}`.toLowerCase()
     return searchString.includes(searchTerm.toLowerCase())
   })
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredRows.length / ITEMS_PER_PAGE)
+  )
+  const currentPage = Math.min(page, totalPages)
+  const paginatedRows = filteredRows.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   function getEntrepreneur(idEmprendedor: number) {
     return entrepreneursById.get(idEmprendedor) ?? null
@@ -140,7 +152,10 @@ export function EmprendimientosTable({
         type="text"
         placeholder="Buscar por emprendimiento..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => {
+          setSearchTerm(e.target.value)
+          setPage(1)
+        }}
         style={{
           padding: '8px',
           marginBottom: '20px',
@@ -172,7 +187,7 @@ export function EmprendimientosTable({
           </TableHeader>
 
           <TableBody>
-            {filteredRows.map((formulario) => {
+            {paginatedRows.map((formulario) => {
               const emprendedor = getEntrepreneur(formulario.id_emprendedor)
               const estado =
                 ESTADO_MAP[formulario.id_estado_emprendedor] ?? ESTADO_MAP[1]
@@ -237,18 +252,48 @@ export function EmprendimientosTable({
               )
             })}
 
-            {formularios.length === 0 ? (
+            {paginatedRows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={8}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No existen emprendimientos registrados.
+                  {formularios.length === 0
+                    ? 'No existen emprendimientos registrados.'
+                    : 'No se encontraron emprendimientos que coincidan con la búsqueda.'}
                 </TableCell>
               </TableRow>
             ) : null}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="mt-2 flex justify-end rounded-xl border bg-background px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+
+          <span className="text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <EmprendimientoDetailDialog
