@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/features/auth/services/session.service'
 import { userRoleService } from '@/features/usuarios/services/user-role.service'
 import { userService } from '@/features/usuarios/services/user.service'
+import { perfilService } from '@/features/usuarios/services/perfil.service'
 
 export interface CreateUserWithRoleInput {
   cuenta: string
@@ -114,6 +115,26 @@ export async function createUserWithRoleAction(
     }
 
     revalidatePath('/usuarios')
+
+    // Crear el perfil del usuario para que nunca quede sin fila en
+    // perfilusuario. No bloquea el éxito si el backend lo rechaza.
+    const perfilResult = await Promise.allSettled([
+      perfilService.create(
+        {
+          id_usuario: createdUser.id,
+          dependencia: 'Unidad de Desarrollo Económico',
+          idioma: 'es-EC',
+          zona_horaria: 'America/Guayaquil',
+        },
+        session.token
+      ),
+    ])
+    if (perfilResult[0].status === 'rejected') {
+      console.error(
+        `El usuario USR-${createdUser.id} fue creado, pero no se pudo crear su perfil`,
+        perfilResult[0].reason
+      )
+    }
 
     return {
       success: true,

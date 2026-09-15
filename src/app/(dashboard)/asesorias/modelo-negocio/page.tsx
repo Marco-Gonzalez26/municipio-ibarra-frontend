@@ -192,11 +192,15 @@ export default async function ModeloNegocioPage({
 
   let analistaNombre = session.usuario.nombres
   try {
-    const usuario = await withSessionRedirect(() =>
-      userService.getById(session.usuario.id, session.token)
+    // Backend has no GET /usuarios/:id → resolve via list endpoint
+    const res = await withSessionRedirect(() =>
+      userService.getAll(1, 200, session.token)
     )
-    const fullName = `${usuario.nombres} ${usuario.apellidos}`.trim()
-    if (fullName) analistaNombre = fullName
+    const me = res.usuarios.find((u) => u.id === session.usuario.id)
+    if (me) {
+      const fullName = `${me.nombres} ${me.apellidos}`.trim()
+      if (fullName) analistaNombre = fullName
+    }
   } catch {
     // fallback to session nombres if user fetch fails
   }
