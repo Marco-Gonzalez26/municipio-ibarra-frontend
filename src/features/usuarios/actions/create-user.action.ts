@@ -17,6 +17,7 @@ export interface CreateUserWithRoleInput {
   fechaVigenciaDesde: string
   fechaVigenciaHasta: string | null
   activo: boolean
+  cargo?: string | null
 }
 
 export type CreateUserWithRoleResult =
@@ -123,6 +124,7 @@ export async function createUserWithRoleAction(
         {
           id_usuario: createdUser.id,
           dependencia: 'Unidad de Desarrollo Económico',
+          cargo: input.cargo?.trim() || null,
           idioma: 'es-EC',
           zona_horaria: 'America/Guayaquil',
         },

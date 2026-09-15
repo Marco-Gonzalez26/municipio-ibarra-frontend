@@ -36,6 +36,7 @@ interface UserFormValues {
   contrasena: string
   confirmarContrasena: string
   idRol: string
+  cargo: string
   fechaVigenciaDesde: string
   fechaVigenciaHasta: string
   activo: boolean
@@ -50,6 +51,7 @@ function createInitialValues(): UserFormValues {
     contrasena: '',
     confirmarContrasena: '',
     idRol: '',
+    cargo: '',
     fechaVigenciaDesde: getCurrentDate(),
     fechaVigenciaHasta: '',
     activo: true,
@@ -176,6 +178,7 @@ export function CreateUserDialog({
       correo,
       contrasena,
       idRol,
+      cargo: values.cargo.trim() || null,
       fechaVigenciaDesde: values.fechaVigenciaDesde,
       fechaVigenciaHasta: values.fechaVigenciaHasta || null,
       activo: values.activo,
@@ -349,6 +352,16 @@ export function CreateUserDialog({
                 <option value="true">Activo</option>
                 <option value="false">Inactivo</option>
               </select>
+            </FormField>
+
+            <FormField id="cargo" label="Cargo">
+              <Input
+                id="cargo"
+                value={values.cargo}
+                onChange={(event) => updateValue('cargo', event.target.value)}
+                placeholder="Ej. Analista"
+                disabled={isPending}
+              />
             </FormField>
 
             <FormField id="fechaVigenciaDesde" label="Vigencia desde">
