@@ -278,7 +278,6 @@ function UserDetailDialog({
 
   return (
     <Dialog
-
       open={Boolean(user)}
       onOpenChange={(open) => {
         if (!open) {
@@ -310,6 +309,11 @@ function UserDetailDialog({
             <InfoItem
               label="Rol"
               value={user.rol?.nombre ?? 'Sin rol asignado'}
+            />
+
+            <InfoItem
+              label="Cargo"
+              value={user.perfil?.cargo ?? 'Sin cargo asignado'}
             />
 
             <InfoItem label="Estado" value={getUserStatus()} />

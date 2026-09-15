@@ -35,6 +35,7 @@ interface EditUserValues {
   cuenta: string
   correo: string
   idRol: string
+  cargo: string
   fechaExpiracion: string
   activo: boolean
 }
@@ -45,6 +46,7 @@ const EMPTY_VALUES: EditUserValues = {
   cuenta: '',
   correo: '',
   idRol: '',
+  cargo: '',
   fechaExpiracion: '',
   activo: true,
 }
@@ -54,11 +56,12 @@ function createInitialValues(user: UsuarioConRol | null): EditUserValues {
   }
 
   return {
-    nombres: user.nombres,
-    apellidos: user.apellidos,
-    cuenta: user.cuenta,
-    correo: user.correo,
+    nombres: user.nombres ?? '',
+    apellidos: user.apellidos ?? '',
+    cuenta: user.cuenta ?? '',
+    correo: user.correo ?? '',
     idRol: user.rol ? String(user.rol.id) : '',
+    cargo: user.perfil?.cargo ?? '',
     fechaExpiracion: user.asignacionRol?.fecha_expiracion ?? '',
     activo: user.activo && user.id_estado === 1,
   }
@@ -130,6 +133,8 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
       cuenta,
       correo,
       idRol,
+      cargo: values.cargo.trim() || null,
+      perfilId: user.perfil?.id ?? null,
       assignmentId: user.asignacionRol?.id ?? null,
       fechaAsignacion: user.asignacionRol?.fecha_asignacion ?? null,
       fechaExpiracion: values.fechaExpiracion || null,
@@ -174,7 +179,7 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
             <FormField id="edit-nombres" label="Nombres">
               <Input
                 id="edit-nombres"
-                value={values.nombres}
+                value={values.nombres ?? ''}
                 onChange={(event) => updateValue('nombres', event.target.value)}
                 disabled={isPending}
                 required
@@ -184,7 +189,7 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
             <FormField id="edit-apellidos" label="Apellidos">
               <Input
                 id="edit-apellidos"
-                value={values.apellidos}
+                value={values.apellidos ?? ''}
                 onChange={(event) =>
                   updateValue('apellidos', event.target.value)
                 }
@@ -196,7 +201,7 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
             <FormField id="edit-cuenta" label="Cuenta">
               <Input
                 id="edit-cuenta"
-                value={values.cuenta}
+                value={values.cuenta ?? ''}
                 onChange={(event) => updateValue('cuenta', event.target.value)}
                 disabled={isPending}
                 required
@@ -207,7 +212,7 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
               <Input
                 id="edit-correo"
                 type="email"
-                value={values.correo}
+                value={values.correo ?? ''}
                 onChange={(event) => updateValue('correo', event.target.value)}
                 disabled={isPending}
                 required
@@ -249,11 +254,21 @@ export function EditUserDialog({ user, roles, onClose }: EditUserDialogProps) {
               </select>
             </FormField>
 
+            <FormField id="edit-cargo" label="Cargo">
+              <Input
+                id="edit-cargo"
+                value={values.cargo}
+                onChange={(event) => updateValue('cargo', event.target.value)}
+                placeholder="Ej. Analista"
+                disabled={isPending}
+              />
+            </FormField>
+
             <FormField id="edit-fecha-expiracion" label="Expiración del rol">
               <Input
                 id="edit-fecha-expiracion"
                 type="date"
-                value={values.fechaExpiracion}
+                value={values.fechaExpiracion ?? ''}
                 onChange={(event) =>
                   updateValue('fechaExpiracion', event.target.value)
                 }

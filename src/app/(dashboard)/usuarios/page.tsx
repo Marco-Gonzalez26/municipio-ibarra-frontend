@@ -4,6 +4,7 @@ import { UsersTable } from '@/features/usuarios/components/users-table'
 import { TablePagination } from '@/features/emprendedores/components/table-pagination'
 import { userService } from '@/features/usuarios/services/user.service'
 import { userRoleService } from '@/features/usuarios/services/user-role.service'
+import { perfilService } from '@/features/usuarios/services/perfil.service'
 import { mergeUsersWithRoles } from '@/features/usuarios/utils/merge-users-with-roles'
 import {
   requireAdmin,
@@ -33,13 +34,15 @@ export default async function UsuariosPage({
   let total = 0
 
   try {
-    const [usersRes, rolesRes, assignmentsRes] = await withSessionRedirect(() =>
-      Promise.all([
-        userService.getAll(page, LIMIT, session.token),
-        userRoleService.getRoles(session.token),
-        userRoleService.getAllAssignments(session.token),
-      ])
-    )
+    const [usersRes, rolesRes, assignmentsRes, perfilesRes] =
+      await withSessionRedirect(() =>
+        Promise.all([
+          userService.getAll(page, LIMIT, session.token),
+          userRoleService.getRoles(session.token),
+          userRoleService.getAllAssignments(session.token),
+          perfilService.getAll(1, 200, session.token),
+        ])
+      )
 
     const usersBase = Array.isArray(usersRes.usuarios) ? usersRes.usuarios : []
 
@@ -49,7 +52,9 @@ export default async function UsuariosPage({
       ? assignmentsRes.data
       : []
 
-    users = mergeUsersWithRoles(usersBase, roles, assignments)
+    const perfiles = Array.isArray(perfilesRes.data) ? perfilesRes.data : []
+
+    users = mergeUsersWithRoles(usersBase, roles, assignments, perfiles)
 
     total = usersRes.total ?? users.length
   } catch (error) {

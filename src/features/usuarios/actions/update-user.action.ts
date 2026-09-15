@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/features/auth/services/session.service'
 import { userService } from '../services/user.service'
 import { userRoleService } from '../services/user-role.service'
+import { perfilService } from '../services/perfil.service'
 
 export interface UpdateUserWithRoleInput {
   id: number
@@ -13,6 +14,8 @@ export interface UpdateUserWithRoleInput {
   nombres: string
   apellidos: string
   idRol: number
+  cargo?: string | null
+  perfilId?: number | null
   assignmentId: number | null
   fechaAsignacion: string | null
   fechaExpiracion: string | null
@@ -99,6 +102,30 @@ export async function updateUserWithRoleAction(
     }
 
     revalidatePath('/usuarios')
+
+    // Sincroniza el cargo en perfilusuario: PUT si ya tiene perfil,
+    // POST si no. No bloquea el éxito si el backend lo rechaza.
+    const cargo = input.cargo?.trim() || null
+    const perfilResult = await Promise.allSettled([
+      input.perfilId
+        ? perfilService.update(input.perfilId, { cargo }, session.token)
+        : perfilService.create(
+            {
+              id_usuario: input.id,
+              dependencia: 'Unidad de Desarrollo Económico',
+              cargo,
+              idioma: 'es-EC',
+              zona_horaria: 'America/Guayaquil',
+            },
+            session.token
+          ),
+    ])
+    if (perfilResult[0].status === 'rejected') {
+      console.error(
+        `El usuario USR-${input.id} fue actualizado, pero no se pudo sincronizar su perfil`,
+        perfilResult[0].reason
+      )
+    }
 
     return {
       success: true,

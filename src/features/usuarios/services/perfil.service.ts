@@ -40,4 +40,14 @@ export const perfilService = {
       '/perfilusuario',
       { body: payload, headers: authHeader(token) }
     ),
+
+  update: (
+    id: number,
+    payload: Partial<PerfilUsuarioCreateDTO>,
+    token: string
+  ) =>
+    api.put<{ ok: boolean; msg?: string }>(`/perfiles/${id}`, {
+      body: payload,
+      headers: authHeader(token),
+    }),
 }
