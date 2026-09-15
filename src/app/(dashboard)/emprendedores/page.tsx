@@ -36,7 +36,7 @@ export default async function EmprendedoresPage({
     ])
   )
 
-  const totalPages = Math.ceil(entrepreneursRes.total / LIMIT)
+  const totalPages = Math.max(1, Math.ceil(entrepreneursRes.total / LIMIT))
 
   return (
     <>

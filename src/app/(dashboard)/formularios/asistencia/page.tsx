@@ -32,7 +32,7 @@ export default async function AsistenciaPage({
     ])
   )
 
-  const totalPages = Math.ceil((formulariosRes.total ?? 0) / LIMIT)
+  const totalPages = Math.max(1, Math.ceil((formulariosRes.total ?? 0) / LIMIT))
 
   return (
     <>
