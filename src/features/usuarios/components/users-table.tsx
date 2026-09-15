@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Eye, Pencil, Plus, Trash2, Unlock } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -31,27 +32,48 @@ import type { UsuarioConRol } from '../utils/merge-users-with-roles'
 interface UsersTableProps {
   users: UsuarioConRol[]
   roles: Role[]
+  initialSearch?: string
 }
 
-export function UsersTable({ users, roles }: UsersTableProps) {
-  const [searchTerm, setSearchTerm] = useState('')
+export function UsersTable({
+  users,
+  roles,
+  initialSearch = '',
+}: UsersTableProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [selectedUser, setSelectedUser] = useState<UsuarioConRol | null>(null)
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<UsuarioConRol | null>(null)
   const [deactivatingUser, setDeactivatingUser] =
     useState<UsuarioConRol | null>(null)
   const [unlockingUser, setUnlockingUser] = useState<UsuarioConRol | null>(null)
-  const filteredUsers = users.filter((user) => {
-    const searchString = `
-      ${user.nombres}
-      ${user.apellidos}
-      ${user.cuenta}
-      ${user.correo}
-      ${user.rol?.nombre ?? ''}
-    `.toLowerCase()
 
-    return searchString.includes(searchTerm.toLowerCase())
-  })
+  function handleSearchChange(value: string) {
+    setSearchTerm(value)
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value.trim()) {
+        params.set('q', value.trim())
+      } else {
+        params.delete('q')
+      }
+      params.set('page', '1')
+      router.push(`${pathname}?${params.toString()}`)
+    }, 400)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   return (
     <>
@@ -60,7 +82,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
           type="text"
           placeholder="Buscar por nombre, cuenta o correo..."
           value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
+          onChange={(event) => handleSearchChange(event.target.value)}
           style={{
             padding: '8px',
             marginBottom: '20px',
@@ -102,7 +124,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
           </TableHeader>
 
           <TableBody>
-            {filteredUsers.map((user) => {
+            {users.map((user) => {
               const isActive = user.activo && user.id_estado === 1
 
               const isBlocked = user.intentos_fallidos >= 5
@@ -205,7 +227,7 @@ export function UsersTable({ users, roles }: UsersTableProps) {
               )
             })}
 
-            {filteredUsers.length === 0 ? (
+            {users.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={8}

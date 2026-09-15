@@ -1,7 +1,6 @@
 import { unstable_rethrow } from 'next/navigation'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EmprendimientosTable } from '@/features/emprendimientos/components/emprendimientos-table'
-import { TablePagination } from '@/features/emprendedores/components/table-pagination'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
 import {
@@ -11,23 +10,13 @@ import {
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
 
-const LIMIT = 15
-const LIMIT_FORMULARIOS = 500
+const LIMIT_FORMULARIOS = 1000
 
-interface EmprendimientosPageProps {
-  searchParams: Promise<{ page?: string }>
-}
-
-export default async function EmprendimientosPage({
-  searchParams,
-}: EmprendimientosPageProps) {
-  const { page: pageParam } = await searchParams
-  const page = Number(pageParam ?? 1)
+export default async function EmprendimientosPage() {
   const session = await requireSession()
 
   let entrepreneurs: Emprendedor[] = []
   let formularios: FormularioReferenciaGeneral[] = []
-  let total = 0
 
   try {
     // Se usa referencia general porque el front aún no tiene servicio propio.
@@ -52,17 +41,14 @@ export default async function EmprendimientosPage({
       ? formulariosRes.formularios_referencia_general
       : []
 
-    const emprendimientos = formulariosBase.filter(
+    // listado completo de emprendimientos (ya no recortado por página)
+    formularios = formulariosBase.filter(
       (formulario) => formulario.tiene_emprendimiento
     )
-    total = emprendimientos.length
-    formularios = emprendimientos.slice((page - 1) * LIMIT, page * LIMIT)
   } catch (error) {
     unstable_rethrow(error)
     console.error('No se pudieron cargar los emprendimientos', error)
   }
-
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
 
   return (
     <>
@@ -75,13 +61,6 @@ export default async function EmprendimientosPage({
         <EmprendimientosTable
           entrepreneurs={entrepreneurs}
           formularios={formularios}
-        />
-
-        <TablePagination
-          currentPage={page}
-          totalPages={totalPages}
-          total={total}
-          itemLabel="emprendimiento"
         />
       </main>
     </>
