@@ -10,6 +10,7 @@ import {
   Check,
   X,
   Trash2,
+  Pencil,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,6 +48,7 @@ import {
   changeEstadoAction,
 } from '@/features/modelo-negocio/actions/modelo-negocio.actions'
 import { ExportModeloNegocioButton } from './export-modelo-negocio-button'
+import { EditarModeloDialog } from './editar-modelo-dialog'
 
 const ESTADO_MAP: Record<
   number,
@@ -109,6 +111,9 @@ export function ModeloNegocioListado({
     useState<ModeloNegocioDTO | null>(null)
   const [modeloACambiarEstado, setModeloACambiarEstado] =
     useState<ModeloNegocioDTO | null>(null)
+  const [modeloAEditar, setModeloAEditar] = useState<ModeloNegocioDTO | null>(
+    null
+  )
   const [nuevoEstadoId, setNuevoEstadoId] = useState<number>(0)
   const [motivo, setMotivo] = useState('')
 
@@ -322,6 +327,15 @@ export function ModeloNegocioListado({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label="Editar modelo"
+                        onClick={() => setModeloAEditar(modelo)}
+                      >
+                        <Pencil className="size-4 text-yellow-500" />
+                      </Button>
                       <Button variant="outline" size="sm" asChild>
                         <Link
                           href={`/asesorias/modelo-negocio?id=${modelo.id}`}
@@ -417,6 +431,21 @@ export function ModeloNegocioListado({
         onMotivoChange={setMotivo}
         onClose={() => setModeloACambiarEstado(null)}
         onConfirm={confirmarCambioEstado}
+      />
+
+      <EditarModeloDialog
+        key={modeloAEditar?.id ?? 'editar-cerrado'}
+        modelo={modeloAEditar}
+        open={Boolean(modeloAEditar)}
+        onOpenChange={(open) => {
+          if (!open) setModeloAEditar(null)
+        }}
+        onSaved={(updated) => {
+          setModelos((prev) =>
+            prev.map((m) => (m.id === updated.id ? updated : m))
+          )
+          setModeloAEditar(null)
+        }}
       />
     </div>
   )
