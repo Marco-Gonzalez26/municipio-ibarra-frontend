@@ -51,7 +51,7 @@ export function UsersTable({
   const [deactivatingUser, setDeactivatingUser] =
     useState<UsuarioConRol | null>(null)
   const [unlockingUser, setUnlockingUser] = useState<UsuarioConRol | null>(null)
-  
+
   function handleSearchChange(value: string) {
     setSearchTerm(value)
 

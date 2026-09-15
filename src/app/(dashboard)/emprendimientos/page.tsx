@@ -41,7 +41,7 @@ export default async function EmprendimientosPage() {
       ? formulariosRes.formularios_referencia_general
       : []
 
-    // listado completo de emprendimientos (ya no recortado por página) 
+    // listado completo de emprendimientos (ya no recortado por página)
     formularios = formulariosBase.filter(
       (formulario) => formulario.tiene_emprendimiento
     )
