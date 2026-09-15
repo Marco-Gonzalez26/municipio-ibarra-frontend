@@ -2,10 +2,12 @@
 
 import { Controller, useForm } from 'react-hook-form'
 import { Send } from 'lucide-react'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
 import { useWizardStore } from '../store/wizard.store'
 import type { AsistenciaTecnicaForm } from '../types/wizard-form.type'
 import type { TechnicalAssistanceCatalogs } from '../types/props.type'
@@ -147,6 +149,34 @@ export function TechnicalAssistanceStep({
           </div>
         )}
       />
+      <Controller
+        name="tasa_cancelada"
+        control={control}
+        rules={{
+          validate: (v) => v !== null || 'Indique si la tasa fue cancelada',
+        }}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Tasa cancelada *</FieldLabel>
+            <RadioGroup
+              value={field.value === null ? '' : String(field.value)}
+              onValueChange={(v) => field.onChange(v === 'true')}
+              className="flex gap-4"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="true" id="tasa-si" />
+                <Label htmlFor="tasa-si">Sí</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="false" id="tasa-no" />
+                <Label htmlFor="tasa-no">No</Label>
+              </div>
+            </RadioGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
       <Controller
         name="observaciones"
         control={control}

@@ -92,7 +92,14 @@ export interface FormularioAsistenciaTecnica {
 
 export type FormularioAsistenciaTecnicaCreateDTO = Omit<
   FormularioAsistenciaTecnica,
-  'id' | 'tasa_cancelada' | 'firma_solicitante' | 'fecha_registro'
+  'id' | 'firma_solicitante' | 'fecha_registro'
+>
+
+export type FormularioAsistenciaTecnicaUpdateDTO = Partial<
+  Pick<
+    FormularioAsistenciaTecnica,
+    'tasa_cancelada' | 'nombre_emprendimiento' | 'id_situacion' | 'notas'
+  >
 >
 
 // Formulario Asist Requerimiento

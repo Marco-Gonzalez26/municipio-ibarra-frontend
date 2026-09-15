@@ -83,11 +83,15 @@ export function mapWizardToFormularioAsistenciaDTO(
   idEmprendedor: number,
   today: string
 ): FormularioAsistenciaTecnicaCreateDTO {
+  if (state.asistenciaTecnica.tasa_cancelada === null) {
+    throw new Error('Debe indicar si la tasa fue cancelada')
+  }
   return {
     id_emprendedor: idEmprendedor,
     fecha_formulario: today,
     nombre_emprendimiento: state.emprendimiento.nombre_emprendimiento || null,
     id_situacion: resolveSituacionId(state),
+    tasa_cancelada: state.asistenciaTecnica.tasa_cancelada,
     notas: state.asistenciaTecnica.observaciones || null,
   }
 }

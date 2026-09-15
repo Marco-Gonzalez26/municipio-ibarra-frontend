@@ -79,6 +79,7 @@ const initialState: RegistroEmprendedorState = {
   asistenciaTecnica: {
     areas_asistencia: [],
     observaciones: '',
+    tasa_cancelada: null,
   },
 }
 

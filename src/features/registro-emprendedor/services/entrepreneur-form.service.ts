@@ -138,6 +138,27 @@ export const entrepeneurFormService = {
       )
     ),
 
+  updateAsistenciaTecnica: (
+    id: number,
+    payload: import('@/types/form.type').FormularioAsistenciaTecnicaUpdateDTO,
+    token?: string
+  ) =>
+    api.put<{ ok: boolean; msg: string }>(
+      `/formularioasistenciatecnica/${id}`,
+      {
+        body: payload,
+        token,
+      }
+    ),
+
+  deleteAsistenciaTecnica: (id: number, token?: string) =>
+    api.delete<{ ok: boolean; msg: string }>(
+      `/formularioasistenciatecnica/${id}`,
+      {
+        token,
+      }
+    ),
+
   createAsistenciaTecnica: (
     payload: FormularioAsistenciaTecnicaCreateDTO,
     token?: string

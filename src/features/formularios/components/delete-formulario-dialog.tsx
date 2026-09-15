@@ -33,11 +33,17 @@ export function DeleteFormularioDialog({
   async function handleDelete() {
     setLoading(true)
     try {
-      // TODO: Implement actual delete when backend endpoint is available
+      if (tipo === 'asistencia') {
+        const { deleteAsistenciaAction } =
+          await import('../actions/delete-asistencia.action')
+        await deleteAsistenciaAction(formularioId)
+      }
       toast.success(`Formulario ${label}-${formularioId} eliminado`)
       onOpenChange(false)
-    } catch {
-      toast.error('Error al eliminar el formulario')
+    } catch (error) {
+      toast.error('Error al eliminar el formulario', {
+        description: error instanceof Error ? error.message : undefined,
+      })
     } finally {
       setLoading(false)
     }
