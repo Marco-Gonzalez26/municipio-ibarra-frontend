@@ -5,29 +5,21 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { entrepreneurService } from '@/features/registro-emprendedor/services/entrepreneur.service'
 import { entrepeneurFormService } from '@/features/registro-emprendedor/services/entrepreneur-form.service'
 import { EntrepreneursTable } from '@/features/emprendedores/components/entrepreneurs-table'
-import { TablePagination } from '@/features/emprendedores/components/table-pagination'
 import {
   requireSession,
   withSessionRedirect,
 } from '@/features/auth/services/session.service'
 
-const LIMIT = 15
+// trae todo el listado (no solo la página actual - paginación) para la búsqueda
+const LIMIT_ALL = 1000
 const LIMIT_FORMULARIOS = 500
 
-interface EmprendedoresPageProps {
-  searchParams: Promise<{ page?: string }>
-}
-
-export default async function EmprendedoresPage({
-  searchParams,
-}: EmprendedoresPageProps) {
-  const { page: pageParam } = await searchParams
-  const page = Number(pageParam ?? 1)
+export default async function EmprendedoresPage() {
   const session = await requireSession()
 
   const [entrepreneursRes, formularsRes] = await withSessionRedirect(() =>
     Promise.all([
-      entrepreneurService.getAll(page, LIMIT, session.token),
+      entrepreneurService.getAll(1, LIMIT_ALL, session.token),
       entrepeneurFormService.getAllReferenciaGeneral(
         1,
         LIMIT_FORMULARIOS,
@@ -35,8 +27,6 @@ export default async function EmprendedoresPage({
       ),
     ])
   )
-
-  const totalPages = Math.max(1, Math.ceil(entrepreneursRes.total / LIMIT))
 
   return (
     <>
@@ -56,11 +46,6 @@ export default async function EmprendedoresPage({
         <EntrepreneursTable
           entrepreneurs={entrepreneursRes.emprendedores}
           formularios={formularsRes.formularios_referencia_general}
-        />
-        <TablePagination
-          currentPage={page}
-          totalPages={totalPages}
-          total={entrepreneursRes.total}
         />
       </div>
     </>
