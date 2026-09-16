@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
+import { formatDate } from '@/lib/date'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import { FormularioDetailDialog } from './formulario-detail-dialog'
 import { DeleteFormularioDialog } from './delete-formulario-dialog'
@@ -119,9 +120,7 @@ export function ReferenciaTable({
                     <TableCell>
                       {emprendedor?.nombres_apellidos ?? 'No encontrado'}
                     </TableCell>
-                    <TableCell>
-                      {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
-                    </TableCell>
+                    <TableCell>{formatDate(f.fecha_formulario, '-')}</TableCell>
                     <TableCell>
                       <Badge
                         variant={estado.variant}

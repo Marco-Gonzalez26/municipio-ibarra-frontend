@@ -9,7 +9,7 @@ import {
   buildSectorChart,
 } from '@/features/dashboard/utils/dashboard.utils'
 import { fetchAllPages } from '@/lib/pagination'
-import { isWithinDateRange, toLocalDate } from '@/lib/date'
+import { formatDate, isWithinDateRange } from '@/lib/date'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type {
   FormularioReferenciaGeneral,
@@ -92,7 +92,7 @@ export const REPORTS: ReportDefinition[] = [
       },
       {
         header: 'Fecha de registro',
-        accessor: (row) => toLocalDate((row as Emprendedor).fecha_registro),
+        accessor: (row) => formatDate((row as Emprendedor).fecha_registro, '-'),
       },
     ],
   },
@@ -177,7 +177,7 @@ export const REPORTS: ReportDefinition[] = [
       {
         header: 'Fecha de registro',
         accessor: (row) =>
-          toLocalDate((row as FormularioEmprendimiento).fecha_registro),
+          formatDate((row as FormularioEmprendimiento).fecha_registro, '-'),
       },
     ],
   },
@@ -285,7 +285,7 @@ export const REPORTS: ReportDefinition[] = [
       {
         header: 'Fecha de registro',
         accessor: (row) =>
-          toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
+          formatDate((row as FormularioReferenciaGeneral).fecha_registro, '-'),
       },
     ],
   },
@@ -441,7 +441,7 @@ export const REPORTS: ReportDefinition[] = [
       {
         header: 'Fecha de registro',
         accessor: (row) =>
-          toLocalDate((row as FormularioReferenciaGeneral).fecha_registro),
+          formatDate((row as FormularioReferenciaGeneral).fecha_registro, '-'),
       },
     ],
   },

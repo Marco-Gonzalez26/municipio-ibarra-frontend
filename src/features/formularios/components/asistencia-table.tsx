@@ -27,6 +27,7 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import type { FormularioAsistenciaTecnica } from '@/types/form.type'
+import { formatDate } from '@/lib/date'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import { FormularioDetailDialog } from './formulario-detail-dialog'
 import { DeleteFormularioDialog } from './delete-formulario-dialog'
@@ -137,9 +138,7 @@ export function AsistenciaTable({
                     <TableCell>
                       {emprendedor?.nombres_apellidos ?? 'No encontrado'}
                     </TableCell>
-                    <TableCell>
-                      {new Date(f.fecha_formulario).toLocaleDateString('es-EC')}
-                    </TableCell>
+                    <TableCell>{formatDate(f.fecha_formulario, '-')}</TableCell>
                     <TableCell>{f.nombre_emprendimiento ?? '-'}</TableCell>
                     <TableCell>
                       <Badge
