@@ -28,6 +28,7 @@ import { UnlockUserDialog } from './unlock-user-dialog'
 
 import type { Role } from '../types/user-role.type'
 import type { UsuarioConRol } from '../utils/merge-users-with-roles'
+import { isDateExpired } from '@/lib/date'
 
 interface UsersTableProps {
   users: UsuarioConRol[]
@@ -354,6 +355,30 @@ function UserDetailDialog({
               label="Vigencia hasta"
               value={formatDate(user.fecha_vigencia_hasta)}
             />
+
+            <div>
+              <p className="text-xs text-muted-foreground">Vigencia del rol</p>
+              {user.asignacionRol?.fecha_expiracion ? (
+                isDateExpired(user.asignacionRol.fecha_expiracion) ? (
+                  <Badge
+                    variant="destructive"
+                    className="bg-red-600 text-white hover:bg-red-600/80"
+                  >
+                    Vencido el {formatDate(user.asignacionRol.fecha_expiracion)}
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="default"
+                    className="bg-green-600 text-white hover:bg-green-600/80"
+                  >
+                    Vigente hasta{' '}
+                    {formatDate(user.asignacionRol.fecha_expiracion)}
+                  </Badge>
+                )
+              ) : (
+                <p className="text-sm font-medium">Sin vencimiento</p>
+              )}
+            </div>
 
             <InfoItem
               label="Fecha de registro"

@@ -1,3 +1,27 @@
+// Formato de visualización DD/MM/YYYY en hora de Ecuador.
+// No usa dateStyle/timeStyle para evitar "14 sept 2026, 5:05 p. m."
+// separator permite el estilo local con guiones: DD-MM-YYYY.
+export function formatDate(value?: string | null, separator = '/'): string {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
+  const formatted = new Intl.DateTimeFormat('es-EC', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'America/Guayaquil',
+  }).format(date)
+  return separator === '/' ? formatted : formatted.split('/').join(separator)
+}
+
+// true si la fecha YYYY-MM-DD ya pasó (vencida). null/undefined = sin vencimiento.
+export function isDateExpired(value?: string | null): boolean {
+  if (!value) return false
+  const today = toLocalDate(new Date().toISOString())
+  if (!today) return false
+  return value.slice(0, 10) < today
+}
+
 // Convierte un timestamp ISO del backend a YYYY-MM-DD en hora local,
 // para poder compararlo contra un <input type="date">.
 export function toLocalDate(value: string): string {

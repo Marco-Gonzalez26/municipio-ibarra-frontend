@@ -7,6 +7,7 @@ import { authService } from '../services/auth.service'
 import { roleService } from '../services/role.service'
 import { SESSION_COOKIE } from '../constants'
 import { ApiError } from '@/lib/https'
+import { formatDate, isDateExpired } from '@/lib/date'
 
 import type { AuthUser, LoginCredentials, Role } from '../types/auth.type'
 
@@ -90,9 +91,18 @@ export async function loginAction(
       ) ?? null)
     : null
 
+  // El rol vencido niega el acceso por completo.
+  if (activeAssignment && isDateExpired(activeAssignment.fecha_expiracion)) {
+    return {
+      success: false,
+      message: `Tu rol venció el ${formatDate(activeAssignment.fecha_expiracion, '-')}. Contacta al administrador para renovar tu acceso.`,
+    }
+  }
+
   const authenticatedUser: AuthUser = {
     ...response.usuario,
     rol: assignedRole,
+    rolVenceEl: activeAssignment?.fecha_expiracion ?? null,
   }
 
   const cookieStore = await cookies()
