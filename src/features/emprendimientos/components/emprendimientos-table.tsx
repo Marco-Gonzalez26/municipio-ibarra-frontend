@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState, useTransition } from 'react'
 import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { formatDate } from '@/lib/date'
 import { updateEmprendimientoAction } from '../actions/update-emprendimiento.action'
 import { deleteEmprendimientoAction } from '../actions/delete-emprendimiento.action'
 import { Badge } from '@/components/ui/badge'
@@ -216,7 +217,7 @@ export function EmprendimientosTable({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatDate(formulario.fecha_formulario)}
+                    {formatDate(formulario.fecha_formulario, '-')}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
@@ -378,7 +379,7 @@ function EmprendimientoDetailDialog({
             />
             <InfoItem
               label="Fecha"
-              value={formatDate(formulario.fecha_formulario)}
+              value={formatDate(formulario.fecha_formulario, '-')}
             />
             <InfoItem
               label="Código de pago"
@@ -668,11 +669,4 @@ function getTipoOferta(id: number | null) {
   }
 
   return id ? (map[id] ?? `Tipo ${id}`) : 'No especificado'
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return '-'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleDateString('es-EC')
 }

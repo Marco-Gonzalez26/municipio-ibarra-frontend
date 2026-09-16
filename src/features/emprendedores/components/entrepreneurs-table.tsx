@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Emprendedor } from '@/types/entrepreneur.type'
 import type { FormularioReferenciaGeneral } from '@/types/form.type'
+import { formatDate } from '@/lib/date'
 import { EntrepreneurDetailDialog } from './entrepreneur-detail-dialog'
 import { DeleteEntrepreneurDialog } from './delete-entrepeneur-dialog'
 import { ChangeEstadoDialog } from './change-estado-dialog'
@@ -148,9 +149,7 @@ export function EntrepreneursTable({
               const estado = ESTADO_MAP[estadoId]
               const isTerminal = estadoId === 3 || estadoId === 4
               const fecha = formulario
-                ? new Date(formulario.fecha_formulario).toLocaleDateString(
-                    'es-EC'
-                  )
+                ? formatDate(formulario.fecha_formulario, '-')
                 : '-'
 
               return (

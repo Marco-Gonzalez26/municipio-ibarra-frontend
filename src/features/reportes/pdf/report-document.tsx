@@ -1,5 +1,6 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import type { ReportPayload } from '@/features/reportes/types/report.type'
+import { formatDate, formatDateTime } from '@/lib/date'
 
 const styles = StyleSheet.create({
   page: {
@@ -104,9 +105,7 @@ const styles = StyleSheet.create({
 
 function formatFiltroFecha(value?: string) {
   if (!value) return 'Sin límite'
-  return new Date(`${value}T00:00:00`).toLocaleDateString('es-EC', {
-    dateStyle: 'long',
-  })
+  return formatDate(`${value}T00:00:00`, '-')
 }
 
 export function ReportDocument({ payload }: { payload: ReportPayload }) {
@@ -121,11 +120,7 @@ export function ReportDocument({ payload }: { payload: ReportPayload }) {
             {formatFiltroFecha(payload.filters.hasta)}
           </Text>
           <Text style={styles.meta}>
-            Generado el{' '}
-            {payload.generatedAt.toLocaleString('es-EC', {
-              dateStyle: 'long',
-              timeStyle: 'short',
-            })}
+            Generado el {formatDateTime(payload.generatedAt.toISOString())}
           </Text>
         </View>
 

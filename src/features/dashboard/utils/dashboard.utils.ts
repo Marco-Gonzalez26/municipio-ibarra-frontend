@@ -1,4 +1,5 @@
 import type { Emprendedor } from '@/types/entrepreneur.type'
+import { formatDateTime } from '@/lib/date'
 import type {
   CatalogItem,
   ChartItem,
@@ -40,11 +41,7 @@ function normalizeParishName(value: string) {
 }
 
 export function formatUpdatedAt(date: Date) {
-  return new Intl.DateTimeFormat('es-EC', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-    timeZone: 'America/Guayaquil',
-  }).format(date)
+  return formatDateTime(date.toISOString())
 }
 
 export function buildGenderChart(
