@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { ApiError } from '@/lib/https'
+import { isDateExpired } from '@/lib/date'
 import { SESSION_COOKIE } from '../constants'
 import type { Session } from '../types/auth.type'
 
@@ -17,10 +18,17 @@ export async function getSession(): Promise<Session | null> {
   }
 }
 
+// true si la sesión tiene rol con fecha de vencimiento pasada.
+// Las sesiones emitidas antes de rolVenceEl se consideran vigentes.
+export function isSessionRoleExpired(session: Session): boolean {
+  if (!session.usuario.rol) return false
+  return isDateExpired(session.usuario.rolVenceEl)
+}
+
 // Las Server Actions no pasan por proxy.ts, así que revalidan la sesión aquí.
 export async function requireSession(redirectTo?: string): Promise<Session> {
   const session = await getSession()
-  if (!session) {
+  if (!session || isSessionRoleExpired(session)) {
     const redirectUrl = redirectTo
       ? `/iniciar-sesion?redirect_url=${encodeURIComponent(redirectTo)}`
       : '/iniciar-sesion'
@@ -31,7 +39,10 @@ export async function requireSession(redirectTo?: string): Promise<Session> {
 export async function requireAdmin(): Promise<Session> {
   const session = await requireSession('/usuarios')
 
-  if (session.usuario.rol?.codigo !== 'ADMIN') {
+  if (
+    isSessionRoleExpired(session) ||
+    session.usuario.rol?.codigo !== 'ADMIN'
+  ) {
     redirect('/inicio')
   }
 

@@ -31,6 +31,9 @@ export interface AuthUser {
   nombres: string
   requiere_cambio_pass: boolean
   rol: Role | null
+  // Fecha de vencimiento del rol YYYY-MM-DD (null = sin vencimiento).
+  // Las sesiones emitidas antes de este campo se consideran vigentes.
+  rolVenceEl?: string | null
 }
 
 export interface LoginResponse {
