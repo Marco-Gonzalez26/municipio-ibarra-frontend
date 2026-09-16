@@ -41,6 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { ModeloNegocioDTO } from '@/features/modelo-negocio/types/modelo-negocio-api.types'
+import { formatDate, toLocalDate } from '@/lib/date'
 import type { EmprendimientoOpcion } from '../types/ficha.type'
 import { SeleccionarEmprendimientoDialog } from './seleccionar-emprendimiento-dialog'
 import {
@@ -70,23 +71,6 @@ const ESTADO_MAP: Record<
 
 type CampoOrden = 'nombre_emprendimiento' | 'fecha_actualizacion'
 type DireccionOrden = 'asc' | 'desc'
-
-function formatFecha(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleString('es-EC', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Guayaquil',
-  })
-}
-
-function toLocalDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return ''
-  const offset = date.getTimezoneOffset() * 60000
-  return new Date(date.getTime() - offset).toISOString().slice(0, 10)
-}
 
 interface ModeloNegocioListadoProps {
   modelosIniciales: ModeloNegocioDTO[]
@@ -323,7 +307,7 @@ export function ModeloNegocioListado({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatFecha(modelo.fecha_actualizacion)}
+                    {formatDate(modelo.fecha_actualizacion, '-')}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">

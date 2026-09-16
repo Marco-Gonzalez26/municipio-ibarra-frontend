@@ -22,12 +22,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { CreateUserDialog } from './create-user-dialog'
+import { formatDate, formatDateTime } from '@/lib/date'
 import { DeactivateUserDialog } from './deactivate-user-dialog'
 import { EditUserDialog } from './edit-user-dialog'
 import { UnlockUserDialog } from './unlock-user-dialog'
 
 import type { Role } from '../types/user-role.type'
 import type { UsuarioConRol } from '../utils/merge-users-with-roles'
+import { isDateExpired } from '@/lib/date'
 
 interface UsersTableProps {
   users: UsuarioConRol[]
@@ -160,7 +162,7 @@ export function UsersTable({
                     )}
                   </TableCell>
 
-                  <TableCell>{formatDate(user.fecha_registro)}</TableCell>
+                  <TableCell>{formatDate(user.fecha_registro, '-')}</TableCell>
 
                   <TableCell>
                     <div className="flex items-center justify-center gap-1">
@@ -347,13 +349,38 @@ function UserDetailDialog({
 
             <InfoItem
               label="Vigencia desde"
-              value={formatDate(user.fecha_vigencia_desde)}
+              value={formatDate(user.fecha_vigencia_desde, '-')}
             />
 
             <InfoItem
               label="Vigencia hasta"
-              value={formatDate(user.fecha_vigencia_hasta)}
+              value={formatDate(user.fecha_vigencia_hasta, '-')}
             />
+
+            <div>
+              <p className="text-xs text-muted-foreground">Vigencia del rol</p>
+              {user.asignacionRol?.fecha_expiracion ? (
+                isDateExpired(user.asignacionRol.fecha_expiracion) ? (
+                  <Badge
+                    variant="destructive"
+                    className="bg-red-600 text-white hover:bg-red-600/80"
+                  >
+                    Vencido el{' '}
+                    {formatDate(user.asignacionRol.fecha_expiracion, '-')}
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="default"
+                    className="bg-green-600 text-white hover:bg-green-600/80"
+                  >
+                    Vigente hasta{' '}
+                    {formatDate(user.asignacionRol.fecha_expiracion, '-')}
+                  </Badge>
+                )
+              ) : (
+                <p className="text-sm font-medium">Sin vencimiento</p>
+              )}
+            </div>
 
             <InfoItem
               label="Fecha de registro"
@@ -395,35 +422,4 @@ function InfoItem({ label, value }: { label: string; value: string }) {
       <p className="mt-1 break-words text-sm font-medium">{value}</p>
     </div>
   )
-}
-
-function formatDate(value?: string | null) {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleDateString('es-EC')
-}
-
-function formatDateTime(value?: string | null) {
-  if (!value) {
-    return '-'
-  }
-
-  const date = new Date(value)
-
-  if (Number.isNaN(date.getTime())) {
-    return '-'
-  }
-
-  return date.toLocaleString('es-EC', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
 }

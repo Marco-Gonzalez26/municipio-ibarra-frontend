@@ -11,6 +11,7 @@ import type {
   FormularioAsistenciaTecnica,
 } from '@/types/form.type'
 import type { Emprendedor } from '@/types/entrepreneur.type'
+import { formatDate } from '@/lib/date'
 
 const ESTADO_MAP: Record<number, string> = {
   1: 'INGRESADO',
@@ -62,9 +63,7 @@ export function FormularioDetailDialog({
             <div>
               <p className="text-muted-foreground">Fecha</p>
               <p className="font-medium">
-                {new Date(formulario.fecha_formulario).toLocaleDateString(
-                  'es-EC'
-                )}
+                {formatDate(formulario.fecha_formulario, '-')}
               </p>
             </div>
             <div>

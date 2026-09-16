@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { useModeloNegocioWizardStore } from '../store/wizard.store'
+import { formatDate } from '@/lib/date'
 import type { FichaContexto, FichaForm } from '../types/ficha.type'
 import { StepFooter, StepHeader, type StepHandle } from './step-shell'
 
@@ -62,7 +63,10 @@ export const FichaStep = forwardRef<StepHandle, FichaStepProps>(
           <InfoItem label="Cédula" value={contexto.cedula} />
           <InfoItem label="Contacto" value={contexto.contacto} />
           <InfoItem label="Correo electrónico" value={contexto.correo} />
-          <InfoItem label="Fecha de ingreso" value={contexto.fechaIngreso} />
+          <InfoItem
+            label="Fecha de ingreso"
+            value={formatDate(contexto.fechaIngreso, '-')}
+          />
           <InfoItem
             label="Nombre del emprendimiento"
             value={contexto.nombreEmprendimiento ?? 'Sin nombre registrado'}

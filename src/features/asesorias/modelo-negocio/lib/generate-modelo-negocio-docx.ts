@@ -16,6 +16,7 @@ import {
   type IParagraphOptions,
 } from 'docx'
 import type { ModeloNegocioFullData } from '@/types/modelo-negocio-full.type'
+import { formatDate } from '@/lib/date'
 
 // ── Constants ──────────────────────────────────────────────────────
 
@@ -405,7 +406,7 @@ function createFichaPage(data: ModeloNegocioFullData): (Paragraph | Table)[] {
     ['Nombre del Emprendedor', f.nombreEmprendedor],
     ['CI', f.cedula],
     ['Contacto', f.contacto],
-    ['Fecha de ingreso', f.fechaIngreso],
+    ['Fecha de ingreso', formatDate(f.fechaIngreso, '-')],
     ['N° Trámite', f.n_tramite],
     ['Sector', f.sector ?? ''],
     ['Producto', f.producto_linea],
